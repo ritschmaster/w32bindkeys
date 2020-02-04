@@ -25,7 +25,13 @@
 #include "kb.h"
 
 #include <stdlib.h>
-#include <string.h>
+// #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include "logger.h"
+
+static wbk_logger_t logger =  { "kb" };
 
 wbk_be_t *
 wbk_be_new(wbk_mk_t modifier, char key)
@@ -135,5 +141,14 @@ wbk_kb_get_cmd(wbk_kb_t *kb)
 int
 wbk_kb_exec(wbk_kb_t *kb)
 {
-	return system(kb->cmd);
+	pid_t pid;
+
+	pid = fork();
+
+	if (pid == 0) {
+		system(kb->cmd);
+		_exit(EXIT_SUCCESS);
+	}
+
+	return 0;
 }

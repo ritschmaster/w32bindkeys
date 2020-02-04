@@ -25,26 +25,53 @@
 /**
  * @author Richard Bäck
  * @date 29 January 2020
- * @brief File contains win32 utility functions
+ * @brief File contains w32kbman class definition
  */
 
-#ifndef WBK_W32UTIL_H
-#define WBK_W32UTIL_H
+#ifndef WBK_W32KBMAN_H
+#define WBK_W32KBMAN_H
 
 #include <collectc/array.h>
+#include <windows.h>
 
 #include "kbman.h"
+#include "kb.h"
+
+typedef struct wbk_w32_id_kb_s
+{
+	int id;
+	wbk_kb_t *kb;
+} wbk_w32_id_kb_t;
+
+typedef struct wbk_w32kbman_s
+{
+	wbk_kbman_t *kbman;
+
+	/**
+	 * Array of wbk_w32_id_kb_t
+	 */
+	Array *id_kb_arr;
+} wbk_w32kbman_t;
+
+/**
+ * @param kbman The passed object will be freed by the w32kbman!
+ */
+extern wbk_w32kbman_t *
+wbk_w32kbman_new(wbk_kbman_t *kbman);
+
+extern wbk_w32kbman_t *
+wbk_w32kbman_free(wbk_w32kbman_t *kbman);
 
 /**
  * @brief Register key bindings to Windows
  */
 extern int
-wbk_w32util_register_kb(wbk_kbman_t *kbman);
+wbk_w32kbman_register_kb(wbk_w32kbman_t *kbman, HWND window_handler);
 
 /**
  * @brief Exec key bindings
  */
 extern int
-wbk_w32util_exec_kb(wbk_kbman_t *kbman);
+wbk_w32kbman_exec_kb(wbk_w32kbman_t *kbman, int id);
 
-#endif // WBK_W32UTIL_H
+#endif // WBK_W32KBMAN_H

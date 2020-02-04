@@ -49,4 +49,7 @@ wbk_logger_set_level(wbk_loglevel_t level);
 extern int
 wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...);
 
+extern int
+wbk_logger_err(wbk_logger_t *logger, const char *fmt, ...);
+
 #endif // WBK_LOGGER_H

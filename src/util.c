@@ -25,8 +25,11 @@
 #include "util.h"
 
 #include <collectc/array.h>
-
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 char *
 wbk_intarr_to_str(Array *array)
@@ -84,4 +87,23 @@ wbk_intarr_to_str(Array *array)
 	pos = pos + 1;
 
 	return str;
+}
+
+char *
+wbk_path_from_home(const char *relative_path)
+{
+	struct passwd *pw = getpwuid(getuid());
+	char *absolute_path;
+	int length;
+	int pw_dir_length;
+
+	pw_dir_length = strlen(pw->pw_dir);
+	length = pw_dir_length + strlen(relative_path) + 1;
+	absolute_path = malloc(sizeof(char) * length);
+
+	strcpy(absolute_path, pw->pw_dir);
+	absolute_path[pw_dir_length] = '/';
+	strcpy(absolute_path + pw_dir_length + 1, relative_path);
+
+	return absolute_path;
 }

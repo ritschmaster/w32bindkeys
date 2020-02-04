@@ -87,11 +87,14 @@ wbk_w32parser_parse(wbk_w32parser_t *parser)
 	wbk_kbman_t *kbman;
 	wbk_kb_t *kb;
 
-	kbman = wbk_kbman_new();
+	wbk_logger_log(&logger, INFO, "Using config: %s\n", wbk_parser_get_filename(parser->parser));
+
+	kbman = NULL;
 
 	file = fopen(wbk_parser_get_filename(parser->parser), "r");
 
 	if (file != NULL) {
+		kbman = wbk_kbman_new();
 		cmd = NULL;
 		binding = NULL;
 		do {
@@ -116,8 +119,14 @@ wbk_w32parser_parse(wbk_w32parser_t *parser)
 
 			if (cmd != NULL && binding != NULL) {
 				kb = wbk_kb_new(binding, cmd);
+				wbk_kbman_add(kbman, kb);
+				kb = NULL;
+				cmd = NULL;
+				binding = NULL;
 			}
 		} while (character != EOF);
+	} else {
+		wbk_logger_err(&logger, "Could not read config: %s\n", wbk_parser_get_filename(parser->parser));
 	}
 
 	return kbman;
@@ -200,45 +209,45 @@ parse_token(const char *token)
 		copy[i] = (char) tolower(copy[i]); // TODO
 	}
 
-	if (strcpy(copy, "release") == 0) {
+	if (strcmp(copy, "release") == 0) {
 		modifier_key = ENTER;
-	} else if (strcpy(copy,  "control") == 0) {
+	} else if (strcmp(copy,  "control") == 0) {
 		modifier_key = CTRL;
-	} else if (strcpy(copy,  "shift") == 0) {
+	} else if (strcmp(copy,  "shift") == 0) {
 		modifier_key = SHIFT;
-	} else if (strcpy(copy,  "mod1") == 0) {
+	} else if (strcmp(copy,  "mod1") == 0) {
 		modifier_key = ALT;
-	} else if (strcpy(copy,  "mod2") == 0) {
+	} else if (strcmp(copy,  "mod2") == 0) {
 		modifier_key = NUMLOCK;
-	} else if (strcpy(copy,  "mod3") == 0) {
+	} else if (strcmp(copy,  "mod3") == 0) {
 		modifier_key = CAPSLOCK;
-	} else if (strcpy(copy,  "mod4") == 0) {
+	} else if (strcmp(copy,  "mod4") == 0) {
 		modifier_key = WIN;
-	} else if (strcpy(copy,  "mod5") == 0) {
+	} else if (strcmp(copy,  "mod5") == 0) {
 		modifier_key = SCROLL;
-	} else if (strcpy(copy,  "f1") == 0) {
+	} else if (strcmp(copy,  "f1") == 0) {
 		modifier_key = F1;
-	} else if (strcpy(copy,  "f2") == 0) {
+	} else if (strcmp(copy,  "f2") == 0) {
 		modifier_key = F2;
-	} else if (strcpy(copy,  "f3") == 0) {
+	} else if (strcmp(copy,  "f3") == 0) {
 		modifier_key = F3;
-	} else if (strcpy(copy,  "f4") == 0) {
+	} else if (strcmp(copy,  "f4") == 0) {
 		modifier_key = F4;
-	} else if (strcpy(copy,  "f5") == 0) {
+	} else if (strcmp(copy,  "f5") == 0) {
 		modifier_key = F5;
-	} else if (strcpy(copy,  "f6") == 0) {
+	} else if (strcmp(copy,  "f6") == 0) {
 		modifier_key = F6;
-	} else if (strcpy(copy,  "f7") == 0) {
+	} else if (strcmp(copy,  "f7") == 0) {
 		modifier_key = F7;
-	} else if (strcpy(copy,  "f8") == 0) {
+	} else if (strcmp(copy,  "f8") == 0) {
 		modifier_key = F8;
-	} else if (strcpy(copy,  "f9") == 0) {
+	} else if (strcmp(copy,  "f9") == 0) {
 		modifier_key = F9;
-	} else if (strcpy(copy,  "f10") == 0) {
+	} else if (strcmp(copy,  "f10") == 0) {
 		modifier_key = F10;
-	} else if (strcpy(copy,  "f11") == 0) {
+	} else if (strcmp(copy,  "f11") == 0) {
 		modifier_key = F11;
-	} else if (strcpy(copy,  "f12") == 0) {
+	} else if (strcmp(copy,  "f12") == 0) {
 		modifier_key = F12;
 	} else {
 		modifier_key = NOT_A_MODIFIER;

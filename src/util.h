@@ -39,4 +39,11 @@
 extern char *
 wbk_intarr_to_str(Array *array);
 
+/**
+ * @brief Produces an absolute path from the home directory
+ * @return A new string. Free it by yourself.
+ */
+extern char *
+wbk_path_from_home(const char *relative_path);
+
 #endif // WBK_UTIL_H

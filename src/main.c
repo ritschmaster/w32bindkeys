@@ -28,55 +28,119 @@
  * @brief File contains the main function
  */
 
-
+#include <stdlib.h>
 #include <stdio.h>
-
 #include <windows.h>
 
 #include "logger.h"
+#include "util.h"
+#include "w32kbman.h"
 #include "w32parser.h"
-#include "kbman.h"
-#include "w32util.h"
 
-// #define DEFAULT_CONFIG "~/.w32bindkeys"
-#define DEFAULT_CONFIG "/home/user/.w32bindkeys"
+#define DEFAULT_CONFIG ".w32bindkeys"
+
+static const char g_szClassName[] = "myWindowClass";
+
+static wbk_w32kbman_t *kbman = NULL;
+
+static int
+main_loop(HINSTANCE hInstance);
 
 static LRESULT CALLBACK
-wnd_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	char *filename;
 	wbk_w32parser_t *parser;
-	wbk_kbman_t *kbman;
 
 	wbk_logger_set_level(SEVERE);
 	wbk_logger_set_level(INFO);
 
-	parser = wbk_w32parser_new(DEFAULT_CONFIG);
-	kbman = wbk_w32parser_parse(parser);
+	filename = wbk_path_from_home(DEFAULT_CONFIG);
+	parser = wbk_w32parser_new(filename);
+	if (parser != NULL) {
+		kbman = wbk_w32kbman_new(wbk_w32parser_parse(parser));
 
-	wbk_w32util_register_kb(kbman);
+		main_loop(hInstance);
 
-	wbk_w32parser_free(parser);
-	wbk_kbman_free(kbman);
+		wbk_w32parser_free(parser);
+		wbk_w32kbman_free(kbman);
+	}
+	free(filename);
+
+	return 0;
+}
+
+int
+main_loop(HINSTANCE hInstance)
+{
+	WNDCLASSEX wc;
+	HWND hwnd;
+	MSG Msg;
+	PTITLEBARINFO titlebar_info;
+
+	wc.cbSize		= sizeof(WNDCLASSEX);
+	wc.style		 = 0;
+	wc.lpfnWndProc   = window_callback;
+	wc.cbClsExtra	= 0;
+	wc.cbWndExtra	= 0;
+	wc.hInstance	 = hInstance;
+	wc.hIcon		 = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hCursor	   = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wc.lpszMenuName  = NULL;
+	wc.lpszClassName = g_szClassName;
+	wc.hIconSm	   = LoadIcon(NULL, IDI_APPLICATION);
+
+	if(!RegisterClassEx(&wc))
+	{
+		MessageBox(NULL, "Window Registration Failed!", "Error!",
+			MB_ICONEXCLAMATION | MB_OK);
+		return 0;
+	}
+
+
+	hwnd = CreateWindowEx(WS_EX_NOACTIVATE | WS_EX_TOPMOST,
+		                  g_szClassName,
+						  "w32bindkeys",
+						  WS_DISABLED | WS_BORDER,
+						  0, 0,
+						  10, 10,
+						  NULL, NULL, hInstance, NULL);
+
+	UpdateWindow(hwnd);
+
+	wbk_w32kbman_register_kb(kbman, hwnd);
+
+	while(GetMessage(&Msg, NULL, 0, 0) > 0) {
+		TranslateMessage(&Msg);
+		DispatchMessage(&Msg);
+	}
+
 	return 0;
 }
 
 LRESULT CALLBACK
-wnd_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT CALLBACK result;
+	int id;
 
 	result = 0;
 
 	switch(msg)
 	{
-		case WM_HOTKEY:
-			// wbk_w32util_exec_kb(kbman); // TODO
-			break;
+	case WM_CLOSE:
+		DestroyWindow(window_handler);
+		break;
 
-		default:
-			result = DefWindowProc(hwnd, msg, wParam, lParam);
+	case WM_HOTKEY:
+		wbk_w32kbman_exec_kb(kbman, wParam);
+		break;
+
+	default:
+		result = DefWindowProc(window_handler, msg, wParam, lParam);
 	}
 
 	return result;

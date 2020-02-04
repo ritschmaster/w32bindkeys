@@ -28,6 +28,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <time.h>
 
 static wbk_loglevel_t global_level;
 
@@ -40,12 +41,44 @@ wbk_logger_set_level(wbk_loglevel_t level)
 int
 wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...)
 {
+	char *extended_fmt;
+	int length;
 	va_list argptr;
 	va_start(argptr, fmt);
 
 	if (global_level >= level) {
-		vfprintf(stdout, fmt, argptr);
+		length = strlen(fmt) + 6 + 1;
+		extended_fmt = malloc(sizeof(char) * length);
+
+		switch (level) {
+		case INFO:
+			strcpy(extended_fmt, "INFO: ");
+			break;
+
+		case WARNING:
+			strcpy(extended_fmt, "WARN: ");
+			break;
+
+		case SEVERE:
+			strcpy(extended_fmt, "SEVE: ");
+			break;
+		}
+
+		strcpy(extended_fmt + 6, fmt);
+
+		vfprintf(stdout, extended_fmt, argptr);
 	}
+
+	va_end(argptr);
+}
+
+int
+wbk_logger_err(wbk_logger_t *logger, const char *fmt, ...)
+{
+	va_list argptr;
+	va_start(argptr, fmt);
+
+	vfprintf(stderr, fmt, argptr);
 
 	va_end(argptr);
 }

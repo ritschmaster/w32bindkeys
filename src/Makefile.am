@@ -31,8 +31,6 @@ bin_PROGRAMS = w32bindkeys
 
 noinst_LTLIBRARIES = libwbkinterpreter.la libwbkw32interpreter.la
 
-w32bindkeys_SOURCES = main.c
-
 libwbkinterpreter_la_SOURCES = logger.h   \
 							   logger.c   \
 							   util.h     \
@@ -44,20 +42,21 @@ libwbkinterpreter_la_SOURCES = logger.h   \
 	                           parser.h   \
 	                           parser.c
 
-libwbkinterpreter_la_CFLAGS = @collectionc_CFLAGS@
-libwbkinterpreter_la_LDFLAGS = --static
-libwbkinterpreter_la_LIBADD = @collectionc_LIBS@
+libwbkinterpreter_la_CFLAGS = @collectionc_CFLAGS@ 
+libwbkinterpreter_la_LDFLAGS = --static 
+libwbkinterpreter_la_LIBADD = @collectionc_LIBS@ 
 
 libwbkw32interpreter_la_SOURCES = w32parser.h   \
 	                           	  w32parser.c   \
-	                           	  w32util.h     \
-	                           	  w32util.c
+	                           	  w32kbman.h     \
+	                           	  w32kbman.c
 
-libwbkw32interpreter_la_CFLAGS = @collectionc_CFLAGS@
-libwbkw32interpreter_la_LDFLAGS = --static
-libwbkw32interpreter_la_LIBADD = libwbkinterpreter.la @collectionc_LIBS@ #-mwindows
+libwbkw32interpreter_la_CFLAGS = @collectionc_CFLAGS@  
+libwbkw32interpreter_la_LDFLAGS = --static -mwindows
+libwbkw32interpreter_la_LIBADD = libwbkinterpreter.la @collectionc_LIBS@
 
-#w32bindkeys_CFLAGS = -static
+
+w32bindkeys_SOURCES = main.c
 w32bindkeys_LDFLAGS = --static
 w32bindkeys_LDADD = libwbkw32interpreter.la
 
