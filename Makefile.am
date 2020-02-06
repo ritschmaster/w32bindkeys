@@ -28,4 +28,4 @@ endif
 
 SUBDIRS = src tests
 
-EXTRA_DIST = autogen.sh
+EXTRA_DIST = autogen.sh w32bindkeysrc

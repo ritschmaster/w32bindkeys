@@ -1,0 +1,30 @@
+# For the benefit of emacs users: -*- shell-script -*-
+#############################
+# w32bindkeys configuration #
+#############################
+#
+# Version: 0.1
+#
+# If you edit this file, do not forget to uncomment any lines
+# that you change.
+# The pound(#) symbol may be used anywhere for comments.
+#
+# The format of a command line is:
+#    "command to start"
+#       associated key
+#
+#
+# List of modifier:
+#   Release, Control, Shift, Mod1 (Alt), Mod2 (NumLock),
+#   Mod3 (CapsLock), Mod4, Mod5 (Scroll).
+#
+
+# Examples of commands:
+
+"/c/Windows/System32/cmd.exe"
+  control+shift + q
+
+####################################
+# End of w32bindkeys configuration #
+####################################
+
