@@ -104,6 +104,18 @@ wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler)
 				modifiers = modifiers | MOD_SHIFT;
 				break;
 
+			case ENTER:
+				key = VK_RETURN;
+				break;
+
+			case NUMLOCK:
+				key = VK_NUMLOCK;
+				break;
+
+			case CAPSLOCK:
+				key = VK_CAPITAL;
+				break;
+
 			case F1:
 				key = VK_F1;
 				break;
