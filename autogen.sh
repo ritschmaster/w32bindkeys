@@ -25,7 +25,7 @@
 
 function all
 {
-    autoreconf -im && ./configure
+    autoreconf -im && ./configure --enable-debug && make
 }
 
 while getopts ":v" opt; do

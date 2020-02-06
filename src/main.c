@@ -32,16 +32,16 @@
 #include <stdio.h>
 #include <windows.h>
 
+#include "ikbman.h"
+#include "iparser.h"
 #include "logger.h"
 #include "util.h"
-#include "w32kbman.h"
-#include "w32parser.h"
 
 #define DEFAULT_CONFIG ".w32bindkeys"
 
 static const char g_szClassName[] = "myWindowClass";
 
-static wbk_w32kbman_t *kbman = NULL;
+static wbki_kbman_t *kbman = NULL;
 
 static int
 main_loop(HINSTANCE hInstance);
@@ -52,20 +52,20 @@ window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	char *filename;
-	wbk_w32parser_t *parser;
+	wbki_parser_t *parser;
 
 	wbk_logger_set_level(SEVERE);
 	wbk_logger_set_level(INFO);
 
 	filename = wbk_path_from_home(DEFAULT_CONFIG);
-	parser = wbk_w32parser_new(filename);
+	parser = wbki_parser_new(filename);
 	if (parser != NULL) {
-		kbman = wbk_w32kbman_new(wbk_w32parser_parse(parser));
+		kbman = wbki_kbman_new(wbki_parser_parse(parser));
 
 		main_loop(hInstance);
 
-		wbk_w32parser_free(parser);
-		wbk_w32kbman_free(kbman);
+		wbki_parser_free(parser);
+		wbki_kbman_free(kbman);
 	}
 	free(filename);
 
@@ -111,7 +111,7 @@ main_loop(HINSTANCE hInstance)
 
 	UpdateWindow(hwnd);
 
-	wbk_w32kbman_register_kb(kbman, hwnd);
+	wbki_kbman_register_kb(kbman, hwnd);
 
 	while(GetMessage(&Msg, NULL, 0, 0) > 0) {
 		TranslateMessage(&Msg);
@@ -136,7 +136,7 @@ window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HOTKEY:
-		wbk_w32kbman_exec_kb(kbman, wParam);
+		wbki_kbman_exec_kb(kbman, wParam);
 		break;
 
 	default:

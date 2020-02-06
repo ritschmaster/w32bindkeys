@@ -24,54 +24,35 @@
 
 /**
  * @author Richard Bäck
- * @date 29 January 2020
- * @brief File contains w32kbman class definition
+ * @date 30 January 2020
+ * @brief File contains the interpreter parser class definition
  */
 
-#ifndef WBK_W32KBMAN_H
-#define WBK_W32KBMAN_H
+#ifndef WBKI_PARSER_H
+#define WBKI_PARSER_H
 
-#include <collectc/array.h>
-#include <windows.h>
-
+#include "parser.h"
 #include "kbman.h"
-#include "kb.h"
 
-typedef struct wbk_w32_id_kb_s
+typedef struct wbki_parser_s
 {
-	int id;
-	wbk_kb_t *kb;
-} wbk_w32_id_kb_t;
+	wbk_parser_t *parser;
+} wbki_parser_t;
 
-typedef struct wbk_w32kbman_s
-{
-	wbk_kbman_t *kbman;
+extern wbki_parser_t *
+wbki_parser_new(const char *filename);
 
-	/**
-	 * Array of wbk_w32_id_kb_t
-	 */
-	Array *id_kb_arr;
-} wbk_w32kbman_t;
-
-/**
- * @param kbman The passed object will be freed by the w32kbman!
- */
-extern wbk_w32kbman_t *
-wbk_w32kbman_new(wbk_kbman_t *kbman);
-
-extern wbk_w32kbman_t *
-wbk_w32kbman_free(wbk_w32kbman_t *kbman);
-
-/**
- * @brief Register key bindings to Windows
- */
 extern int
-wbk_w32kbman_register_kb(wbk_w32kbman_t *kbman, HWND window_handler);
+wbki_parser_free(wbki_parser_t *parser);
+
+extern wbk_kbman_t *
+wbki_parser_parse(wbki_parser_t *parser);
 
 /**
- * @brief Exec key bindings
+ * @brief Gets the filename used by the parser
+ * @return The filename used by the parser. Do not free the returned string.
  */
-extern int
-wbk_w32kbman_exec_kb(wbk_w32kbman_t *kbman, int id);
+extern const char *
+wbki_parser_get_filename(wbki_parser_t *parser);
 
-#endif // WBK_W32KBMAN_H
+#endif // WBKI_PARSER_H

@@ -55,7 +55,19 @@ AS_HELP_STRING([--enable-debug],
 esac],
 [debug=false])
 
+AC_ARG_ENABLE(installbase,
+AS_HELP_STRING([--enable-install-base],
+               [enable the installing of the libwbkbase library, default: no]),
+[case "${enableval}" in
+             yes) installbase=true ;;
+             no)  installbase=false ;;
+             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-install-base]) ;;
+esac],
+[installbase=false])
+
+
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
+AM_CONDITIONAL(INSTALLBASE, test x"$installbase" = x"true")
 
 # Checks for library functions.
 AC_CONFIG_FILES([Makefile

@@ -29,35 +29,46 @@ endif
 
 bin_PROGRAMS = w32bindkeys
 
-noinst_LTLIBRARIES = libwbkinterpreter.la libwbkw32interpreter.la
+noinst_LTLIBRARIES = libwbkinterpreter.la
+if INSTALLBASE
+lib_LTLIBRARIES = libwbkbase.la
+else
+noinst_LTLIBRARIES += libwbkbase.la
+endif
 
-libwbkinterpreter_la_SOURCES = logger.h   \
-							   logger.c   \
-							   util.h     \
-							   util.c     \
-							   kb.h       \
-                               kb.c       \
-	                           kbman.h    \
-	                           kbman.c    \
-	                           parser.h   \
-	                           parser.c
+nobase_include_HEADERS = wbkbase/logger.h
+nobase_include_HEADERS += wbkbase/util.h
+nobase_include_HEADERS += wbkbase/kb.h
+nobase_include_HEADERS += wbkbase/kbman.h
+nobase_include_HEADERS += wbkbase/ikbman.h
+nobase_include_HEADERS += wbkbase/parser.h
 
-libwbkinterpreter_la_CFLAGS = @collectionc_CFLAGS@ 
-libwbkinterpreter_la_LDFLAGS = --static 
-libwbkinterpreter_la_LIBADD = @collectionc_LIBS@ 
+#libwbkbase_la_SOURCES = logger.h
+libwbkbase_la_SOURCES = logger.c
+#libwbkbase_la_SOURCES += util.h
+libwbkbase_la_SOURCES += util.c
+#libwbkbase_la_SOURCES += kb.h
+libwbkbase_la_SOURCES += kb.c
+#libwbkbase_la_SOURCES += kbman.h
+libwbkbase_la_SOURCES += kbman.c
+#libwbkbase_la_SOURCES += ikbman.h
+libwbkbase_la_SOURCES += ikbman.c
+#libwbkbase_la_SOURCES += parser.h
+libwbkbase_la_SOURCES += parser.c
 
-libwbkw32interpreter_la_SOURCES = w32parser.h   \
-	                           	  w32parser.c   \
-	                           	  w32kbman.h     \
-	                           	  w32kbman.c
+libwbkbase_la_CFLAGS = @collectionc_CFLAGS@
+libwbkbase_la_LDFLAGS = --static -mwindows
+libwbkbase_la_LIBADD = @collectionc_LIBS@
 
-libwbkw32interpreter_la_CFLAGS = @collectionc_CFLAGS@  
-libwbkw32interpreter_la_LDFLAGS = --static -mwindows
-libwbkw32interpreter_la_LIBADD = libwbkinterpreter.la @collectionc_LIBS@
+libwbkinterpreter_la_SOURCES = iparser.h
+libwbkinterpreter_la_SOURCES += iparser.c
 
+libwbkinterpreter_la_CFLAGS = @collectionc_CFLAGS@
+libwbkinterpreter_la_LDFLAGS = --static -mwindows
+libwbkinterpreter_la_LIBADD = libwbkbase.la @collectionc_LIBS@
 
 w32bindkeys_SOURCES = main.c
 w32bindkeys_LDFLAGS = --static
-w32bindkeys_LDADD = libwbkw32interpreter.la
+w32bindkeys_LDADD = libwbkinterpreter.la
 
 

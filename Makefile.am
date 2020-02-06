@@ -1,5 +1,5 @@
 ################################################################################
-# This file is part of b3.
+# This file is part of w32bindkeys.
 #
 # Copyright 2020 Richard Paul Baeck <richard.baeck@mailbox.org>
 #
@@ -24,8 +24,10 @@
 
 if DEBUG
 AM_CFLAGS = -g3 -O0
+AM_LDFLAGS = -g3 -O0
 endif
 
 SUBDIRS = src tests
 
-EXTRA_DIST = autogen.sh w32bindkeysrc
+#EXTRA_DIST = autogen.sh
+EXTRA_DIST = w32bindkeysrc

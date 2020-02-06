@@ -22,7 +22,7 @@
   SOFTWARE.
 *******************************************************************************/
 
-#include "w32kbman.h"
+#include "ikbman.h"
 
 #include <collectc/array.h>
 #include <windows.h>
@@ -30,7 +30,7 @@
 #include "logger.h"
 #include "kbman.h"
 
-static wbk_logger_t logger =  { "w32bkman" };
+static wbk_logger_t logger =  { "ibkman" };
 
 /**
  * @param id_kb_arr Array of wbk_w32_id_kb_t
@@ -38,13 +38,13 @@ static wbk_logger_t logger =  { "w32bkman" };
 static int
 id_kb_arr_free(Array *id_kb_arr);
 
-wbk_w32kbman_t *
-wbk_w32kbman_new(wbk_kbman_t *kbman)
+wbki_kbman_t *
+wbki_kbman_new(wbk_kbman_t *kbman)
 {
-	wbk_w32kbman_t *new;
+	wbki_kbman_t *new;
 
 	new = NULL;
-	new = malloc(sizeof(wbk_w32kbman_t));
+	new = malloc(sizeof(wbki_kbman_t));
 
 	new->kbman = kbman;
 	array_new(&(new->id_kb_arr));
@@ -53,8 +53,8 @@ wbk_w32kbman_new(wbk_kbman_t *kbman)
 
 }
 
-wbk_w32kbman_t *
-wbk_w32kbman_free(wbk_w32kbman_t *kbman)
+wbki_kbman_t *
+wbki_kbman_free(wbki_kbman_t *kbman)
 {
 	id_kb_arr_free(kbman->id_kb_arr);
 	wbk_kbman_free(kbman->kbman);
@@ -62,7 +62,7 @@ wbk_w32kbman_free(wbk_w32kbman_t *kbman)
 }
 
 int
-wbk_w32kbman_register_kb(wbk_w32kbman_t *kbman, HWND window_handler)
+wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler)
 {
 	ArrayIter kb_iter;
 	ArrayIter b_iter;
@@ -73,7 +73,7 @@ wbk_w32kbman_register_kb(wbk_w32kbman_t *kbman, HWND window_handler)
 	UINT modifiers;
 	UINT key;
 	int id;
-	wbk_w32_id_kb_t *id_kb;
+	wbki_id_kb_t *id_kb;
 
 	id_kb_arr_free(kbman->id_kb_arr);
 	kbman->id_kb_arr = NULL;
@@ -162,7 +162,7 @@ wbk_w32kbman_register_kb(wbk_w32kbman_t *kbman, HWND window_handler)
 		}
 
 		if (key != 0) {
-			id_kb = malloc(sizeof(wbk_w32_id_kb_t));
+			id_kb = malloc(sizeof(wbki_id_kb_t));
 			id_kb->id = id;
 			id_kb->kb = kb;
 			array_add(kbman->id_kb_arr, id_kb);
@@ -179,11 +179,11 @@ wbk_w32kbman_register_kb(wbk_w32kbman_t *kbman, HWND window_handler)
 }
 
 int
-wbk_w32kbman_exec_kb(wbk_w32kbman_t *kbman, int id)
+wbki_kbman_exec_kb(wbki_kbman_t *kbman, int id)
 {
 	char found;
 	ArrayIter id_kb_arr_iter;
-	wbk_w32_id_kb_t *id_kb;
+	wbki_id_kb_t *id_kb;
 
 	wbk_logger_log(&logger, INFO, "Id triggered: %d\n", id);
 
@@ -204,7 +204,7 @@ int
 id_kb_arr_free(Array *id_kb_arr)
 {
 	ArrayIter id_kb_arr_iter;
-	wbk_w32_id_kb_t *id_kb;
+	wbki_id_kb_t *id_kb;
 
 	array_iter_init(&id_kb_arr_iter, id_kb_arr);
 	while (array_iter_next(&id_kb_arr_iter, (void *) &id_kb) != CC_ITER_END) {

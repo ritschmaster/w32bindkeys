@@ -22,7 +22,7 @@
   SOFTWARE.
 *******************************************************************************/
 
-#include "w32parser.h"
+#include "iparser.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -33,7 +33,7 @@
 #include "parser.h"
 #include "util.h"
 
-static wbk_logger_t logger =  { "w32parser" };
+static wbk_logger_t logger =  { "iparser" };
 
 typedef enum parser_state_s {
 	NONE,
@@ -53,15 +53,15 @@ parse_token(const char *token);
 wbk_b_t *
 parse_binding(FILE *file, int first_character);
 
-wbk_w32parser_t *
-wbk_w32parser_new(const char *filename)
+wbki_parser_t *
+wbki_parser_new(const char *filename)
 {
-	wbk_w32parser_t *parser;
+	wbki_parser_t *parser;
 	int length;
 
 	parser = NULL;
-	parser = malloc(sizeof(wbk_w32parser_t));
-	memset(parser, 0, sizeof(wbk_w32parser_t));
+	parser = malloc(sizeof(wbki_parser_t));
+	memset(parser, 0, sizeof(wbki_parser_t));
 
 	parser->parser = wbk_parser_new(filename);
 
@@ -69,7 +69,7 @@ wbk_w32parser_new(const char *filename)
 }
 
 int
-wbk_w32parser_free(wbk_w32parser_t *parser)
+wbki_parser_free(wbki_parser_t *parser)
 {
 	wbk_parser_free(parser->parser);
 	free(parser);
@@ -78,7 +78,7 @@ wbk_w32parser_free(wbk_w32parser_t *parser)
 }
 
 wbk_kbman_t *
-wbk_w32parser_parse(wbk_w32parser_t *parser)
+wbki_parser_parse(wbki_parser_t *parser)
 {
 	FILE *file;
 	int character;
