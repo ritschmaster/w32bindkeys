@@ -24,6 +24,7 @@
 
 if DEBUG
 AM_CFLAGS = -I$(top_builddir)/src -g3 -O0
+AM_LDFLAGS = -g3 -O0
 else
 AM_CFLAGS = -I$(top_builddir)/src -O2
 endif

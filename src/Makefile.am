@@ -36,32 +36,27 @@ else
 noinst_LTLIBRARIES += libwbkbase.la
 endif
 
+if INSTALLBASE
 nobase_include_HEADERS = wbkbase/logger.h
 nobase_include_HEADERS += wbkbase/util.h
 nobase_include_HEADERS += wbkbase/kb.h
 nobase_include_HEADERS += wbkbase/kbman.h
 nobase_include_HEADERS += wbkbase/ikbman.h
 nobase_include_HEADERS += wbkbase/parser.h
+endif
 
-#libwbkbase_la_SOURCES = logger.h
-libwbkbase_la_SOURCES = logger.c
-#libwbkbase_la_SOURCES += util.h
-libwbkbase_la_SOURCES += util.c
-#libwbkbase_la_SOURCES += kb.h
-libwbkbase_la_SOURCES += kb.c
-#libwbkbase_la_SOURCES += kbman.h
-libwbkbase_la_SOURCES += kbman.c
-#libwbkbase_la_SOURCES += ikbman.h
-libwbkbase_la_SOURCES += ikbman.c
-#libwbkbase_la_SOURCES += parser.h
-libwbkbase_la_SOURCES += parser.c
+libwbkbase_la_SOURCES = logger.c logger.h
+libwbkbase_la_SOURCES += util.c util.h
+libwbkbase_la_SOURCES += kb.c kb.h
+libwbkbase_la_SOURCES += kbman.c kbman.h
+libwbkbase_la_SOURCES += ikbman.c ikbman.h
+libwbkbase_la_SOURCES += parser.c parser.h
 
 libwbkbase_la_CFLAGS = @collectionc_CFLAGS@
 libwbkbase_la_LDFLAGS = --static -mwindows
 libwbkbase_la_LIBADD = @collectionc_LIBS@
 
-libwbkinterpreter_la_SOURCES = iparser.h
-libwbkinterpreter_la_SOURCES += iparser.c
+libwbkinterpreter_la_SOURCES = iparser.c iparser.h
 
 libwbkinterpreter_la_CFLAGS = @collectionc_CFLAGS@
 libwbkinterpreter_la_LDFLAGS = --static -mwindows
