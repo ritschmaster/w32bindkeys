@@ -45,32 +45,35 @@ PKG_CHECK_MODULES([collectionc], [collectionc >= 3.14.5])
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_ARG_ENABLE(debug,
-AS_HELP_STRING([--enable-debug],
-               [enable debugging, default: no]),
-[case "${enableval}" in
-             yes) debug=true ;;
-             no)  debug=false ;;
-             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
-esac],
-[debug=false])
-
-AC_ARG_ENABLE(installbase,
-AS_HELP_STRING([--enable-install-base],
-               [enable the installing of the libwbkbase library, default: no]),
-[case "${enableval}" in
-             yes) installbase=true ;;
-             no)  installbase=false ;;
-             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-install-base]) ;;
-esac],
-[installbase=false])
-
-
-AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
-AM_CONDITIONAL(INSTALLBASE, test x"$installbase" = x"true")
 
 # Checks for library functions.
+
+# Additional configuration options
+AC_ARG_ENABLE(debug,
+	      AS_HELP_STRING([--enable-debug],
+			     [enable debugging, default: no]),
+			     [case "${enableval}" in
+			      yes) debug=true ;;
+			      no)  debug=false ;;
+			      *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
+		      	      esac],
+			      [debug=false])
+AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
+
+AC_ARG_ENABLE(install-base,
+	      AS_HELP_STRING([--enable-install-base],
+			     [enable the installing of the libwbkbase library, default: no]),
+			     [case "${enableval}" in
+			      yes) installbase=true ;;
+			      no)  installbase=false ;;
+			      *)   AC_MSG_ERROR([bad value ${enableval} for --enable-install-base]) ;;
+		      	      esac],
+			      [installbase=false])
+AM_CONDITIONAL(INSTALLBASE, test x"$installbase" = x"true")
+
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  tests/Makefile])
+AC_CONFIG_MACRO_DIRS([m4])
 AC_OUTPUT
