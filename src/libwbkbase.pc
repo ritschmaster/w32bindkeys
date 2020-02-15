@@ -1,0 +1,11 @@
+prefix=AUTOMAKE_PREFIX
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libwbkbase
+Description: The base functions of w32bindkeys
+Version: AUTOMAKE_VERSION
+Libs: -L${libdir} -lwbkbase
+Cflags: -I${includedir}
+

@@ -74,6 +74,7 @@ wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler)
 	UINT key;
 	int id;
 	wbki_id_kb_t *id_kb;
+	BOOL reg_success;
 
 	id_kb_arr_free(kbman->id_kb_arr);
 	kbman->id_kb_arr = NULL;
@@ -180,9 +181,12 @@ wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler)
 			array_add(kbman->id_kb_arr, id_kb);
 			id_kb = NULL;
 
-			wbk_logger_log(&logger, INFO, "Registering hotkey: %d %c\n", modifiers, key);
-			RegisterHotKey(window_handler, id, modifiers, key);
-			//RegisterHotKey(window_handler, id, MOD_WIN | MOD_ALT, 'X');
+			reg_success = RegisterHotKey(window_handler, id, modifiers, key);
+			if (reg_success) {
+				wbk_logger_log(&logger, INFO, "Registering hotkey: %d %c\n", modifiers, key);
+			} else {
+				wbk_logger_log(&logger, WARNING, "Failed registering hotkey: %d %c\n", modifiers, key);
+			}
 			id++;
 		}
 	}

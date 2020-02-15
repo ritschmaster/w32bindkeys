@@ -66,4 +66,13 @@ w32bindkeys_SOURCES = main.c
 w32bindkeys_LDFLAGS = --static
 w32bindkeys_LDADD = libwbkinterpreter.la
 
+if INSTALLBASE
+install-data-local:
+	mkdir -p $(libdir)/pkgconfig
+	$(INSTALL_DATA) libwbkbase.pc $(libdir)/pkgconfig/
+	sed -i s,AUTOMAKE_PREFIX,$(prefix),g $(libdir)/pkgconfig/libwbkbase.pc
+	sed -i s,AUTOMAKE_VERSION,$(PACKAGE_VERSION),g $(libdir)/pkgconfig/libwbkbase.pc
 
+uninstall-local:
+	rm -f $(libdir)/pkgconfig/libwbkbase.pc
+endif
