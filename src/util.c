@@ -105,7 +105,7 @@ wbk_path_from_home(const char *relative_path)
 	int length;
 	int pw_dir_length;
 
-	SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, home_dir);
+	SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, home_dir);
 
 	pw_dir_length = strlen(home_dir);
 	length = pw_dir_length + strlen(relative_path) + 1;

@@ -29,6 +29,7 @@ Then compile and install Collections-C:
 
 Then compile w32bindkeys:
 
+    export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/mingw64/lib/pkgconfig
     ./configure
     make
 
