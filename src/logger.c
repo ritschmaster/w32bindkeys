@@ -46,7 +46,7 @@ wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...)
 	va_list argptr;
 	va_start(argptr, fmt);
 
-	if (global_level >= level) {
+	if (level >= global_level) {
 		length = strlen(fmt) + 6 + 1;
 		extended_fmt = malloc(sizeof(char) * length);
 

@@ -33,7 +33,7 @@
 
 typedef enum wbk_loglevel_e
 {
-	INFO,
+	INFO = 0,
 	WARNING,
 	SEVERE
 } wbk_loglevel_t;

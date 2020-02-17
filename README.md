@@ -13,7 +13,9 @@ You will need a functioning MinGW environment. This sections describes the compi
 
 First install the dependencies:
 
-    pacman -S gcc make cmake automake autoconf
+    pacman -S gcc make cmake automake autoconf mingw-w64-x86_64-gcc
+
+Use the __MSYS2 MinGW 64-bit__ Terminal for the next actions and everytime you want to re-compile w32bindkeys.
 
 Then compile and install Collections-C:
 
@@ -23,7 +25,7 @@ Then compile and install Collections-C:
     sed -i s/add_subdirectory\(test\)//g CMakeLists.txt # Testing is not needed
     mkdir build
     cd build
-    cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    cmake -DCMAKE_INSTALL_PREFIX=/mingw64 ..
 
 Then compile w32bindkeys:
 
@@ -34,7 +36,7 @@ If you want to re-use the core functionality you may supply a special option to 
 
     ./configure --enable-install-base
 
-Afterwards you may install w32bindkeys - depending on your MinGW environment - by performing:
+Afterwards you may install w32bindkeys by performing:
 
     make install
 

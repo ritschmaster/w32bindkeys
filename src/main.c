@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 /**
- * @author Richard Bäck
+ * @author Richard BÃ¤ck
  * @date 26 January 2020
  * @brief File contains the main function
  */
@@ -41,7 +41,7 @@
 
 static const char g_szClassName[] = "myWindowClass";
 
-static wbki_kbman_t *kbman = NULL;
+static wbki_kbman_t *g_kbman = NULL;
 
 static int
 main_loop(HINSTANCE hInstance);
@@ -53,19 +53,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	char *filename;
 	wbki_parser_t *parser;
+	wbk_kbman_t *kbman;
 
 	wbk_logger_set_level(SEVERE);
 	wbk_logger_set_level(INFO);
 
 	filename = wbk_path_from_home(DEFAULT_CONFIG);
 	parser = wbki_parser_new(filename);
-	if (parser != NULL) {
-		kbman = wbki_kbman_new(wbki_parser_parse(parser));
+	if (parser) {
+		kbman = wbki_parser_parse(parser);
+		if (kbman) {
+			g_kbman = wbki_kbman_new(kbman);
 
-		main_loop(hInstance);
+			main_loop(hInstance);
 
-		wbki_parser_free(parser);
-		wbki_kbman_free(kbman);
+			wbki_parser_free(parser);
+			wbki_kbman_free(g_kbman);
+		}
 	}
 	free(filename);
 
@@ -111,7 +115,7 @@ main_loop(HINSTANCE hInstance)
 
 	UpdateWindow(hwnd);
 
-	wbki_kbman_register_kb(kbman, hwnd);
+	wbki_kbman_register_kb(g_kbman, hwnd);
 
 	while(GetMessage(&Msg, NULL, 0, 0) > 0) {
 		TranslateMessage(&Msg);
@@ -136,7 +140,7 @@ window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HOTKEY:
-		wbki_kbman_exec_kb(kbman, wParam);
+		wbki_kbman_exec_kb(g_kbman, wParam);
 		break;
 
 	default:
@@ -145,3 +149,4 @@ window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	return result;
 }
+

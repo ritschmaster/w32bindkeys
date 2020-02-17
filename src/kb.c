@@ -25,9 +25,12 @@
 #include "kb.h"
 
 #include <stdlib.h>
-// #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#if defined(WIN32)
+#include <windows.h>
+#endif
 
 #include "logger.h"
 
@@ -141,6 +144,14 @@ wbk_kb_get_cmd(wbk_kb_t *kb)
 int
 wbk_kb_exec(wbk_kb_t *kb)
 {
+#if defined(WIN32)
+	if (system(kb->cmd)) {
+		wbk_logger_log(&logger, WARNING, "Exec failed: %s\n", kb->cmd);
+	} else {
+		wbk_logger_log(&logger, INFO, "Exec: %s\n", kb->cmd);
+	}
+#else
+
 	pid_t pid;
 
 	pid = fork();
@@ -149,6 +160,7 @@ wbk_kb_exec(wbk_kb_t *kb)
 		system(kb->cmd);
 		_exit(EXIT_SUCCESS);
 	}
+#endif
 
 	return 0;
 }
