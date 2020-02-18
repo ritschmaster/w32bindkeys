@@ -3,7 +3,7 @@
 # w32bindkeys configuration #
 #############################
 #
-# Version: 0.1
+# Version: 0.2
 #
 # If you edit this file, do not forget to uncomment any lines
 # that you change.
@@ -18,10 +18,13 @@
 #   Release, Control, Shift, Mod1 (Alt), Mod2 (NumLock),
 #   Mod3 (CapsLock), Mod4, Mod5 (Scroll).
 #
+# Info: Mod4 is actually reserved for Windows itself. You may
+# tinker a bit if you want to use it!
+#
 
 # Examples of commands:
 
-"/c/Windows/System32/cmd.exe"
+"start cmd.exe"
   control+shift + q
 
 ####################################

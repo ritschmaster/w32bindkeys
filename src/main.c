@@ -37,7 +37,7 @@
 #include "logger.h"
 #include "util.h"
 
-#define DEFAULT_CONFIG ".w32bindkeys"
+#define DEFAULT_CONFIG ".w32bindkeysrc"
 
 static const char g_szClassName[] = "myWindowClass";
 
