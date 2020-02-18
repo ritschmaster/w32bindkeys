@@ -41,16 +41,16 @@ typedef enum parser_state_s {
 	BINDING
 } parser_state_t;
 
-void
+static void
 parse_comment(FILE *file);
 
-char *
+static char *
 parse_cmd(FILE *file);
 
-wbk_mk_t
+static wbk_mk_t
 parse_token(const char *token);
 
-wbk_b_t *
+static wbk_b_t *
 parse_binding(FILE *file, int first_character);
 
 wbki_parser_t *
@@ -149,46 +149,58 @@ parse_cmd(FILE *file)
 	int *character;
 	int quotes;
 	Array *line;
+	int length;
+	int last_quote;
+	int last_hashtag;
+	int i;
 
 	array_new(&line);
+
+	character = malloc(sizeof(int));
+	*character = '"';
+	array_add(line, character);
+
 	quotes = 1;
 	do {
 		character = malloc(sizeof(int));
 		*character = fgetc(file);
 
 		switch(*character) {
-		case '"':
-			quotes++;
-			break;
-
-		case '#':
-			if (quotes % 2 == 0) {
-				parse_comment(file);
-				*character = EOF;
-			}
-			break;
-
 		case '\n':
 			*character = EOF;
 			break;
 
-		default:
-			if (*character != EOF) {
-				array_add(line, character);
-			}
+		case '"':
+			quotes++;
+			last_quote = length;
+			break;
+
+		case '#':
+			last_hashtag = length;
+			break;
+		}
+
+		if (*character != EOF) {
+			array_add(line, character);
+			length++;
 		}
 	} while(*character != EOF);
 
 	if (quotes % 2 == 0) {
+		if (last_hashtag > last_quote) {
+			for (i = length; length > last_quote; i--) {
+				array_remove_at(line, i, free);
+			}
+		}
 		cmd = wbk_intarr_to_str(line);
+		wbk_logger_log(&logger, INFO, "Parsed command: %s\n", cmd);
 	} else {
-		cmd = NULL;
-		// TODO throw error
+		cmd = wbk_intarr_to_str(line);
+		wbk_logger_log(&logger, SEVERE, "Failed parsing command: %s\n", cmd);
 	}
 
 	array_destroy_cb(line, free);
 
-	wbk_logger_log(&logger, INFO, "Parsed command: %s\n", cmd);
 
 	return cmd;
 }
