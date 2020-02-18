@@ -148,7 +148,7 @@ wbk_kb_exec(wbk_kb_t *kb)
 	if (system(kb->cmd)) {
 		wbk_logger_log(&logger, WARNING, "Exec failed: %s\n", kb->cmd);
 	} else {
-		wbk_logger_log(&logger, INFO, "Exec: %s\n", kb->cmd);
+		wbk_logger_log(&logger, SEVERE, "Exec: %s\n", kb->cmd);
 	}
 #else
 
@@ -157,7 +157,11 @@ wbk_kb_exec(wbk_kb_t *kb)
 	pid = fork();
 
 	if (pid == 0) {
-		system(kb->cmd);
+		if (system(kb->cmd)) {
+			wbk_logger_log(&logger, WARNING, "Exec failed: %s\n", kb->cmd);
+		} else {
+			wbk_logger_log(&logger, SEVERE, "Exec: %s\n", kb->cmd);
+		}
 		_exit(EXIT_SUCCESS);
 	}
 #endif

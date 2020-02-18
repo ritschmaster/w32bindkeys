@@ -185,7 +185,7 @@ wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler)
 			if (reg_success) {
 				wbk_logger_log(&logger, INFO, "Registering hotkey: %d %c\n", modifiers, key);
 			} else {
-				wbk_logger_log(&logger, WARNING, "Failed registering hotkey: %d %c\n", modifiers, key);
+				wbk_logger_log(&logger, SEVERE, "Failed registering hotkey: %d %c\n", modifiers, key);
 			}
 			id++;
 		}
