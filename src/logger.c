@@ -30,6 +30,34 @@
 #include <stdarg.h>
 #include <time.h>
 
+/**
+ * - 4 characters for the year
+ * - 1 character for a dash
+ * - 2 characters for the month
+ * - 1 character for a dash
+ * - 2 characters for the day
+ *
+ * - 1 character for a blank
+ *
+ * - 2 characters for the hour
+ * - 1 character for a colon
+ * - 2 characters for the minute
+ * - 1 character for a colon
+ * - 2 characters for the second
+ *
+ * - 1 character for a blank
+ * - 4 characters for the log level
+ * - 1 character for a colon
+ * - 1 character for a blank
+ */
+#define FMT_ADDITIONAL_LEN 26
+
+#define FMT "%04d-%02d-%02d %02d:%02d:%02d %s: "
+
+#define LEVEL_INFO "INFO"
+#define LEVEL_WARNING "WARN"
+#define LEVEL_SEVERE "SEVE"
+
 static wbk_loglevel_t global_level;
 
 int
@@ -43,33 +71,49 @@ wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...)
 {
 	char *extended_fmt;
 	int length;
+	time_t rawtime;
+	struct tm *tm;
 	va_list argptr;
-	va_start(argptr, fmt);
 
 	if (level >= global_level) {
-		length = strlen(fmt) + 6 + 1;
+		time(&rawtime);
+		tm = gmtime(&rawtime);
+
+		length = strlen(fmt) + FMT_ADDITIONAL_LEN + 1;
 		extended_fmt = malloc(sizeof(char) * length);
 
 		switch (level) {
 		case INFO:
-			strcpy(extended_fmt, "INFO: ");
+			sprintf(extended_fmt, FMT,
+					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+					tm->tm_hour, tm->tm_min, tm->tm_sec,
+					LEVEL_INFO);
 			break;
 
 		case WARNING:
-			strcpy(extended_fmt, "WARN: ");
+			sprintf(extended_fmt, FMT,
+					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+					tm->tm_hour, tm->tm_min, tm->tm_sec,
+					LEVEL_WARNING);
 			break;
 
 		case SEVERE:
-			strcpy(extended_fmt, "SEVE: ");
+			sprintf(extended_fmt, FMT,
+					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+					tm->tm_hour, tm->tm_min, tm->tm_sec,
+					LEVEL_SEVERE);
 			break;
 		}
 
-		strcpy(extended_fmt + 6, fmt);
+		strcpy(extended_fmt + FMT_ADDITIONAL_LEN, fmt);
 
+
+		va_start(argptr, fmt);
 		vfprintf(stdout, extended_fmt, argptr);
+		va_end(argptr);
 	}
 
-	va_end(argptr);
+	return 0;
 }
 
 int
@@ -82,3 +126,4 @@ wbk_logger_err(wbk_logger_t *logger, const char *fmt, ...)
 
 	va_end(argptr);
 }
+
