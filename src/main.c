@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 /**
- * @author Richard BÃ¤ck
+ * @author Richard Bäck
  * @date 26 January 2020
  * @brief File contains the main function
  */
@@ -31,17 +31,38 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
+#include <getopt.h>
 
+#include "../config.h"
 #include "ikbman.h"
 #include "iparser.h"
 #include "logger.h"
 #include "util.h"
 
-#define DEFAULT_CONFIG ".w32bindkeysrc"
+#define B3_DEFAULT_CONFIG ".w32bindkeysrc"
+
+#define B3_GETOPT_OPTIONS "hvV"
+
+static struct option B3_GETOPT_LONG_OPTIONS[] = {
+    /*   NAME       ARGUMENT           FLAG  SHORTNAME */
+        {"help",    no_argument,       NULL, 'h'},
+        {"verbose", no_argument,       NULL, 'v'},
+        {"version", no_argument,       NULL, 'V'},
+        {NULL,      0,                 NULL, 0}
+    };
 
 static const char g_szClassName[] = "myWindowClass";
 
 static wbki_kbman_t *g_kbman = NULL;
+
+static int
+print_version(void);
+
+static int
+print_help(const char *cmd_name);
+
+static int
+parameterized_main(HINSTANCE hInstance);
 
 static int
 main_loop(HINSTANCE hInstance);
@@ -51,29 +72,116 @@ window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	LPWSTR *wargv;
+	char **argv;
+	int argc;
+	int i;
+	size_t size;
+	int opt;
+	int option_index;
+
+	wbk_logger_set_level(SEVERE);
+
+	wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
+	if (wargv) {
+		argv = malloc(sizeof(char *) * argc);
+		for (i = 0; i < argc; i++) {
+			size = sizeof(char) * (sizeof(wchar_t) * wcslen(wargv[i]) + 1);
+			argv[i] = malloc(size);
+			memset(argv[i], 0, size);
+			wcstombs(argv[i], wargv[i], size);
+		}
+
+		option_index = 0;
+		while ((opt = getopt_long(argc, argv,
+								  B3_GETOPT_OPTIONS,
+								  B3_GETOPT_LONG_OPTIONS,
+								  &option_index))
+				!= -1) {
+			switch(opt) {
+			case 'v':
+				return print_version();
+				break;
+
+			case 'V':
+				wbk_logger_set_level(INFO);
+				break;
+
+			case 'h':
+			default:
+				return print_help(argv[0]);
+			}
+		}
+
+		free(argv);
+		LocalFree(wargv);
+	}
+
+	return parameterized_main(hInstance);
+}
+
+int
+print_version(void)
+{
+	fprintf(stdout, "%s version %s\n", PACKAGE, PACKAGE_VERSION);
+	return 0;
+}
+
+int
+print_help(const char *cmd_name)
+{
+	print_version();
+
+	fprintf(stdout, "Usage: %s [options]\n", cmd_name);
+	fprintf(stdout, "  where options are:\n", cmd_name);
+	fprintf(stdout, "  -V, --version          Print version and exit\n", cmd_name);
+	fprintf(stdout, "  -v, --verbose          More information on w32bindkeys when it run\n", cmd_name);
+	fprintf(stdout, "  -h, --help             This help!\n", cmd_name);
+
+	return 0;
+}
+
+int
+parameterized_main(HINSTANCE hInstance)
+{
+	int error;
 	char *filename;
 	wbki_parser_t *parser;
 	wbk_kbman_t *kbman;
 
-	wbk_logger_set_level(SEVERE);
-	wbk_logger_set_level(INFO);
+	error = 0;
 
-	filename = wbk_path_from_home(DEFAULT_CONFIG);
-	parser = wbki_parser_new(filename);
-	if (parser) {
+	if (!error) {
+		filename = wbk_path_from_home(B3_DEFAULT_CONFIG);
+		parser = wbki_parser_new(filename);
+		if (!parser) {
+			error = 1;
+		}
+		free(filename);
+	}
+
+	if (!error) {
 		kbman = wbki_parser_parse(parser);
-		if (kbman) {
-			g_kbman = wbki_kbman_new(kbman);
-
-			main_loop(hInstance);
-
-			wbki_parser_free(parser);
-			wbki_kbman_free(g_kbman);
+		if (!kbman) {
+			error = 1;
 		}
 	}
-	free(filename);
 
-	return 0;
+	if (!error) {
+		g_kbman = wbki_kbman_new(kbman);
+
+		error = main_loop(hInstance);
+	}
+
+	if (parser) {
+		wbki_parser_free(parser);
+	}
+
+	if (g_kbman) {
+		wbki_kbman_free(g_kbman);
+	}
+
+	return error;
 }
 
 int
@@ -149,4 +257,5 @@ window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	return result;
 }
+
 
