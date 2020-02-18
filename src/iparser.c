@@ -160,6 +160,9 @@ parse_cmd(FILE *file)
 	*character = '"';
 	array_add(line, character);
 
+	length = 1;
+	last_quote = 0;
+	last_hashtag = 0;
 	quotes = 1;
 	do {
 		character = malloc(sizeof(int));
@@ -188,8 +191,9 @@ parse_cmd(FILE *file)
 
 	if (quotes % 2 == 0) {
 		if (last_hashtag > last_quote) {
-			for (i = length; length > last_quote; i--) {
-				array_remove_at(line, i, free);
+			for (i = length; i > last_quote; i--) {
+				array_remove_at(line, i, (void *)&character);
+				free(character);
 			}
 		}
 		cmd = wbk_intarr_to_str(line);
