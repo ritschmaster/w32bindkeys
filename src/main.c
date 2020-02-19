@@ -99,11 +99,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 								  &option_index))
 				!= -1) {
 			switch(opt) {
-			case 'v':
+			case 'V':
 				return print_version();
 				break;
 
-			case 'V':
+			case 'v':
 				wbk_logger_set_level(INFO);
 				break;
 
