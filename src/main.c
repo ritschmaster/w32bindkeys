@@ -32,24 +32,31 @@
 #include <stdio.h>
 #include <windows.h>
 #include <getopt.h>
+#include <unistd.h>
 
 #include "../config.h"
-#include "ikbman.h"
-#include "iparser.h"
 #include "logger.h"
 #include "util.h"
+#include "datafinder.h"
+#include "ikbman.h"
+#include "iparser.h"
 
-#define B3_DEFAULT_CONFIG ".w32bindkeysrc"
+#define WBK_RC ".w32bindkeysrc"
 
-#define B3_GETOPT_OPTIONS "hvV"
+#define WBK_DEFAULTS_RC "w32bindkeysrc"
+
+#define WBK_GETOPT_OPTIONS "dhvV"
 
 static struct option B3_GETOPT_LONG_OPTIONS[] = {
-    /*   NAME       ARGUMENT           FLAG  SHORTNAME */
-        {"help",    no_argument,       NULL, 'h'},
-        {"verbose", no_argument,       NULL, 'v'},
-        {"version", no_argument,       NULL, 'V'},
-        {NULL,      0,                 NULL, 0}
+    /*   NAME          ARGUMENT           FLAG  SHORTNAME */
+        {"help",       no_argument,       NULL, 'h'},
+        {"verbose",    no_argument,       NULL, 'v'},
+        {"version",    no_argument,       NULL, 'V'},
+        {"defaults",   no_argument,       NULL, 'd'},
+        {NULL,         0,                 NULL, 0}
     };
+
+static wbk_logger_t logger = { "main" };
 
 static const char g_szClassName[] = "myWindowClass";
 
@@ -62,7 +69,10 @@ static int
 print_help(const char *cmd_name);
 
 static int
-parameterized_main(HINSTANCE hInstance);
+print_defaults(const wbk_datafinder_t *datafinder);
+
+static int
+parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder);
 
 static int
 main_loop(HINSTANCE hInstance);
@@ -72,6 +82,9 @@ window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	wbk_datafinder_t *datafinder;
+	int ret;
+	char exec;
 	LPWSTR *wargv;
 	char **argv;
 	int argc;
@@ -81,6 +94,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int option_index;
 
 	wbk_logger_set_level(SEVERE);
+
+	datafinder = wbk_datafinder_new(PKGDATADIR);
+	exec = 1;
 
 	wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
 	if (wargv) {
@@ -94,22 +110,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		option_index = 0;
 		while ((opt = getopt_long(argc, argv,
-								  B3_GETOPT_OPTIONS,
+								  WBK_GETOPT_OPTIONS,
 								  B3_GETOPT_LONG_OPTIONS,
 								  &option_index))
 				!= -1) {
 			switch(opt) {
-			case 'V':
-				return print_version();
-				break;
-
 			case 'v':
 				wbk_logger_set_level(INFO);
 				break;
 
+			case 'V':
+				ret = print_version();
+				exec = 0;
+				break;
+
+			case 'd':
+				ret = print_defaults(datafinder);
+				exec = 0;
+				break;
+
 			case 'h':
 			default:
-				return print_help(argv[0]);
+				ret = print_help(argv[0]);
+				exec = 0;
 			}
 		}
 
@@ -117,7 +140,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		LocalFree(wargv);
 	}
 
-	return parameterized_main(hInstance);
+	if (exec) {
+		ret = parameterized_main(hInstance, datafinder);
+	}
+
+	wbk_datafinder_free(datafinder);
+
+	return ret;
 }
 
 int
@@ -135,6 +164,7 @@ print_help(const char *cmd_name)
 	fprintf(stdout, "Usage: %s [options]\n", cmd_name);
 	fprintf(stdout, "  where options are:\n", cmd_name);
 	fprintf(stdout, "  -V, --version          Print version and exit\n", cmd_name);
+	fprintf(stdout, "  -d, --defaults         Print a default rc file\n", cmd_name);
 	fprintf(stdout, "  -v, --verbose          More information on w32bindkeys when it run\n", cmd_name);
 	fprintf(stdout, "  -h, --help             This help!\n", cmd_name);
 
@@ -142,22 +172,60 @@ print_help(const char *cmd_name)
 }
 
 int
-parameterized_main(HINSTANCE hInstance)
+print_defaults(const wbk_datafinder_t *datafinder)
+{
+	char *defaults_rc;
+
+	defaults_rc = wbk_datafinder_gen_path(datafinder, WBK_DEFAULTS_RC);
+
+	if (defaults_rc) {
+		wbk_write_file(defaults_rc, stdout);
+		free(defaults_rc);
+	}
+
+	return 0;
+}
+
+int
+parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 {
 	int error;
-	char *filename;
+	char *rc_filename;
+	char *defaults_rc_filename;
+	FILE *rc_file;
 	wbki_parser_t *parser;
 	wbk_kbman_t *kbman;
 
 	error = 0;
+	rc_filename = NULL;
+	rc_file = NULL;
+	parser = NULL;
+	kbman = NULL;
 
 	if (!error) {
-		filename = wbk_path_from_home(B3_DEFAULT_CONFIG);
-		parser = wbki_parser_new(filename);
+		rc_filename = wbk_path_from_home(WBK_RC);
+		if(access(rc_filename, F_OK)) {
+			/**
+			 * Create WBK_RC by WBK_DEFAULTS_RC
+			 */
+			defaults_rc_filename = wbk_datafinder_gen_path(datafinder, WBK_DEFAULTS_RC);
+			if (defaults_rc_filename) {
+				wbk_logger_log(&logger, INFO, "Copy %s to %s: %s\n", defaults_rc_filename, rc_filename);
+				rc_file = fopen(rc_filename, "w");
+				wbk_write_file(defaults_rc_filename, rc_file);
+				fclose(rc_file);
+				rc_file = NULL;
+			} else {
+				error = 1;
+			}
+		}
+	}
+
+	if (!error) {
+		parser = wbki_parser_new(rc_filename);
 		if (!parser) {
 			error = 1;
 		}
-		free(filename);
 	}
 
 	if (!error) {
@@ -171,6 +239,10 @@ parameterized_main(HINSTANCE hInstance)
 		g_kbman = wbki_kbman_new(kbman);
 
 		error = main_loop(hInstance);
+	}
+
+	if (rc_filename) {
+		free(rc_filename);
 	}
 
 	if (parser) {

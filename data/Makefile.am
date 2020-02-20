@@ -22,9 +22,4 @@
 # SOFTWARE.
 ################################################################################
 
-if DEBUG
-AM_CFLAGS = -g -O0
-AM_LDFLAGS = -g -O0
-endif
-
-SUBDIRS = src tests data
+pkgdata_DATA = w32bindkeysrc

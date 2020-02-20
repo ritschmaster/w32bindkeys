@@ -48,6 +48,8 @@ PKG_CHECK_MODULES([collectionc], [collectionc >= 3.14.5])
 
 # Checks for library functions.
 
+# Define header constants
+
 # Additional configuration options
 AC_ARG_ENABLE(debug,
 	      AS_HELP_STRING([--enable-debug],
@@ -74,6 +76,7 @@ AM_CONDITIONAL(INSTALLBASE, test x"$installbase" = x"true")
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 tests/Makefile])
+                 tests/Makefile
+                 data/Makefile])
 AC_CONFIG_MACRO_DIRS([m4])
 AC_OUTPUT

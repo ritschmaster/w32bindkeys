@@ -87,7 +87,7 @@ wbk_b_add(wbk_b_t *b, wbk_be_t *be)
 }
 
 Array *
-wbk_b_get_comb(wbk_b_t *b)
+wbk_b_get_comb(const wbk_b_t *b)
 {
 	return b->comb;
 }
@@ -129,20 +129,20 @@ wbk_kb_free(wbk_kb_t *kb)
 	return 0;
 }
 
-wbk_b_t *
-wbk_kb_get_comb(wbk_kb_t *kb)
+const wbk_b_t *
+wbk_kb_get_comb(const wbk_kb_t *kb)
 {
 	return kb->comb;
 }
 
 const char *
-wbk_kb_get_cmd(wbk_kb_t *kb)
+wbk_kb_get_cmd(const wbk_kb_t *kb)
 {
 	return kb->cmd;
 }
 
 int
-wbk_kb_exec(wbk_kb_t *kb)
+wbk_kb_exec(const wbk_kb_t *kb)
 {
 #if defined(WIN32)
 	if (system(kb->cmd)) {
@@ -151,7 +151,6 @@ wbk_kb_exec(wbk_kb_t *kb)
 		wbk_logger_log(&logger, INFO, "Exec: %s\n", kb->cmd);
 	}
 #else
-
 	pid_t pid;
 
 	pid = fork();

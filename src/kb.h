@@ -105,7 +105,7 @@ wbk_b_add(wbk_b_t *b, wbk_be_t *be);
  * @return
  */
 extern Array *
-wbk_b_get_comb(wbk_b_t *b);
+wbk_b_get_comb(const wbk_b_t *b);
 
 
 /**
@@ -126,23 +126,23 @@ wbk_kb_free(wbk_kb_t *kb);
 
 /**
  * @brief Gets the combinations of a key binding
- * @return The combinations of a key binding. Do not free it. It is an array of wbk_b_t.
+ * @return The combinations of a key binding. It is an array of wbk_b_t.
  */
-extern wbk_b_t *
-wbk_kb_get_comb(wbk_kb_t *kb);
+extern const wbk_b_t *
+wbk_kb_get_comb(const wbk_kb_t *kb);
 
 /**
  * @brief Gets the command of a key binding
  * @return The command of a key binding. Do not free it.
  */
 extern const char *
-wbk_kb_get_cmd(wbk_kb_t *kb);
+wbk_kb_get_cmd(const wbk_kb_t *kb);
 
 /**
  * @brief Execute the command of a key binding
  * @return Non-0 if the execution failed
  */
 extern int
-wbk_kb_exec(wbk_kb_t *kb);
+wbk_kb_exec(const wbk_kb_t *kb);
 
 #endif // WBK_KB_H

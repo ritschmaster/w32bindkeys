@@ -37,6 +37,9 @@
 #include <pwd.h>
 #endif
 
+#include "logger.h"
+
+static wbk_logger_t logger = { "logger" };
 
 char *
 wbk_intarr_to_str(Array *array)
@@ -132,4 +135,23 @@ wbk_path_from_home(const char *relative_path)
 #endif
 
 	return absolute_path;
+}
+
+int
+wbk_write_file(const char *src_path, FILE *dest)
+{
+	FILE *src;
+	int character;
+
+	src = fopen(src_path, "r");
+	if (src) {
+		do {
+			character = fgetc(src);
+			if (character != EOF) {
+				putc(character, dest);
+			}
+		} while (character != EOF);
+	} else {
+		wbk_logger_log(&logger, SEVERE, "Could not read file: %s\n", src_path);
+	}
 }

@@ -22,9 +22,11 @@
 # SOFTWARE.
 ################################################################################
 
+AM_CFLAGS = -D PKGDATADIR=\"$(pkgdatadir)\"
+
 if DEBUG
-AM_CFLAGS = -g3 -O0
-AM_LDFLAGS = -g3 -O0
+AM_CFLAGS += -g -O0
+AM_LDFLAGS = -g -O0
 endif
 
 bin_PROGRAMS = w32bindkeys
@@ -47,6 +49,7 @@ endif
 
 libwbkbase_la_SOURCES = logger.c logger.h
 libwbkbase_la_SOURCES += util.c util.h
+libwbkbase_la_SOURCES += datafinder.c datafinder.h
 libwbkbase_la_SOURCES += kb.c kb.h
 libwbkbase_la_SOURCES += kbman.c kbman.h
 libwbkbase_la_SOURCES += ikbman.c ikbman.h

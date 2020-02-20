@@ -23,31 +23,43 @@
 *******************************************************************************/
 
 /**
- * @author Richard BÃ¤ck
- * @date 29 January 2020
- * @brief File contains utility functions
+ * @author Richard Bäck
+ * @date 2020-02-20
+ * @brief File contains the data finder class definition
  */
 
-#ifndef WBK_UTIL_H
-#define WBK_UTIL_H
+#ifndef WBK_DATAFINDER_H
+#define WBK_DATAFINDER_H
 
-#include <collectc/array.h>
-#include <stdio.h>
+typedef struct wbk_datafinder_s
+{
+	char *datadir;
 
-/**
- * @return A new string. Free it by yourself.
- */
-extern char *
-wbk_intarr_to_str(Array *array);
+	/**
+	 * Length of datadir. It includes the terminating byte.
+	 */
+	int datadir_len;
 
-/**
- * @brief Produces an absolute path from the home directory
- * @return A new string. Free it by yourself.
- */
-extern char *
-wbk_path_from_home(const char *relative_path);
+	char *execdir;
+
+	/**
+	 * Length of exec_dir. It includes the terminating byte.
+	 */
+	int execdir_len;
+} wbk_datafinder_t;
+
+extern wbk_datafinder_t *
+wbk_datafinder_new(const char *datadir);
 
 extern int
-wbk_write_file(const char *src_path, FILE *dest);
+wbk_datafinder_free(wbk_datafinder_t *datafinder);
 
-#endif // WBK_UTIL_H
+/**
+ * @param data_file The base name of a file to search for.
+ * @return A new string containing the absolute path to data_file, free it
+ *         yourself. If NULL, then the file could not be found.
+ */
+extern char *
+wbk_datafinder_gen_path(const wbk_datafinder_t *datafinder, const char *data_file);
+
+#endif // WBK_DATAFINDER_H

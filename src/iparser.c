@@ -126,7 +126,7 @@ wbki_parser_parse(wbki_parser_t *parser)
 			}
 		} while (character != EOF);
 	} else {
-		wbk_logger_err(&logger, "Could not read config: %s\n", wbk_parser_get_filename(parser->parser));
+		wbk_logger_log(&logger, SEVERE, "Could not read config: %s\n", wbk_parser_get_filename(parser->parser));
 	}
 
 	return kbman;
