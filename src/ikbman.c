@@ -25,6 +25,7 @@
 #include "ikbman.h"
 
 #include <collectc/array.h>
+#include <collectc/treeset.h>
 #include <windows.h>
 
 #include "logger.h"
@@ -57,7 +58,9 @@ wbki_kbman_t *
 wbki_kbman_free(wbki_kbman_t *kbman)
 {
 	id_kb_arr_free(kbman->id_kb_arr);
+	kbman->id_kb_arr = NULL;
 	wbk_kbman_free(kbman->kbman);
+	kbman->kbman = NULL;
 	free(kbman);
 }
 
@@ -66,7 +69,7 @@ wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler)
 {
 	ArrayIter kb_iter;
 	ArrayIter b_iter;
-	ArrayIter be_iter;
+	TreeSetIter be_iter;
 	wbk_kb_t *kb;
 	wbk_b_t *b;
 	wbk_be_t *be;
@@ -85,8 +88,8 @@ wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler)
 	while (array_iter_next(&kb_iter, (void *) &kb) != CC_ITER_END) {
 		modifiers = 0;
 		key = 0;
-		array_iter_init(&be_iter, wbk_b_get_comb(wbk_kb_get_comb(kb)));
-		while (array_iter_next(&be_iter, (void *) &be) != CC_ITER_END) {
+		treeset_iter_init(&be_iter, wbk_b_get_comb(wbk_kb_get_comb(kb)));
+		while (treeset_iter_next(&be_iter, (void *) &be) != CC_ITER_END) {
 			wbk_logger_log(&logger, INFO, "Binding element: %d %c\n", be->modifier, be->key);
 			switch(be->modifier) {
 			case WIN:

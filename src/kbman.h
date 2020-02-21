@@ -72,7 +72,7 @@ wbk_kbman_add(wbk_kbman_t *kbman, wbk_kb_t *kb);
 
 /**
  * @brief Execute a key binding matching a combination
- * @return Non-0 if the execution failed
+ * @return Non-0 if the combination was not found.
  */
 extern int
 wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *comb);

@@ -32,6 +32,7 @@
 #define WBK_KB_H
 
 #include <collectc/array.h>
+#include <collectc/treeset.h>
 
 /**
  * @brief Modifier key
@@ -75,11 +76,14 @@ typedef struct wbk_be_s
 typedef struct wbk_b_s
 {
 	/**
-	 * Array of wbk_be_t
+	 * TreeSet of wbk_be_t.
 	 */
-	Array *comb;
+	TreeSet *comb;
 } wbk_b_t;
 
+/**
+ * @brief Keyboard binding
+ */
 typedef struct wbk_kb_s
 {
 	wbk_b_t *comb;
@@ -89,6 +93,9 @@ typedef struct wbk_kb_s
 extern wbk_be_t *
 wbk_be_new(wbk_mk_t modifier, char key);
 
+extern int
+wbk_be_free(wbk_be_t *be);
+
 extern wbk_b_t *
 wbk_b_new();
 
@@ -96,15 +103,24 @@ extern int
 wbk_b_free(wbk_b_t *b);
 
 /**
+ * @brief Add a binding element.
  * @param be Binding element to add. Contents will be copied
+ * @return 0 if the element was added. Non-0 otherwise.
  */
 extern int
-wbk_b_add(wbk_b_t *b, wbk_be_t *be);
+wbk_b_add(wbk_b_t *b, const wbk_be_t *be);
+
+/**
+ * @param be Binding element to remove.
+ * @return 0 if the element was removed. Non-0 otherwise.
+ */
+extern int
+wbk_b_remove(wbk_b_t *b, const wbk_be_t *be);
 
 /**
  * @return
  */
-extern Array *
+extern TreeSet *
 wbk_b_get_comb(const wbk_b_t *b);
 
 

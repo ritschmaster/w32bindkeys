@@ -25,6 +25,7 @@
 #include "kbman.h"
 
 #include <stdlib.h>
+#include <collectc/treeset.h>
 
 #include "logger.h"
 
@@ -46,7 +47,8 @@ wbk_kbman_new(void)
 int
 wbk_kbman_free(wbk_kbman_t *kbman)
 {
-	array_destroy_cb(kbman->kb, free);
+	array_destroy_cb(kbman->kb, free); // TODO wbk_kb_free
+	kbman->kb = NULL;
 	free(kbman);
 	return 0;
 }
@@ -66,11 +68,12 @@ wbk_kbman_add(wbk_kbman_t *kbman, wbk_kb_t *kb)
 int
 wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *comb)
 {
+	int ret;
 	char found;
 
 	ArrayIter kb_iter;
-	ArrayIter kb_be_iter;
-	ArrayIter be_iter;
+	TreeSetIter kb_be_iter;
+	TreeSetIter be_iter;
 
 	wbk_kb_t *kb;
 	wbk_be_t *kb_be;
@@ -79,17 +82,22 @@ wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *comb)
 	int kb_be_ret;
 	int be_ret;
 
+	ret = -1;
+
+
+	wbk_logger_log(&logger, INFO, "trying.\n");
+
 	found = 0;
 	array_iter_init(&kb_iter, kbman->kb);
 	while (array_iter_next(&kb_iter, (void *) &kb) != CC_ITER_END &&
 		   !found) {
-		array_iter_init(&kb_be_iter, wbk_b_get_comb(wbk_kb_get_comb(kb)));
-		array_iter_init(&be_iter, wbk_b_get_comb(comb));
+		treeset_iter_init(&kb_be_iter, wbk_b_get_comb(wbk_kb_get_comb(kb)));
+		treeset_iter_init(&be_iter, wbk_b_get_comb(comb));
 
 		found = 0;
 		do {
-			kb_be_ret = array_iter_next(&kb_be_iter, (void *) &kb_be);
-			be_ret = array_iter_next(&be_iter, (void *) &be);
+			kb_be_ret = treeset_iter_next(&kb_be_iter, (void *) &kb_be);
+			be_ret = treeset_iter_next(&be_iter, (void *) &be);
 
 			if (kb_be_ret != CC_ITER_END &&
 				be_ret != CC_ITER_END &&
@@ -104,5 +112,8 @@ wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *comb)
 
 	if (found) {
 		wbk_kb_exec(kb);
+		ret = 0;
 	}
+
+	return ret;
 }

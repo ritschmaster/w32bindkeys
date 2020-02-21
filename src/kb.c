@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <collectc/treeset.h>
 
 #if defined(WIN32)
 #include <windows.h>
@@ -35,6 +36,32 @@
 #include "logger.h"
 
 static wbk_logger_t logger =  { "kb" };
+
+static int
+be_cmp(const void *k1, const void *k2);
+
+int
+be_cmp(const void *k1, const void *k2)
+{
+	wbk_be_t *be_a;
+	wbk_be_t *be_b;
+
+	int a;
+	int b;
+
+    be_a = (wbk_be_t *) k1;
+    be_b = (wbk_be_t *) k2;
+
+    a = be_a->modifier + be_a->key;
+    b = be_b->modifier + be_a->key;
+
+    if (a < b)
+        return -1;
+    else if (a > b)
+        return 1;
+    else
+        return 0;
+}
 
 wbk_be_t *
 wbk_be_new(wbk_mk_t modifier, char key)
@@ -50,6 +77,14 @@ wbk_be_new(wbk_mk_t modifier, char key)
 	return be;
 }
 
+int
+wbk_be_free(wbk_be_t *be)
+{
+	free(be);
+
+	return 0;
+}
+
 wbk_b_t *
 wbk_b_new()
 {
@@ -58,7 +93,7 @@ wbk_b_new()
 	b = NULL;
 	b = malloc(sizeof(wbk_b_t));
 
-	if (array_new(&(b->comb))) {
+	if (treeset_new(be_cmp, &(b->comb))) {
 		free(b);
 		b = NULL;
 	}
@@ -69,24 +104,82 @@ wbk_b_new()
 int
 wbk_b_free(wbk_b_t *b)
 {
-	array_destroy_cb(b->comb, free);
+	TreeSetIter be_iter;
+	wbk_be_t *my_be;
+
+	my_be = NULL;
+	treeset_iter_init(&be_iter, wbk_b_get_comb(b));
+	while (treeset_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END) {
+		treeset_iter_remove(&be_iter, NULL);
+		wbk_be_free(my_be);
+		my_be = NULL;
+	}
+
+	treeset_destroy(b->comb);
 	b->comb = NULL;
+
 	free(b);
 	return 0;
 }
 
 int
-wbk_b_add(wbk_b_t *b, wbk_be_t *be)
+wbk_b_add(wbk_b_t *b, const wbk_be_t *be)
 {
+	int ret;
+//	ArrayIter be_iter;
+//	wbk_be_t *my_be;
 	wbk_be_t *copy;
 
-	copy = malloc(sizeof(wbk_be_t));
-	copy = be;
+//	ret = 0;
+//	array_iter_init(&be_iter, wbk_b_get_comb(b));
+//	while (array_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && !ret) {
+//		if (my_be->modifier == be->modifier
+//			&& my_be->key == be->key) {
+//			ret = 1;
+//		}
+//	}
+//
+//	if (!ret) {
+//		copy = wbk_be_new(be->modifier, be->key);
+//		array_add(b->comb, copy);
+//	}
 
-	return array_add(b->comb, copy);
+	copy = wbk_be_new(be->modifier, be->key);
+
+	if (treeset_add(b->comb, copy) == CC_OK) {
+		ret = 0;
+	} else {
+		ret = 1;
+	}
+
+	return ret;
 }
 
-Array *
+int
+wbk_b_remove(wbk_b_t *b, const wbk_be_t *be)
+{
+	int ret;
+	TreeSetIter be_iter;
+	wbk_be_t *my_be;
+
+	ret = 1;
+
+	my_be = NULL;
+	treeset_iter_init(&be_iter, wbk_b_get_comb(b));
+	while (treeset_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && ret) {
+		if (my_be->modifier == be->modifier
+			&& my_be->key == be->key) {
+			treeset_iter_remove(&be_iter, NULL);
+			wbk_be_free(my_be);
+			my_be = NULL;
+			ret = 0; /** removed */
+		}
+	}
+
+	return ret;
+}
+
+TreeSet *
 wbk_b_get_comb(const wbk_b_t *b)
 {
 	return b->comb;
