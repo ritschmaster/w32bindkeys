@@ -30,7 +30,7 @@ Then compile and install Collections-C:
 Then compile w32bindkeys:
 
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/mingw64/lib/pkgconfig
-    ./configure
+    ./autogen.sh
     make
 
 If you want to re-use the core functionality you may supply a special option to the `configure` script that will produce a dynamic installable library:
