@@ -25,7 +25,6 @@
 #include "kbman.h"
 
 #include <stdlib.h>
-#include <collectc/treeset.h>
 
 #include "logger.h"
 
@@ -66,48 +65,21 @@ wbk_kbman_add(wbk_kbman_t *kbman, wbk_kb_t *kb)
 }
 
 int
-wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *comb)
+wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b)
 {
 	int ret;
 	char found;
-
 	ArrayIter kb_iter;
-	TreeSetIter kb_be_iter;
-	TreeSetIter be_iter;
-
 	wbk_kb_t *kb;
-	wbk_be_t *kb_be;
-	wbk_be_t *be;
-
-	int kb_be_ret;
-	int be_ret;
 
 	ret = -1;
 
-
-	wbk_logger_log(&logger, INFO, "trying.\n");
-
 	found = 0;
-	array_iter_init(&kb_iter, kbman->kb);
-	while (array_iter_next(&kb_iter, (void *) &kb) != CC_ITER_END &&
-		   !found) {
-		treeset_iter_init(&kb_be_iter, wbk_b_get_comb(wbk_kb_get_comb(kb)));
-		treeset_iter_init(&be_iter, wbk_b_get_comb(comb));
-
-		found = 0;
-		do {
-			kb_be_ret = treeset_iter_next(&kb_be_iter, (void *) &kb_be);
-			be_ret = treeset_iter_next(&be_iter, (void *) &be);
-
-			if (kb_be_ret != CC_ITER_END &&
-				be_ret != CC_ITER_END &&
-				kb_be->modifier == be->modifier &&
-				kb_be->key == be->key) {
-				found = 1;
-			}
-		} while (kb_be_ret != CC_ITER_END &&
-				 be_ret != CC_ITER_END &&
-				 !found);
+	array_iter_init(&kb_iter, wbk_kbman_get_kb(kbman));
+	while (!found && array_iter_next(&kb_iter, (void *) &kb) != CC_ITER_END) {
+		if (wbk_b_compare(wbk_kb_get_binding(kb), b) == 0) {
+			found = 1;
+		}
 	}
 
 	if (found) {

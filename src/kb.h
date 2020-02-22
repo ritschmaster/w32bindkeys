@@ -32,13 +32,12 @@
 #define WBK_KB_H
 
 #include <collectc/array.h>
-#include <collectc/treeset.h>
 
 /**
  * @brief Modifier key
  */
 typedef enum wbk_mk_e {
-	NOT_A_MODIFIER,
+	NOT_A_MODIFIER = 0,
 	WIN,
 	ALT,
 	CTRL,
@@ -76,9 +75,9 @@ typedef struct wbk_be_s
 typedef struct wbk_b_s
 {
 	/**
-	 * TreeSet of wbk_be_t.
+	 * Array of wbk_be_t. Actually it is a Set.
 	 */
-	TreeSet *comb;
+	Array *comb;
 } wbk_b_t;
 
 /**
@@ -86,7 +85,7 @@ typedef struct wbk_b_s
  */
 typedef struct wbk_kb_s
 {
-	wbk_b_t *comb;
+	wbk_b_t *binding;
 	char *cmd;
 } wbk_kb_t;
 
@@ -95,6 +94,20 @@ wbk_be_new(wbk_mk_t modifier, char key);
 
 extern int
 wbk_be_free(wbk_be_t *be);
+
+extern wbk_mk_t
+wbk_be_get_modifier(wbk_be_t *be);
+
+extern char
+wbk_be_get_key(wbk_be_t *be);
+
+/**
+ * @param be
+ * @param other
+ * @return If be < other, then < 0. If be > other, then > 0. If be = other, then 0.
+ */
+extern int
+wbk_be_compare(const wbk_be_t *be, const wbk_be_t *other);
 
 extern wbk_b_t *
 wbk_b_new();
@@ -118,9 +131,24 @@ extern int
 wbk_b_remove(wbk_b_t *b, const wbk_be_t *be);
 
 /**
+ * @param be Binding element to check.
+ * @return Non-0 if the binding element is within the binding. 0 otherwise.
+ */
+extern int
+wbk_b_contains(wbk_b_t *b, const wbk_be_t *be);
+
+/**
+ * @param b
+ * @param other
+ * @return If b < other, then < 0. If b > other, then > 0. If b = other, then 0.
+ */
+extern int
+wbk_b_compare(const wbk_b_t *b, const wbk_b_t *other);
+
+/**
  * @return
  */
-extern TreeSet *
+extern Array *
 wbk_b_get_comb(const wbk_b_t *b);
 
 
@@ -145,7 +173,7 @@ wbk_kb_free(wbk_kb_t *kb);
  * @return The combinations of a key binding. It is an array of wbk_b_t.
  */
 extern const wbk_b_t *
-wbk_kb_get_comb(const wbk_kb_t *kb);
+wbk_kb_get_binding(const wbk_kb_t *kb);
 
 /**
  * @brief Gets the command of a key binding

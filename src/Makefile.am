@@ -25,7 +25,8 @@
 AM_CFLAGS = -D PKGDATADIR=\"$(pkgdatadir)\"
 
 if DEBUG
-AM_CFLAGS += -g -O0
+AM_CFLAGS += -g -O0 
+AM_CFLAGS += -D DEBUG_ENABLED=1
 AM_LDFLAGS = -g -O0
 endif
 

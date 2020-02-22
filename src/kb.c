@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <collectc/treeset.h>
 
 #if defined(WIN32)
 #include <windows.h>
@@ -40,27 +39,30 @@ static wbk_logger_t logger =  { "kb" };
 static int
 be_cmp(const void *k1, const void *k2);
 
+static int
+wbk_be_compare_key(char a, char b);
+
+int
+wbk_be_compare_key(char a, char b)
+{
+	if (a < b)
+        return -1;
+    else if (a > b)
+        return 1;
+    else
+        return 0;
+}
+
 int
 be_cmp(const void *k1, const void *k2)
 {
 	wbk_be_t *be_a;
 	wbk_be_t *be_b;
 
-	int a;
-	int b;
+    be_a = *(wbk_be_t **) k1;
+    be_b = *(wbk_be_t **) k2;
 
-    be_a = (wbk_be_t *) k1;
-    be_b = (wbk_be_t *) k2;
-
-    a = be_a->modifier + be_a->key;
-    b = be_b->modifier + be_a->key;
-
-    if (a < b)
-        return -1;
-    else if (a > b)
-        return 1;
-    else
-        return 0;
+    return wbk_be_compare(be_a, be_b);
 }
 
 wbk_be_t *
@@ -85,6 +87,37 @@ wbk_be_free(wbk_be_t *be)
 	return 0;
 }
 
+wbk_mk_t
+wbk_be_get_modifier(wbk_be_t *be)
+{
+	return be->modifier;
+}
+
+char
+wbk_be_get_key(wbk_be_t *be)
+{
+	return be->key;
+}
+
+int
+wbk_be_compare(const wbk_be_t *be, const wbk_be_t *other)
+{
+	int ret;
+
+	if (be->modifier && other->modifier) {
+		if (be->modifier < other->modifier)
+			ret = -1;
+		else if (be->modifier > other->modifier)
+			ret = 1;
+		else
+			ret = 0;
+	} else {
+		ret = wbk_be_compare_key(be->key, other->key);
+	}
+
+	return ret;
+}
+
 wbk_b_t *
 wbk_b_new()
 {
@@ -93,7 +126,7 @@ wbk_b_new()
 	b = NULL;
 	b = malloc(sizeof(wbk_b_t));
 
-	if (treeset_new(be_cmp, &(b->comb))) {
+	if (array_new(&(b->comb))) {
 		free(b);
 		b = NULL;
 	}
@@ -104,18 +137,7 @@ wbk_b_new()
 int
 wbk_b_free(wbk_b_t *b)
 {
-	TreeSetIter be_iter;
-	wbk_be_t *my_be;
-
-	my_be = NULL;
-	treeset_iter_init(&be_iter, wbk_b_get_comb(b));
-	while (treeset_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END) {
-		treeset_iter_remove(&be_iter, NULL);
-		wbk_be_free(my_be);
-		my_be = NULL;
-	}
-
-	treeset_destroy(b->comb);
+	array_destroy_cb(b->comb, free);
 	b->comb = NULL;
 
 	free(b);
@@ -126,32 +148,26 @@ int
 wbk_b_add(wbk_b_t *b, const wbk_be_t *be)
 {
 	int ret;
-//	ArrayIter be_iter;
-//	wbk_be_t *my_be;
+	ArrayIter be_iter;
+	wbk_be_t *my_be;
 	wbk_be_t *copy;
 
-//	ret = 0;
-//	array_iter_init(&be_iter, wbk_b_get_comb(b));
-//	while (array_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && !ret) {
-//		if (my_be->modifier == be->modifier
-//			&& my_be->key == be->key) {
-//			ret = 1;
-//		}
-//	}
-//
-//	if (!ret) {
-//		copy = wbk_be_new(be->modifier, be->key);
-//		array_add(b->comb, copy);
-//	}
+	ret = 0;
 
-	copy = wbk_be_new(be->modifier, be->key);
-
-	if (treeset_add(b->comb, copy) == CC_OK) {
-		ret = 0;
-	} else {
-		ret = 1;
+	my_be = NULL;
+	array_iter_init(&be_iter, wbk_b_get_comb(b));
+	while (array_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && !ret) {
+		if (my_be->modifier == be->modifier
+			&& my_be->key == be->key) {
+			ret = 1;
+		}
 	}
 
+	if (!ret) {
+		copy = wbk_be_new(be->modifier, be->key);
+		array_add(b->comb, copy);
+		array_sort(b->comb, be_cmp);
+	}
 	return ret;
 }
 
@@ -159,27 +175,96 @@ int
 wbk_b_remove(wbk_b_t *b, const wbk_be_t *be)
 {
 	int ret;
-	TreeSetIter be_iter;
+	ArrayIter be_iter;
 	wbk_be_t *my_be;
 
 	ret = 1;
 
 	my_be = NULL;
-	treeset_iter_init(&be_iter, wbk_b_get_comb(b));
-	while (treeset_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && ret) {
+	array_iter_init(&be_iter, wbk_b_get_comb(b));
+	while (array_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && ret) {
 		if (my_be->modifier == be->modifier
 			&& my_be->key == be->key) {
-			treeset_iter_remove(&be_iter, NULL);
+			array_iter_remove(&be_iter, NULL);
 			wbk_be_free(my_be);
 			my_be = NULL;
 			ret = 0; /** removed */
 		}
 	}
 
+	if (!ret) {
+		array_sort(b->comb, be_cmp);
+	}
+
 	return ret;
 }
 
-TreeSet *
+int
+wbk_b_contains(wbk_b_t *b, const wbk_be_t *be)
+{
+	char found;
+	ArrayIter be_iter;
+	wbk_be_t *my_be;
+
+	found = 0;
+	array_iter_init(&be_iter, wbk_b_get_comb(b));
+	while (array_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && !found) {
+		if (my_be->modifier == be->modifier
+			&& my_be->key == be->key) {
+			found = 1;
+		}
+	}
+
+	found = 0;
+	return found;
+}
+
+int
+wbk_b_compare(const wbk_b_t *b, const wbk_b_t *other)
+{
+	wbk_be_t *b_be;
+	wbk_be_t *other_be;
+
+	char found;
+
+	int other_be_len;
+	int b_be_len;
+
+	int i;
+	int j;
+
+	found = 0;
+
+	i = -1;
+	j = -1;
+	other_be_len = array_size(wbk_b_get_comb(other));
+	b_be_len = array_size(wbk_b_get_comb(b));
+
+	found = 1;
+	do {
+		i++;
+		j++;
+		if ((i < other_be_len && j >= b_be_len)
+			|| (i >= other_be_len && j < b_be_len)) {
+			found = 0;
+		} else {
+
+		array_get_at(wbk_b_get_comb(other), i, (void *) &other_be);
+		array_get_at(wbk_b_get_comb(b), j, (void *) &b_be);
+
+		if (other_be->modifier != b_be->modifier
+			|| other_be->key != b_be->key) {
+			found = 0;
+		}
+		}
+	} while (i < other_be_len &&
+			 j < other_be_len &&
+			 found);
+
+	return !found;
+}
+
+Array *
 wbk_b_get_comb(const wbk_b_t *b)
 {
 	return b->comb;
@@ -196,7 +281,7 @@ wbk_kb_new(wbk_b_t *comb, char *cmd)
 	memset(kb, 0, sizeof(wbk_kb_t));
 
 	if (kb != NULL) {
-		kb->comb = comb;
+		kb->binding = comb;
 	}
 
 	if (kb != NULL) {
@@ -209,9 +294,9 @@ wbk_kb_new(wbk_b_t *comb, char *cmd)
 int
 wbk_kb_free(wbk_kb_t *kb)
 {
-	if (kb->comb) {
-		wbk_b_free(kb->comb);
-		kb->comb = NULL;
+	if (kb->binding) {
+		wbk_b_free(kb->binding);
+		kb->binding = NULL;
 	}
 
 	if (kb->cmd) {
@@ -223,9 +308,9 @@ wbk_kb_free(wbk_kb_t *kb)
 }
 
 const wbk_b_t *
-wbk_kb_get_comb(const wbk_kb_t *kb)
+wbk_kb_get_binding(const wbk_kb_t *kb)
 {
-	return kb->comb;
+	return kb->binding;
 }
 
 const char *

@@ -54,6 +54,7 @@
 
 #define FMT "%04d-%02d-%02d %02d:%02d:%02d %s: "
 
+#define LEVEL_DEBUG "DEBU"
 #define LEVEL_INFO "INFO"
 #define LEVEL_WARNING "WARN"
 #define LEVEL_SEVERE "SEVE"
@@ -83,6 +84,13 @@ wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...)
 		extended_fmt = malloc(sizeof(char) * length);
 
 		switch (level) {
+		case DEBUG:
+			sprintf(extended_fmt, FMT,
+					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
+					tm->tm_hour, tm->tm_min, tm->tm_sec,
+					LEVEL_DEBUG);
+			break;
+
 		case INFO:
 			sprintf(extended_fmt, FMT,
 					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
