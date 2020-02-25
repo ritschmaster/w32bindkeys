@@ -40,6 +40,7 @@
 #include "datafinder.h"
 #include "ikbman.h"
 #include "iparser.h"
+#include "kb.h"
 
 #define WBK_RC ".w32bindkeysrc"
 
@@ -259,11 +260,6 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 
 	return error;
 }
-
-#include <collectc/array.h>
-#include <sys/time.h>
-
-#include "kb.h"
 
 /**
  * @param c The result of GetAsyncKeyState

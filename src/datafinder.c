@@ -65,11 +65,11 @@ wbk_datafinder_gen_path(const wbk_datafinder_t *datafinder, const char *data_fil
 
 	data_file_len = strlen(data_file) + 1;
 
-	absolute_path = malloc(sizeof(char) * (datafinder->datadir_len + data_file_len));
-	strcpy(absolute_path, datafinder->datadir);
-	if (datafinder->datadir[0] != '\0') {
-		absolute_path[datafinder->datadir_len - 1] = '/';
-		strcpy(absolute_path + datafinder->datadir_len, data_file);
+	absolute_path = malloc(sizeof(char) * (datafinder->execdir_len + data_file_len));
+	strcpy(absolute_path, datafinder->execdir);
+	if (datafinder->execdir[0] != '\0') {
+		absolute_path[datafinder->execdir_len - 1] = '/';
+		strcpy(absolute_path + datafinder->execdir_len, data_file);
 	} else {
 		strcpy(absolute_path, data_file);
 	}
@@ -78,11 +78,11 @@ wbk_datafinder_gen_path(const wbk_datafinder_t *datafinder, const char *data_fil
 	if(access(absolute_path, F_OK)) {
 		free(absolute_path);
 
-		absolute_path = malloc(sizeof(char) * (datafinder->execdir_len + data_file_len));
-		strcpy(absolute_path, datafinder->execdir);
-		if (datafinder->execdir[0] != '\0') {
-			absolute_path[datafinder->execdir_len - 1] = '/';
-			strcpy(absolute_path + datafinder->execdir_len, data_file);
+		absolute_path = malloc(sizeof(char) * (datafinder->datadir_len + data_file_len));
+		strcpy(absolute_path, datafinder->datadir);
+		if (datafinder->datadir[0] != '\0') {
+			absolute_path[datafinder->datadir_len - 1] = '/';
+			strcpy(absolute_path + datafinder->datadir_len, data_file);
 		} else {
 			strcpy(absolute_path, data_file);
 		}

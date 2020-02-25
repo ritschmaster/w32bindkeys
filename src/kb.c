@@ -42,6 +42,9 @@ be_cmp(const void *k1, const void *k2);
 static int
 wbk_be_compare_key(char a, char b);
 
+static DWORD WINAPI
+wbk_kbthread_exec(LPVOID param);
+
 int
 wbk_be_compare_key(char a, char b)
 {
@@ -319,14 +322,32 @@ wbk_kb_get_cmd(const wbk_kb_t *kb)
 	return kb->cmd;
 }
 
+DWORD WINAPI
+wbk_kbthread_exec(LPVOID param)
+{
+	char *cmd;
+
+	cmd = (char *) param;
+
+	return system(cmd);
+}
+
 int
 wbk_kb_exec(const wbk_kb_t *kb)
 {
 #if defined(WIN32)
-	if (system(kb->cmd)) {
-		wbk_logger_log(&logger, SEVERE, "Exec failed: %s\n", kb->cmd);
-	} else {
+	HANDLE thread_handler;
+
+	thread_handler = CreateThread(NULL,
+					 0,
+					 wbk_kbthread_exec,
+					 kb->cmd,
+					 0,
+					 NULL);
+	if (thread_handler) {
 		wbk_logger_log(&logger, INFO, "Exec: %s\n", kb->cmd);
+	} else {
+		wbk_logger_log(&logger, SEVERE, "Exec failed: %s\n", kb->cmd);
 	}
 #else
 	pid_t pid;
