@@ -80,3 +80,8 @@ wbk_kc_get_binding(const wbk_kc_t *kc)
 	return kc->binding;
 }
 
+int
+wbk_kc_exec(const wbk_kc_t *kc)
+{
+	return 1;
+}

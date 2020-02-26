@@ -60,4 +60,11 @@ wbk_kc_free(wbk_kc_t *kc);
 extern const wbk_b_t *
 wbk_kc_get_binding(const wbk_kc_t *kc);
 
+/**
+ * @brief Execute the command of a key binding command
+ * @return Non-0 if the execution failed
+ */
+extern int
+wbk_kc_exec(const wbk_kc_t *kc);
+
 #endif // WBK_KB_H
