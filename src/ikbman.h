@@ -35,43 +35,42 @@
 #include <windows.h>
 
 #include "kbman.h"
-#include "kb.h"
+#include "kc_sys.h"
 
-typedef struct wbki_id_kb_s
+typedef struct wbki_kbman_s
 {
-	int id;
-	wbk_kb_t *kb;
-} wbki_id_kb_t;
-
-typedef struct wbk_w32kbman_s
-{
-	wbk_kbman_t *kbman;
-
 	/**
-	 * Array of wbk_w32_id_kb_t
+	 * Array of wbk_kc_sys *
 	 */
-	Array *id_kb_arr;
+	Array *kc_sys;
 } wbki_kbman_t;
 
 /**
- * @param kbman The passed object will be freed by the w32kbman!
  */
 extern wbki_kbman_t *
-wbki_kbman_new(wbk_kbman_t *kbman);
+wbki_kbman_new();
 
 extern wbki_kbman_t *
 wbki_kbman_free(wbki_kbman_t *kbman);
 
 /**
- * @brief Register key bindings to Windows
+ * @brief Gets the key bindings of a key binding manager
+ * @return Array of wbk_kc_sys *
  */
-extern int
-wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler);
+extern Array *
+wbki_kbman_get_kb(wbki_kbman_t* kbman);
 
 /**
- * @brief Exec key bindings
+ * @param kb The key binding to add. The added key binding will be freed by the key binding manager
  */
 extern int
-wbki_kbman_exec_kb(wbki_kbman_t *kbman, int id);
+wbki_kbman_add(wbki_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
+
+/**
+  * @brief Execute a key binding matching a combination
+ * @return Non-0 if the combination was not found.
+ */
+extern int
+wbki_kbman_exec(wbki_kbman_t *kbman, wbk_b_t *b);
 
 #endif // WBKI_KBMAN_H

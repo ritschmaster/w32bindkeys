@@ -32,22 +32,15 @@
 
 static wbk_logger_t logger =  { "ibkman" };
 
-/**
- * @param id_kb_arr Array of wbk_w32_id_kb_t
- */
-static int
-id_kb_arr_free(Array *id_kb_arr);
-
 wbki_kbman_t *
-wbki_kbman_new(wbk_kbman_t *kbman)
+wbki_kbman_new()
 {
 	wbki_kbman_t *new;
 
 	new = NULL;
 	new = malloc(sizeof(wbki_kbman_t));
 
-	new->kbman = kbman;
-	array_new(&(new->id_kb_arr));
+	array_new(&(new->kc_sys));
 
 	return new;
 
@@ -56,178 +49,47 @@ wbki_kbman_new(wbk_kbman_t *kbman)
 wbki_kbman_t *
 wbki_kbman_free(wbki_kbman_t *kbman)
 {
-	id_kb_arr_free(kbman->id_kb_arr);
-	kbman->id_kb_arr = NULL;
-	wbk_kbman_free(kbman->kbman);
-	kbman->kbman = NULL;
+	array_destroy_cb(kbman->kc_sys, free); // TODO wbk_kb_sys_free
+	kbman->kc_sys = NULL;
 	free(kbman);
 }
 
-int
-wbki_kbman_register_kb(wbki_kbman_t *kbman, HWND window_handler)
+Array *
+wbki_kbman_get_kb(wbki_kbman_t* kbman)
 {
-	ArrayIter kb_iter;
-	ArrayIter b_iter;
-	ArrayIter be_iter;
-	wbk_kb_t *kb;
-	wbk_b_t *b;
-	wbk_be_t *be;
-	UINT modifiers;
-	UINT key;
-	int id;
-	wbki_id_kb_t *id_kb;
-	BOOL reg_success;
-
-	id_kb_arr_free(kbman->id_kb_arr);
-	kbman->id_kb_arr = NULL;
-	array_new(&(kbman->id_kb_arr));
-
-	id = 100;
-	array_iter_init(&kb_iter, wbk_kbman_get_kb(kbman->kbman));
-	while (array_iter_next(&kb_iter, (void *) &kb) != CC_ITER_END) {
-		modifiers = 0;
-		key = 0;
-		array_iter_init(&be_iter, wbk_b_get_comb(wbk_kb_get_binding(kb)));
-		while (array_iter_next(&be_iter, (void *) &be) != CC_ITER_END) {
-			wbk_logger_log(&logger, INFO, "Binding element: %d %c\n", be->modifier, be->key);
-			switch(be->modifier) {
-			case WIN:
-				modifiers = modifiers | MOD_WIN;
-				break;
-
-			case ALT:
-				modifiers = modifiers | MOD_ALT;
-				break;
-
-			case CTRL:
-				modifiers = modifiers | MOD_CONTROL;
-				break;
-
-			case SHIFT:
-				modifiers = modifiers | MOD_SHIFT;
-				break;
-
-			case ENTER:
-				key = VK_RETURN;
-				break;
-
-			case NUMLOCK:
-				key = VK_NUMLOCK;
-				break;
-
-			case CAPSLOCK:
-				key = VK_CAPITAL;
-				break;
-
-			case F1:
-				key = VK_F1;
-				break;
-
-			case F2:
-				key = VK_F2;
-				break;
-
-			case F3:
-				key = VK_F3;
-				break;
-
-			case F4:
-				key = VK_F4;
-				break;
-
-			case F5:
-				key = VK_F5;
-				break;
-
-			case F6:
-				key = VK_F6;
-				break;
-
-			case F7:
-				key = VK_F7;
-				break;
-
-			case F8:
-				key = VK_F9;
-				break;
-
-			case F9:
-				key = VK_F1;
-				break;
-
-			case F10:
-				key = VK_F10;
-				break;
-
-	    	case F11:
-				key = VK_F11;
-				break;
-
-			case F12:
-				key = VK_F12;
-				break;
-
-	    	case NOT_A_MODIFIER:
-				key = toupper(be->key);
-				break;
-
-			// default:
-				// TODO error
-			}
-		}
-
-		if (key != 0) {
-			id_kb = malloc(sizeof(wbki_id_kb_t));
-			id_kb->id = id;
-			id_kb->kb = kb;
-			array_add(kbman->id_kb_arr, id_kb);
-			id_kb = NULL;
-
-			reg_success = RegisterHotKey(window_handler, id, modifiers, key);
-			if (reg_success) {
-				wbk_logger_log(&logger, INFO, "Registering hotkey: %d %c\n", modifiers, key);
-			} else {
-				wbk_logger_log(&logger, SEVERE, "Failed registering hotkey: %d %c\n", modifiers, key);
-			}
-			id++;
-		}
-	}
-
-	return 0;
+	return kbman->kc_sys;
 }
 
 int
-wbki_kbman_exec_kb(wbki_kbman_t *kbman, int id)
+wbki_kbman_add(wbki_kbman_t *kbman, wbk_kc_sys_t *kc_sys)
 {
-	char found;
-	ArrayIter id_kb_arr_iter;
-	wbki_id_kb_t *id_kb;
+	array_add(kbman->kc_sys, kc_sys);
+}
 
-	wbk_logger_log(&logger, INFO, "Id triggered: %d\n", id);
+int
+wbki_kbman_exec(wbki_kbman_t *kbman, wbk_b_t *b)
+{
+	int ret;
+	char found;
+	ArrayIter kb_iter;
+	wbk_kc_sys_t *kc_sys;
+
+	ret = -1;
 
 	found = 0;
-	array_iter_init(&id_kb_arr_iter, kbman->id_kb_arr);
-	while ((array_iter_next(&id_kb_arr_iter, (void *) &id_kb) != CC_ITER_END)
-		    && !found) {
-		if (id_kb->id == id) {
-			wbk_kb_exec(id_kb->kb);
+	array_iter_init(&kb_iter, wbki_kbman_get_kb(kbman));
+	while (!found && array_iter_next(&kb_iter, (void *) &kc_sys) != CC_ITER_END) {
+		if (wbk_b_compare(wbk_kc_sys_get_binding(kc_sys), b) == 0) {
 			found = 1;
 		}
 	}
 
-	return 0;
-}
-
-int
-id_kb_arr_free(Array *id_kb_arr)
-{
-	ArrayIter id_kb_arr_iter;
-	wbki_id_kb_t *id_kb;
-
-	array_iter_init(&id_kb_arr_iter, id_kb_arr);
-	while (array_iter_next(&id_kb_arr_iter, (void *) &id_kb) != CC_ITER_END) {
-		id_kb->kb = NULL;
+	if (found) {
+		wbk_kc_sys_exec(kc_sys);
+		ret = 0;
 	}
 
-	array_destroy_cb(id_kb_arr, free);
+	return ret;
+
 }
+

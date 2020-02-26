@@ -23,58 +23,58 @@
 *******************************************************************************/
 
 /**
- * @author Richard BÃ¤ck
- * @date 26 January 2020
- * @brief File contains the key binding manager class definition
+ * @author Richard Bäck
+ * @date 2020-02-26
+ * @brief File contains the key binding system command class definition
  */
-
-#ifndef WBK_KBMAN_H
-#define WBK_KBMAN_H
-
-#include <collectc/array.h>
 
 #include "kc.h"
 
-typedef struct wbk_kbman_s
+#ifndef WBK_KC_SYS_H
+#define WBK_KC_SYS_H
+
+typedef struct wbk_kc_sys_s
 {
-	/**
-	 * Array of wbk_kb_t
-	 */
-	Array *kb;
-} wbk_kbman_t;
+	wbk_kc_t *kc;
+
+	char *cmd;
+} wbk_kc_sys_t;
 
 /**
- * @brief Creates a new key binding manager 
- * @return A new key binding manager or NULL if allocation failed
+ * @brief Creates a new key binding system command
+ * @param comb The binding of the key command. The object will be freed by the key binding.
+ * @param cmd The system command of the key command. The passed string will be freed by the key binding.
+ * @return A new key binding command or NULL if allocation failed
  */
-extern wbk_kbman_t *
-wbk_kbman_new(void);
+extern wbk_kc_sys_t *
+wbk_kc_sys_new(wbk_b_t *comb, char *cmd);
 
 /**
- * @brief Free a key binding manager 
+ * @brief Frees a key binding system command
  * @return Non-0 if the freeing failed
  */
 extern int
-wbk_kbman_free(wbk_kbman_t* kbman);
+wbk_kc_sys_free(wbk_kc_sys_t *kc);
 
 /**
- * @brief Gets the key bindings of a key binding manager
- * @return The key bindings of a key binding manager
+ * @brief Gets the combinations of a key binding system command.
+ * @return The combinations of a key binding system command. It is an array of wbk_b_t.
  */
-extern Array *
-wbk_kbman_get_kb(wbk_kbman_t* kbman);
+extern const wbk_b_t *
+wbk_kc_sys_get_binding(const wbk_kc_sys_t *kc);
 
 /**
- * @param kb The key binding to add. The added key binding will be freed by the key binding manager
+ * @brief Gets the command of a key binding system command.
+ * @return The command of a key binding system command.
+ */
+extern const char *
+wbk_kc_sys_get_cmd(const wbk_kc_sys_t *kc_sys);
+
+/**
+ * @brief Execute the system command of a key binding system command
+ * @return Non-0 if the execution failed
  */
 extern int
-wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_t *kb);
+wbk_kc_sys_exec(const wbk_kc_sys_t *kc_sys);
 
-/**
- * @brief Execute a key binding matching a combination
- * @return Non-0 if the combination was not found.
- */
-extern int
-wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *comb);
-
-#endif // WBK_KBMAN_H
+#endif // WBK_KC_SYS_H

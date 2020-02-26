@@ -32,6 +32,7 @@
 #include "logger.h"
 #include "parser.h"
 #include "util.h"
+#include "kc_sys.h"
 
 static wbk_logger_t logger =  { "iparser" };
 
@@ -77,15 +78,15 @@ wbki_parser_free(wbki_parser_t *parser)
 	return 0;
 }
 
-wbk_kbman_t *
+wbki_kbman_t *
 wbki_parser_parse(wbki_parser_t *parser)
 {
 	FILE *file;
 	int character;
 	char *cmd;
 	wbk_b_t *binding;
-	wbk_kbman_t *kbman;
-	wbk_kb_t *kb;
+	wbki_kbman_t *kbman;
+	wbk_kc_sys_t *kc;
 
 	wbk_logger_log(&logger, INFO, "Using config: %s\n", wbk_parser_get_filename(parser->parser));
 
@@ -94,7 +95,7 @@ wbki_parser_parse(wbki_parser_t *parser)
 	file = fopen(wbk_parser_get_filename(parser->parser), "r");
 
 	if (file != NULL) {
-		kbman = wbk_kbman_new();
+		kbman = wbki_kbman_new();
 		cmd = NULL;
 		binding = NULL;
 		do {
@@ -118,9 +119,9 @@ wbki_parser_parse(wbki_parser_t *parser)
 			}
 
 			if (cmd != NULL && binding != NULL) {
-				kb = wbk_kb_new(binding, cmd);
-				wbk_kbman_add(kbman, kb);
-				kb = NULL;
+				kc = wbk_kc_sys_new(binding, cmd);
+				wbki_kbman_add(kbman, kc);
+				kc = NULL;
 				cmd = NULL;
 				binding = NULL;
 			}

@@ -32,7 +32,7 @@
 #define WBKI_PARSER_H
 
 #include "parser.h"
-#include "kbman.h"
+#include "ikbman.h"
 
 typedef struct wbki_parser_s
 {
@@ -45,7 +45,7 @@ wbki_parser_new(const char *filename);
 extern int
 wbki_parser_free(wbki_parser_t *parser);
 
-extern wbk_kbman_t *
+extern wbki_kbman_t *
 wbki_parser_parse(wbki_parser_t *parser);
 
 /**

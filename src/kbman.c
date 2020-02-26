@@ -59,7 +59,7 @@ wbk_kbman_get_kb(wbk_kbman_t* kbman)
 }
 
 int
-wbk_kbman_add(wbk_kbman_t *kbman, wbk_kb_t *kb)
+wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_t *kb)
 {
 	array_add(kbman->kb, kb);
 }
@@ -67,25 +67,5 @@ wbk_kbman_add(wbk_kbman_t *kbman, wbk_kb_t *kb)
 int
 wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b)
 {
-	int ret;
-	char found;
-	ArrayIter kb_iter;
-	wbk_kb_t *kb;
-
-	ret = -1;
-
-	found = 0;
-	array_iter_init(&kb_iter, wbk_kbman_get_kb(kbman));
-	while (!found && array_iter_next(&kb_iter, (void *) &kb) != CC_ITER_END) {
-		if (wbk_b_compare(wbk_kb_get_binding(kb), b) == 0) {
-			found = 1;
-		}
-	}
-
-	if (found) {
-		wbk_kb_exec(kb);
-		ret = 0;
-	}
-
-	return ret;
+	return 1;
 }

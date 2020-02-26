@@ -22,7 +22,13 @@
   SOFTWARE.
 *******************************************************************************/
 
-#include "kb.h"
+/**
+ * @author Richard Bäck
+ * @date 2020-01-26
+ * @brief File contains the key binding command class implementation and private methods
+ */
+
+#include "kc.h"
 
 #include <stdlib.h>
 #include <sys/types.h>
@@ -34,101 +40,43 @@
 
 #include "logger.h"
 
-static wbk_logger_t logger =  { "kb" };
+static wbk_logger_t logger =  { "kc" };
 
 static DWORD WINAPI
 wbk_kbthread_exec(LPVOID param);
 
-wbk_kb_t *
-wbk_kb_new(wbk_b_t *comb, char *cmd)
+wbk_kc_t *
+wbk_kc_new(wbk_b_t *comb)
 {
-	wbk_kb_t *kb;
+	wbk_kc_t *kc;
 	int length;
 
-	kb = NULL;
-	kb = malloc(sizeof(wbk_kb_t));
-	memset(kb, 0, sizeof(wbk_kb_t));
+	kc = NULL;
+	kc = malloc(sizeof(wbk_kc_t));
+	memset(kc, 0, sizeof(wbk_kc_t));
 
-	if (kb != NULL) {
-		kb->binding = comb;
+	if (kc != NULL) {
+		kc->binding = comb;
 	}
 
-	if (kb != NULL) {
-		kb->cmd = cmd;
-	}
-
-	return kb;
+	return kc;
 }
 
 int
-wbk_kb_free(wbk_kb_t *kb)
+wbk_kc_free(wbk_kc_t *kc)
 {
-	if (kb->binding) {
-		wbk_b_free(kb->binding);
-		kb->binding = NULL;
+	if (kc->binding) {
+		wbk_b_free(kc->binding);
+		kc->binding = NULL;
 	}
 
-	if (kb->cmd) {
-		free(kb->cmd);
-	}
-
-	free(kb);
+	free(kc);
 	return 0;
 }
 
 const wbk_b_t *
-wbk_kb_get_binding(const wbk_kb_t *kb)
+wbk_kc_get_binding(const wbk_kc_t *kc)
 {
-	return kb->binding;
+	return kc->binding;
 }
 
-const char *
-wbk_kb_get_cmd(const wbk_kb_t *kb)
-{
-	return kb->cmd;
-}
-
-DWORD WINAPI
-wbk_kbthread_exec(LPVOID param)
-{
-	char *cmd;
-
-	cmd = (char *) param;
-
-	return system(cmd);
-}
-
-int
-wbk_kb_exec(const wbk_kb_t *kb)
-{
-#if defined(WIN32)
-	HANDLE thread_handler;
-
-	thread_handler = CreateThread(NULL,
-					 0,
-					 wbk_kbthread_exec,
-					 kb->cmd,
-					 0,
-					 NULL);
-	if (thread_handler) {
-		wbk_logger_log(&logger, INFO, "Exec: %s\n", kb->cmd);
-	} else {
-		wbk_logger_log(&logger, SEVERE, "Exec failed: %s\n", kb->cmd);
-	}
-#else
-	pid_t pid;
-
-	pid = fork();
-
-	if (pid == 0) {
-		if (system(kb->cmd)) {
-			wbk_logger_log(&logger, SEVERE, "Exec failed: %s\n", kb->cmd);
-		} else {
-			wbk_logger_log(&logger, INFO, "Exec: %s\n", kb->cmd);
-		}
-		_exit(EXIT_SUCCESS);
-	}
-#endif
-
-	return 0;
-}

@@ -40,7 +40,7 @@
 #include "datafinder.h"
 #include "ikbman.h"
 #include "iparser.h"
-#include "kb.h"
+#include "kc.h"
 
 #define WBK_RC ".w32bindkeysrc"
 
@@ -77,9 +77,6 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder);
 
 static int
 main_loop(HINSTANCE hInstance);
-
-static LRESULT CALLBACK
-window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -199,13 +196,11 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	char *defaults_rc_filename;
 	FILE *rc_file;
 	wbki_parser_t *parser;
-	wbk_kbman_t *kbman;
 
 	error = 0;
 	rc_filename = NULL;
 	rc_file = NULL;
 	parser = NULL;
-	kbman = NULL;
 
 	if (!error) {
 		rc_filename = wbk_path_from_home(WBK_RC);
@@ -234,15 +229,13 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		kbman = wbki_parser_parse(parser);
-		if (!kbman) {
+		g_kbman = wbki_parser_parse(parser);
+		if (!g_kbman) {
 			error = 1;
 		}
 	}
 
 	if (!error) {
-		g_kbman = wbki_kbman_new(kbman);
-
 		error = main_loop(hInstance);
 	}
 
@@ -373,7 +366,7 @@ main_loop(HINSTANCE hInstance)
 		}
 
 		if (changed) {
-			wbk_kbman_exec(g_kbman->kbman, b);
+			wbki_kbman_exec(g_kbman, b);
 		}
 
 //				if(c == 1)
@@ -441,31 +434,6 @@ main_loop(HINSTANCE hInstance)
 
 
 	return 0;
-}
-
-LRESULT CALLBACK
-window_callback(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	LRESULT CALLBACK result;
-	int id;
-
-	result = 0;
-
-	switch(msg)
-	{
-	case WM_CLOSE:
-		DestroyWindow(window_handler);
-		break;
-
-	case WM_HOTKEY:
-		wbki_kbman_exec_kb(g_kbman, wParam);
-		break;
-
-	default:
-		result = DefWindowProc(window_handler, msg, wParam, lParam);
-	}
-
-	return result;
 }
 
 

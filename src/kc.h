@@ -25,57 +25,39 @@
 /**
  * @author Richard Bäck
  * @date 2020-01-26
- * @brief File contains the key binding class definition
+ * @brief File contains the key binding command class definition
  */
-
-#include <collectc/array.h>
 
 #include "b.h"
 
 #ifndef WBK_KB_H
 #define WBK_KB_H
 
-typedef struct wbk_kb_s
+typedef struct wbk_kc_s
 {
 	wbk_b_t *binding;
-	char *cmd;
-} wbk_kb_t;
+} wbk_kc_t;
 
 /**
- * @brief Creates a new key binding
- * @param comb The binding of the key binding. The object will be freed by the key binding.
- * @param cmd The command of the key binding. The passed string will be freed by the key binding.
- * @return A new key binding or NULL if allocation failed
+ * @brief Creates a new key binding command
+ * @param comb The binding of the key command. The object will be freed by the key binding.
+ * @return A new key binding command or NULL if allocation failed
  */
-extern wbk_kb_t *
-wbk_kb_new(wbk_b_t *comb, char *cmd);
+extern wbk_kc_t *
+wbk_kc_new(wbk_b_t *comb);
 
 /**
- * @brief Frees a key binding
+ * @brief Frees a key binding command
  * @return Non-0 if the freeing failed
  */
 extern int
-wbk_kb_free(wbk_kb_t *kb);
+wbk_kc_free(wbk_kc_t *kc);
 
 /**
- * @brief Gets the combinations of a key binding
- * @return The combinations of a key binding. It is an array of wbk_b_t.
+ * @brief Gets the combinations of a key binding command.
+ * @return The combinations of a key binding command. It is an array of wbk_b_t.
  */
 extern const wbk_b_t *
-wbk_kb_get_binding(const wbk_kb_t *kb);
-
-/**
- * @brief Gets the command of a key binding
- * @return The command of a key binding. Do not free it.
- */
-extern const char *
-wbk_kb_get_cmd(const wbk_kb_t *kb);
-
-/**
- * @brief Execute the command of a key binding
- * @return Non-0 if the execution failed
- */
-extern int
-wbk_kb_exec(const wbk_kb_t *kb);
+wbk_kc_get_binding(const wbk_kc_t *kc);
 
 #endif // WBK_KB_H
