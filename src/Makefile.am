@@ -42,6 +42,8 @@ endif
 if INSTALLBASE
 nobase_include_HEADERS = wbkbase/logger.h
 nobase_include_HEADERS += wbkbase/util.h
+nobase_include_HEADERS += wbbease/be.h
+nobase_include_HEADERS += wbbase/b.h
 nobase_include_HEADERS += wbkbase/kb.h
 nobase_include_HEADERS += wbkbase/kbman.h
 nobase_include_HEADERS += wbkbase/ikbman.h
@@ -51,6 +53,8 @@ endif
 libwbkbase_la_SOURCES = logger.c logger.h
 libwbkbase_la_SOURCES += util.c util.h
 libwbkbase_la_SOURCES += datafinder.c datafinder.h
+libwbkbase_la_SOURCES += be.c be.h
+libwbkbase_la_SOURCES += b.c b.h
 libwbkbase_la_SOURCES += kb.c kb.h
 libwbkbase_la_SOURCES += kbman.c kbman.h
 libwbkbase_la_SOURCES += ikbman.c ikbman.h

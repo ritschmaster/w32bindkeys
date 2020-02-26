@@ -24,58 +24,65 @@
 
 /**
  * @author Richard Bäck
- * @date 2020-01-26
- * @brief File contains the key binding class definition
+ * @date 2020-02-26
+ * @brief File contains the binding class definition
  */
 
 #include <collectc/array.h>
 
-#include "b.h"
+#include "be.h"
 
-#ifndef WBK_KB_H
-#define WBK_KB_H
+#ifndef WBK_B_H
+#define WBK_B_H
 
-typedef struct wbk_kb_s
+typedef struct wbk_b_s
 {
-	wbk_b_t *binding;
-	char *cmd;
-} wbk_kb_t;
+	/**
+	 * Array of wbk_be_t. Actually it is a Set.
+	 */
+	Array *comb;
+} wbk_b_t;
+
+extern wbk_b_t *
+wbk_b_new();
+
+extern int
+wbk_b_free(wbk_b_t *b);
 
 /**
- * @brief Creates a new key binding
- * @param comb The binding of the key binding. The object will be freed by the key binding.
- * @param cmd The command of the key binding. The passed string will be freed by the key binding.
- * @return A new key binding or NULL if allocation failed
- */
-extern wbk_kb_t *
-wbk_kb_new(wbk_b_t *comb, char *cmd);
-
-/**
- * @brief Frees a key binding
- * @return Non-0 if the freeing failed
+ * @brief Add a binding element.
+ * @param be Binding element to add. Contents will be copied
+ * @return 0 if the element was added. Non-0 otherwise.
  */
 extern int
-wbk_kb_free(wbk_kb_t *kb);
+wbk_b_add(wbk_b_t *b, const wbk_be_t *be);
 
 /**
- * @brief Gets the combinations of a key binding
- * @return The combinations of a key binding. It is an array of wbk_b_t.
- */
-extern const wbk_b_t *
-wbk_kb_get_binding(const wbk_kb_t *kb);
-
-/**
- * @brief Gets the command of a key binding
- * @return The command of a key binding. Do not free it.
- */
-extern const char *
-wbk_kb_get_cmd(const wbk_kb_t *kb);
-
-/**
- * @brief Execute the command of a key binding
- * @return Non-0 if the execution failed
+ * @param be Binding element to remove.
+ * @return 0 if the element was removed. Non-0 otherwise.
  */
 extern int
-wbk_kb_exec(const wbk_kb_t *kb);
+wbk_b_remove(wbk_b_t *b, const wbk_be_t *be);
 
-#endif // WBK_KB_H
+/**
+ * @param be Binding element to check.
+ * @return Non-0 if the binding element is within the binding. 0 otherwise.
+ */
+extern int
+wbk_b_contains(wbk_b_t *b, const wbk_be_t *be);
+
+/**
+ * @param b
+ * @param other
+ * @return If b < other, then < 0. If b > other, then > 0. If b = other, then 0.
+ */
+extern int
+wbk_b_compare(const wbk_b_t *b, const wbk_b_t *other);
+
+/**
+ * @return
+ */
+extern Array *
+wbk_b_get_comb(const wbk_b_t *b);
+
+#endif // WBK_B_H

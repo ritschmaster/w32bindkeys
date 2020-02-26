@@ -24,58 +24,83 @@
 
 /**
  * @author Richard Bäck
- * @date 2020-01-26
- * @brief File contains the key binding class definition
+ * @date 2020-02-26
+ * @brief File contains the binding element class implementation and private methods
  */
 
-#include <collectc/array.h>
+#include "be.h"
 
-#include "b.h"
+#include <stdlib.h>
 
-#ifndef WBK_KB_H
-#define WBK_KB_H
+#include "logger.h"
 
-typedef struct wbk_kb_s
+static wbk_logger_t logger =  { "be" };
+
+static int
+wbk_be_compare_key(char a, char b);
+
+int
+wbk_be_compare_key(char a, char b)
 {
-	wbk_b_t *binding;
-	char *cmd;
-} wbk_kb_t;
+	if (a < b)
+        return -1;
+    else if (a > b)
+        return 1;
+    else
+        return 0;
+}
 
-/**
- * @brief Creates a new key binding
- * @param comb The binding of the key binding. The object will be freed by the key binding.
- * @param cmd The command of the key binding. The passed string will be freed by the key binding.
- * @return A new key binding or NULL if allocation failed
- */
-extern wbk_kb_t *
-wbk_kb_new(wbk_b_t *comb, char *cmd);
+wbk_be_t *
+wbk_be_new(wbk_mk_t modifier, char key)
+{
+	wbk_be_t *be;
 
-/**
- * @brief Frees a key binding
- * @return Non-0 if the freeing failed
- */
-extern int
-wbk_kb_free(wbk_kb_t *kb);
+	be = NULL;
+	be = malloc(sizeof(wbk_be_t));
 
-/**
- * @brief Gets the combinations of a key binding
- * @return The combinations of a key binding. It is an array of wbk_b_t.
- */
-extern const wbk_b_t *
-wbk_kb_get_binding(const wbk_kb_t *kb);
+	be->modifier = modifier;
+	be->key = key;
 
-/**
- * @brief Gets the command of a key binding
- * @return The command of a key binding. Do not free it.
- */
-extern const char *
-wbk_kb_get_cmd(const wbk_kb_t *kb);
+	return be;
+}
 
-/**
- * @brief Execute the command of a key binding
- * @return Non-0 if the execution failed
- */
-extern int
-wbk_kb_exec(const wbk_kb_t *kb);
+int
+wbk_be_free(wbk_be_t *be)
+{
+	free(be);
 
-#endif // WBK_KB_H
+	return 0;
+}
+
+wbk_mk_t
+wbk_be_get_modifier(wbk_be_t *be)
+{
+	return be->modifier;
+}
+
+char
+wbk_be_get_key(wbk_be_t *be)
+{
+	return be->key;
+}
+
+int
+wbk_be_compare(const wbk_be_t *be, const wbk_be_t *other)
+{
+	int ret;
+
+	if (be->modifier && other->modifier) {
+		if (be->modifier < other->modifier)
+			ret = -1;
+		else if (be->modifier > other->modifier)
+			ret = 1;
+		else
+			ret = 0;
+	} else {
+		ret = wbk_be_compare_key(be->key, other->key);
+	}
+
+	return ret;
+}
+
+

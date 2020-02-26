@@ -24,58 +24,64 @@
 
 /**
  * @author Richard Bäck
- * @date 2020-01-26
- * @brief File contains the key binding class definition
+ * @date 2020-02-26
+ * @brief File contains the binding element class definition
  */
 
-#include <collectc/array.h>
+#ifndef WBK_BE_H
+#define WBK_BE_H
 
-#include "b.h"
+/**
+ * @brief Modifier key
+ */
+typedef enum wbk_mk_e {
+	NOT_A_MODIFIER = 0,
+	WIN,
+	ALT,
+	CTRL,
+	SHIFT,
+	ENTER,
+	NUMLOCK,
+	CAPSLOCK,
+	SCROLL,
+	F1,
+	F2,
+	F3,
+	F4,
+	F5,
+	F6,
+	F7,
+	F8,
+	F9,
+	F10,
+	F11,
+	F12
+} wbk_mk_t;
 
-#ifndef WBK_KB_H
-#define WBK_KB_H
-
-typedef struct wbk_kb_s
+typedef struct wbk_be_s
 {
-	wbk_b_t *binding;
-	char *cmd;
-} wbk_kb_t;
+	wbk_mk_t modifier;
+	char key;
+} wbk_be_t;
+
+extern wbk_be_t *
+wbk_be_new(wbk_mk_t modifier, char key);
+
+extern int
+wbk_be_free(wbk_be_t *be);
+
+extern wbk_mk_t
+wbk_be_get_modifier(wbk_be_t *be);
+
+extern char
+wbk_be_get_key(wbk_be_t *be);
 
 /**
- * @brief Creates a new key binding
- * @param comb The binding of the key binding. The object will be freed by the key binding.
- * @param cmd The command of the key binding. The passed string will be freed by the key binding.
- * @return A new key binding or NULL if allocation failed
- */
-extern wbk_kb_t *
-wbk_kb_new(wbk_b_t *comb, char *cmd);
-
-/**
- * @brief Frees a key binding
- * @return Non-0 if the freeing failed
+ * @param be
+ * @param other
+ * @return If be < other, then < 0. If be > other, then > 0. If be = other, then 0.
  */
 extern int
-wbk_kb_free(wbk_kb_t *kb);
+wbk_be_compare(const wbk_be_t *be, const wbk_be_t *other);
 
-/**
- * @brief Gets the combinations of a key binding
- * @return The combinations of a key binding. It is an array of wbk_b_t.
- */
-extern const wbk_b_t *
-wbk_kb_get_binding(const wbk_kb_t *kb);
-
-/**
- * @brief Gets the command of a key binding
- * @return The command of a key binding. Do not free it.
- */
-extern const char *
-wbk_kb_get_cmd(const wbk_kb_t *kb);
-
-/**
- * @brief Execute the command of a key binding
- * @return Non-0 if the execution failed
- */
-extern int
-wbk_kb_exec(const wbk_kb_t *kb);
-
-#endif // WBK_KB_H
+#endif // WBK_BE_H
