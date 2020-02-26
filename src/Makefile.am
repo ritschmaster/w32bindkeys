@@ -25,7 +25,7 @@
 AM_CFLAGS = -D PKGDATADIR=\"$(pkgdatadir)\"
 
 if DEBUG
-AM_CFLAGS += -g -O0 
+AM_CFLAGS += -g -O0
 AM_CFLAGS += -D DEBUG_ENABLED=1
 AM_LDFLAGS = -g -O0
 endif
@@ -42,10 +42,10 @@ endif
 if INSTALLBASE
 nobase_include_HEADERS = wbkbase/logger.h
 nobase_include_HEADERS += wbkbase/util.h
-nobase_include_HEADERS += wbbease/be.h
-nobase_include_HEADERS += wbbase/b.h
-nobase_include_HEADERS += wbkcase/kc.h
-nobase_include_HEADERS += wbkcase/kc_sys.h
+nobase_include_HEADERS += wbkbase/be.h
+nobase_include_HEADERS += wbkbase/b.h
+nobase_include_HEADERS += wbkbase/kc.h
+nobase_include_HEADERS += wbkbase/kc_sys.h
 nobase_include_HEADERS += wbkbase/kbman.h
 nobase_include_HEADERS += wbkbase/ikbman.h
 nobase_include_HEADERS += wbkbase/parser.h
