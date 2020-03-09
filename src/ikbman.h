@@ -67,10 +67,16 @@ extern int
 wbki_kbman_add(wbki_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
 
 /**
-  * @brief Execute a key binding matching a combination
+ * @brief Execute a key binding matching a combination
  * @return Non-0 if the combination was not found.
  */
 extern int
 wbki_kbman_exec(wbki_kbman_t *kbman, wbk_b_t *b);
+
+/**
+ * @brief Main loop, runs forever.
+ */
+extern int
+wbki_kbman_main(wbki_kbman_t *kbman);
 
 #endif // WBKI_KBMAN_H
