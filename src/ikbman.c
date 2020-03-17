@@ -30,52 +30,49 @@
 #include "logger.h"
 #include "kbman.h"
 
-static wbk_logger_t logger =  { "ibkman" };
-
-/**
- * @param c The result of GetAsyncKeyState
- */
-static wbk_mk_t
-win32_to_mk(unsigned char c);
-
-/**
- * @param c The result of GetAsyncKeyState
- */
-static char
-win32_to_char(unsigned char c);
+static wbk_logger_t logger =  { "ikbman" };
 
 wbki_kbman_t *
 wbki_kbman_new()
 {
-	wbki_kbman_t *new;
+	wbki_kbman_t *kbman;
 
-	new = NULL;
-	new = malloc(sizeof(wbki_kbman_t));
+	kbman = NULL;
+	kbman = malloc(sizeof(wbki_kbman_t));
 
-	array_new(&(new->kc_sys));
+	array_new(&(kbman->kc_sys_arr));
 
-	return new;
+	return kbman;
 
 }
 
 wbki_kbman_t *
 wbki_kbman_free(wbki_kbman_t *kbman)
 {
-	array_destroy_cb(kbman->kc_sys, free); // TODO wbk_kb_sys_free
-	kbman->kc_sys = NULL;
+	ArrayIter kb_iter;
+	wbk_kc_sys_t *kc_sys;
+
+	array_iter_init(&kb_iter, wbki_kbman_get_kb(kbman));
+	while (array_iter_next(&kb_iter, (void *) &kc_sys) != CC_ITER_END) {
+		array_iter_remove(&kb_iter, NULL);
+		wbk_kc_sys_free(kc_sys);
+	}
+	array_destroy_cb(kbman->kc_sys_arr, free);
+	kbman->kc_sys_arr = NULL;
+
 	free(kbman);
 }
 
 Array *
 wbki_kbman_get_kb(wbki_kbman_t* kbman)
 {
-	return kbman->kc_sys;
+	return kbman->kc_sys_arr;
 }
 
 int
 wbki_kbman_add(wbki_kbman_t *kbman, wbk_kc_sys_t *kc_sys)
 {
-	array_add(kbman->kc_sys, kc_sys);
+	array_add(kbman->kc_sys_arr, kc_sys);
 }
 
 int
@@ -122,7 +119,7 @@ wbki_kbman_main(wbki_kbman_t *kbman)
 		changed = 0;
 		for(c = 1; c < 255; c++){
 			rv = GetKeyState(c);
-			be = wbk_be_new(win32_to_mk(c), win32_to_char(c));
+			be = wbk_be_new(wbki_kbman_win32_to_mk(c), wbki_kbman_win32_to_char(c));
 			if (wbk_be_get_modifier(be) || wbk_be_get_key(be)) {
 				if(rv < 0) {
 					if (wbk_b_add(b, be) == 0) {
@@ -211,7 +208,7 @@ wbki_kbman_main(wbki_kbman_t *kbman)
 }
 
 wbk_mk_t
-win32_to_mk(unsigned char c)
+wbki_kbman_win32_to_mk(unsigned char c)
 {
 	wbk_mk_t modifier;
 
@@ -250,7 +247,7 @@ win32_to_mk(unsigned char c)
 
 
 char
-win32_to_char(unsigned char c)
+wbki_kbman_win32_to_char(unsigned char c)
 {
 	char key;
 

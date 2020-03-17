@@ -42,7 +42,7 @@ typedef struct wbki_kbman_s
 	/**
 	 * Array of wbk_kc_sys *
 	 */
-	Array *kc_sys;
+	Array *kc_sys_arr;
 } wbki_kbman_t;
 
 /**
@@ -78,5 +78,19 @@ wbki_kbman_exec(wbki_kbman_t *kbman, wbk_b_t *b);
  */
 extern int
 wbki_kbman_main(wbki_kbman_t *kbman);
+
+/**
+ * @param c The result of GetAsyncKeyState (a virtual key code).
+ * @return A virtual key code as modifier key
+ */
+extern wbk_mk_t
+wbki_kbman_win32_to_mk(unsigned char c);
+
+/**
+ * @param c The result of GetAsyncKeyState (a virtual key code).
+ * @return An actual character (e.g. 'a').
+ */
+extern char
+wbki_kbman_win32_to_char(unsigned char c);
 
 #endif // WBKI_KBMAN_H
