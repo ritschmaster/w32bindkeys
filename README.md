@@ -1,15 +1,16 @@
+# w32bindkeys
+[![Join the chat at https://gitter.im/w32bindkeys/community](https://badges.gitter.im/w32bindkeys/community.svg)](https://gitter.im/w32bindkeys/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 xbindkeys for Windows
 
-# Dependencies
-
-[![Join the chat at https://gitter.im/w32bindkeys/community](https://badges.gitter.im/w32bindkeys/community.svg)](https://gitter.im/w32bindkeys/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## Dependencies
 
 * [MinGW](http://mingw.org/)
 * [Collections-C](https://github.com/srdja/Collections-C)
 
-# Compiling
+## Compiling
 
-# On Windows using Msys2
+### On Windows using Msys2
 
 You will need a functioning MinGW environment. This sections describes the compilation using [Msys2](https://www.msys2.org/).
 
@@ -43,7 +44,7 @@ Afterwards you may install w32bindkeys by performing:
 
     make install
 
-## On Fedora Linux (64 bit)
+### On Fedora Linux (64 bit)
 
 First install MinGW:
 
@@ -69,4 +70,24 @@ Then compile w32bindkeys:
 If you want to re-use the core functionality you may supply a special option to the `configure` script that will produce a dynamic installable library:
 
     ./configure --enable-install-base
+
+## Using w32bindkeys
+
+### Using precompiled releases
+
+1. Head over to the [Release](https://github.com/ritschmaster/w32bindkeys/releases) page and download the latest zip file.
+2. Decompress it somwhere
+3. Execute `w32bindkeys.exe`
+4. An example configuration file was copied to your home directory named `.w32bindkeysrc`. Modify it to your needs!
+
+### Using the <kbd>Win</kbd> key
+
+<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This migt be annoying for people coming from a Linux window manager background. Luckily almost every special binding can be disabled by doing the following:
+
+1. Run `regedit`
+2. Go to `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\`
+3. Create the DWORD `NoWinKeys` with the value `1`
+4. Restart the computer
+5. <kbd>Win</kbd> + <kbd>E</kbd> and friends are now disabled. The only exception is <kbd>Win</kbd> + <kbd>L</kbd>.
+
 
