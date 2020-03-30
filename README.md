@@ -2,6 +2,8 @@ xbindkeys for Windows
 
 # Dependencies
 
+[![Join the chat at https://gitter.im/w32bindkeys/community](https://badges.gitter.im/w32bindkeys/community.svg)](https://gitter.im/w32bindkeys/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * [MinGW](http://mingw.org/)
 * [Collections-C](https://github.com/srdja/Collections-C)
 
