@@ -232,7 +232,11 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		error = wbki_kbman_main(kbman);
+		while (1) {
+			error = wbki_kbman_main(kbman);
+			sleep(1000000000);
+		}
+		wbki_kbman_stop(kbman);
 	}
 
 	if (rc_filename) {

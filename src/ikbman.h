@@ -79,6 +79,9 @@ wbki_kbman_exec(wbki_kbman_t *kbman, wbk_b_t *b);
 extern int
 wbki_kbman_main(wbki_kbman_t *kbman);
 
+extern int
+wbki_kbman_stop(wbki_kbman_t *kbman);
+
 /**
  * @param c The result of GetAsyncKeyState (a virtual key code).
  * @return A virtual key code as modifier key

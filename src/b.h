@@ -50,7 +50,7 @@ extern int
 wbk_b_free(wbk_b_t *b);
 
 /**
- * @brief Add a binding element.
+ * @brief Add a binding element. The binding will only be added if was not already added.
  * @param be Binding element to add. Contents will be copied
  * @return 0 if the element was added. Non-0 otherwise.
  */
