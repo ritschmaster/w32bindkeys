@@ -71,10 +71,10 @@ extern int
 wbk_be_free(wbk_be_t *be);
 
 extern wbk_mk_t
-wbk_be_get_modifier(wbk_be_t *be);
+wbk_be_get_modifier(const wbk_be_t *be);
 
 extern char
-wbk_be_get_key(wbk_be_t *be);
+wbk_be_get_key(const wbk_be_t *be);
 
 /**
  * @param be

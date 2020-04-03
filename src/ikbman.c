@@ -171,7 +171,7 @@ wbki_hookman_start_fn(void *arg)
 	hookman = (wbki_hookman_t *) arg;
 
 	h_instance = GetModuleHandle(NULL);
-	hookman->hook_id = SetWindowsHookExA(WH_KEYBOARD_LL, wbki_hookman_windows_hook, h_instance, NULL);
+	hookman->hook_id = SetWindowsHookExA(WH_KEYBOARD_LL, wbki_hookman_windows_hook, h_instance, 0);
 
 	while (!hookman->stop && GetMessage(&msg, NULL, 0, 0) > 0) {
 		TranslateMessage(&msg);
@@ -346,19 +346,13 @@ wbki_kbman_win32_to_mk(unsigned char c)
 
 	if (c == 13)
 		modifier = ENTER;
-	//else if(c == 16 || c == 17 || c == 18) // TODO maybe
-		//; // TODO maybe
-	// else if(c == 160 || c == 161) // lastc == 16 // TODO maybe
-	else if (c == 16)
+	else if (c == 16 || c == 160 || c == 161)
 		modifier = SHIFT;
-	// else if(c == 162 || c == 163) // lastc == 17 // TODO maybe
-	else if (c == 17)
+	else if (c == 17 || c == 162 || c == 163)
 		modifier = CTRL;
-	// else if(c == 164) // lastc == 18 // TODO maybe
-	else if (c == 18)
+	else if (c == 18 || c == 164 || c == 165)
 		modifier = ALT;
-	//else if(c == 91 || c == 92) // TODO maybe
-	else if(c == 91)   modifier = WIN;
+	else if(c == 91 || c == 92)   modifier = WIN;
 	else if (c == 112) modifier = F1;
 	else if (c == 113) modifier = F2;
 	else if (c == 114) modifier = F3;
@@ -371,6 +365,8 @@ wbki_kbman_win32_to_mk(unsigned char c)
 	else if (c == 121) modifier = F10;
 	else if (c == 122) modifier = F11;
 	else if (c == 123) modifier = F12;
+
+	wbk_logger_log(&logger, DEBUG, "Shift pressed? %d\n", c);
 
 	return modifier;
 }

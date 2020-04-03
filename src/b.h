@@ -28,19 +28,19 @@
  * @brief File contains the binding class definition
  */
 
-#include <collectc/array.h>
-
 #include "be.h"
 
 #ifndef WBK_B_H
 #define WBK_B_H
 
+#define WBK_B_MODIFER_MAP_LEN 30
+#define WBK_B_KEY_MAP_LEN 256
+
 typedef struct wbk_b_s
 {
-	/**
-	 * Array of wbk_be_t. Actually it is a Set.
-	 */
-	Array *comb;
+	wbk_mk_t modifier_map[WBK_B_MODIFER_MAP_LEN];
+
+	char key_map[WBK_B_KEY_MAP_LEN];
 } wbk_b_t;
 
 extern wbk_b_t *
@@ -50,8 +50,14 @@ extern int
 wbk_b_free(wbk_b_t *b);
 
 /**
+ * @brief Removes all binding elements from the binding.
+ */
+extern int
+wbk_b_reset(wbk_b_t *b);
+
+/**
  * @brief Add a binding element. The binding will only be added if was not already added.
- * @param be Binding element to add. Contents will be copied
+ * @param be Binding element to add.
  * @return 0 if the element was added. Non-0 otherwise.
  */
 extern int
@@ -78,11 +84,5 @@ wbk_b_contains(wbk_b_t *b, const wbk_be_t *be);
  */
 extern int
 wbk_b_compare(const wbk_b_t *b, const wbk_b_t *other);
-
-/**
- * @return
- */
-extern Array *
-wbk_b_get_comb(const wbk_b_t *b);
 
 #endif // WBK_B_H

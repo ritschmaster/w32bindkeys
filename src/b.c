@@ -31,6 +31,7 @@
 #include "b.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "logger.h"
 
@@ -59,10 +60,7 @@ wbk_b_new()
 	b = NULL;
 	b = malloc(sizeof(wbk_b_t));
 
-	if (array_new(&(b->comb))) {
-		free(b);
-		b = NULL;
-	}
+	wbk_b_reset(b);
 
 	return b;
 }
@@ -70,10 +68,16 @@ wbk_b_new()
 int
 wbk_b_free(wbk_b_t *b)
 {
-	array_destroy_cb(b->comb, free);
-	b->comb = NULL;
-
 	free(b);
+	return 0;
+}
+
+int
+wbk_b_reset(wbk_b_t *b)
+{
+	memset(b->modifier_map, 0, sizeof(wbk_mk_t) * WBK_B_MODIFER_MAP_LEN);
+	memset(b->key_map, 0, sizeof(char) * WBK_B_KEY_MAP_LEN);
+
 	return 0;
 }
 
@@ -81,26 +85,20 @@ int
 wbk_b_add(wbk_b_t *b, const wbk_be_t *be)
 {
 	int ret;
-	ArrayIter be_iter;
-	wbk_be_t *my_be;
-	wbk_be_t *copy;
 
-	ret = 0;
-
-	my_be = NULL;
-	array_iter_init(&be_iter, wbk_b_get_comb(b));
-	while (array_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && !ret) {
-		if (my_be->modifier == be->modifier
-			&& my_be->key == be->key) {
-			ret = 1;
+	ret = 1;
+	if (wbk_be_get_modifier(be) != 0) {
+		if (b->modifier_map[wbk_be_get_modifier(be)] == 0) {
+			b->modifier_map[wbk_be_get_modifier(be)] = 1;
+			ret = 0;
+		}
+	} else if (wbk_be_get_key(be) != 0) {
+		if (b->key_map[wbk_be_get_key(be)] == 0) {
+			b->key_map[wbk_be_get_key(be)] = 1;
+			ret = 0;
 		}
 	}
 
-	if (!ret) {
-		copy = wbk_be_new(be->modifier, be->key);
-		array_add(b->comb, copy);
-		array_sort(b->comb, be_cmp);
-	}
 	return ret;
 }
 
@@ -108,25 +106,18 @@ int
 wbk_b_remove(wbk_b_t *b, const wbk_be_t *be)
 {
 	int ret;
-	ArrayIter be_iter;
-	wbk_be_t *my_be;
 
 	ret = 1;
-
-	my_be = NULL;
-	array_iter_init(&be_iter, wbk_b_get_comb(b));
-	while (array_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && ret) {
-		if (my_be->modifier == be->modifier
-			&& my_be->key == be->key) {
-			array_iter_remove(&be_iter, NULL);
-			wbk_be_free(my_be);
-			my_be = NULL;
-			ret = 0; /** removed */
+	if (wbk_be_get_modifier(be) != 0) {
+		if (b->modifier_map[wbk_be_get_modifier(be)] != 0) {
+			b->modifier_map[wbk_be_get_modifier(be)] = 0;
+			ret = 0;
 		}
-	}
-
-	if (!ret) {
-		array_sort(b->comb, be_cmp);
+	} else if (wbk_be_get_key(be) != 0) {
+		if (b->key_map[wbk_be_get_key(be)] != 0) {
+			b->key_map[wbk_be_get_key(be)] = 0;
+			ret = 0;
+		}
 	}
 
 	return ret;
@@ -135,70 +126,37 @@ wbk_b_remove(wbk_b_t *b, const wbk_be_t *be)
 int
 wbk_b_contains(wbk_b_t *b, const wbk_be_t *be)
 {
-	char found;
-	ArrayIter be_iter;
-	wbk_be_t *my_be;
+	int found;
 
 	found = 0;
-	array_iter_init(&be_iter, wbk_b_get_comb(b));
-	while (array_iter_next(&be_iter, (void *) &my_be) != CC_ITER_END && !found) {
-		if (my_be->modifier == be->modifier
-			&& my_be->key == be->key) {
-			found = 1;
-		}
+	if (b->modifier_map[wbk_be_get_modifier(be)] != 0
+		|| b->key_map[wbk_be_get_key(be)] != 0) {
+		found = 0;
 	}
 
-	found = 0;
 	return found;
 }
 
 int
 wbk_b_compare(const wbk_b_t *b, const wbk_b_t *other)
 {
-	wbk_be_t *b_be;
-	wbk_be_t *other_be;
-
-	char found;
-
-	int other_be_len;
-	int b_be_len;
-
+	int differs;
 	int i;
-	int j;
 
-	found = 0;
+	differs = 0;
 
-	i = -1;
-	j = -1;
-	other_be_len = array_size(wbk_b_get_comb(other));
-	b_be_len = array_size(wbk_b_get_comb(b));
-
-	found = 1;
-	do {
-		i++;
-		j++;
-		if ((i < other_be_len && j >= b_be_len)
-			|| (i >= other_be_len && j < b_be_len)) {
-			found = 0;
-		} else {
-
-		array_get_at(wbk_b_get_comb(other), i, (void *) &other_be);
-		array_get_at(wbk_b_get_comb(b), j, (void *) &b_be);
-
-		if (other_be->modifier != b_be->modifier
-			|| other_be->key != b_be->key) {
-			found = 0;
+	for (i = 0; !differs && i < WBK_B_MODIFER_MAP_LEN; i++) {
+		if (b->modifier_map[i] != other->modifier_map[i]) {
+			differs = 1;
 		}
-		}
-	} while (i < other_be_len &&
-			 j < other_be_len &&
-			 found);
+	}
 
-	return !found;
+	for (i = 0; !differs && i < WBK_B_KEY_MAP_LEN; i++) {
+		if (b->key_map[i] != other->key_map[i]) {
+			differs = 1;
+		}
+	}
+
+	return differs;
 }
 
-Array *
-wbk_b_get_comb(const wbk_b_t *b)
-{
-	return b->comb;
-}
