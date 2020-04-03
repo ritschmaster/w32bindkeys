@@ -33,6 +33,7 @@
 #include <windows.h>
 #include <getopt.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "../config.h"
 #include "logger.h"
@@ -61,6 +62,9 @@ static wbk_logger_t logger = { "main" };
 
 static const char g_szClassName[] = "myWindowClass";
 
+/** If non-0 then the application should exit */
+static char g_exit = 0;
+
 static int
 print_version(void);
 
@@ -72,6 +76,9 @@ print_defaults(const wbk_datafinder_t *datafinder);
 
 static int
 parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder);
+
+static void
+graceful_exit(int signo);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -232,10 +239,15 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		while (1) {
-			error = wbki_kbman_main(kbman);
-			sleep(1000000000);
+		if (signal(SIGINT, graceful_exit) == SIG_ERR) {
+			wbk_logger_log(&logger, SEVERE, "Unable to catch terminating signal\n");
 		}
+
+		while (!g_exit) {
+			error = wbki_kbman_main(kbman);
+			sleep(3);
+		}
+		wbk_logger_log(&logger, INFO, "Terminating the application\n");
 		wbki_kbman_stop(kbman);
 	}
 
@@ -252,4 +264,12 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	return error;
+}
+
+void
+graceful_exit(int signo)
+{
+	if (signo == SIGINT) {
+		g_exit = 1;
+	}
 }

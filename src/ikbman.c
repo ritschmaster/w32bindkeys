@@ -366,8 +366,6 @@ wbki_kbman_win32_to_mk(unsigned char c)
 	else if (c == 122) modifier = F11;
 	else if (c == 123) modifier = F12;
 
-	wbk_logger_log(&logger, DEBUG, "Shift pressed? %d\n", c);
-
 	return modifier;
 }
 
