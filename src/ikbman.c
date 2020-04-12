@@ -70,18 +70,11 @@ static int
 wbki_hookman_remove_kbman(wbki_hookman_t *hookman, wbki_kbman_t *kbman);
 
 /**
- * @brief Runs in its own thread
+ * @brief Adds a handler to the Windows message loop
  * @return 0 if the thread was started.
  */
 static int
 wbki_hookman_start(wbki_hookman_t *hookman);
-
-/**
- * @brief To be used for pthread_create()
- * @param arg Actually a wbki_hookman_t *
- */
-static void *
-wbki_hookman_start_fn(void *arg);
 
 static int
 wbki_hookman_stop(wbki_hookman_t *hookman);
@@ -149,11 +142,13 @@ wbki_hookman_remove_kbman(wbki_hookman_t *hookman, wbki_kbman_t *kbman)
 int
 wbki_hookman_start(wbki_hookman_t *hookman)
 {
+	HINSTANCE h_instance;
 	int ret;
 
 	if (hookman->stop) {
 		hookman->stop = 0;
-		ret = pthread_create(&(hookman->thread), NULL, wbki_hookman_start_fn, hookman);
+		h_instance = GetModuleHandle(NULL);
+		hookman->hook_id = SetWindowsHookExA(WH_KEYBOARD_LL, wbki_hookman_windows_hook, h_instance, 0);
 	} else {
 		ret = 1;
 	}
@@ -161,29 +156,13 @@ wbki_hookman_start(wbki_hookman_t *hookman)
 	return ret;
 }
 
-void *
-wbki_hookman_start_fn(void *arg)
-{
-	wbki_hookman_t *hookman;
-	MSG msg;
-	HINSTANCE h_instance;
-
-	hookman = (wbki_hookman_t *) arg;
-
-	h_instance = GetModuleHandle(NULL);
-	hookman->hook_id = SetWindowsHookExA(WH_KEYBOARD_LL, wbki_hookman_windows_hook, h_instance, 0);
-
-	while (!hookman->stop && GetMessage(&msg, NULL, 0, 0) > 0) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-
-	UnhookWindowsHookEx(hookman->hook_id);
-}
-
 int
 wbki_hookman_stop(wbki_hookman_t *hookman)
 {
+	if (!hookman->stop) {
+		UnhookWindowsHookEx(hookman->hook_id);
+	}
+
 	hookman->stop = 1;
 	return 0;
 }
@@ -314,7 +293,7 @@ wbki_kbman_exec(wbki_kbman_t *kbman, wbk_b_t *b)
 }
 
 int
-wbki_kbman_main(wbki_kbman_t *kbman)
+wbki_kbman_start(wbki_kbman_t *kbman)
 {
 	wbki_hookman_t *hookman;
 

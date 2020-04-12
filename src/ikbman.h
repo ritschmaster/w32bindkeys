@@ -77,7 +77,7 @@ wbki_kbman_exec(wbki_kbman_t *kbman, wbk_b_t *b);
  * @brief Main loop, runs forever.
  */
 extern int
-wbki_kbman_main(wbki_kbman_t *kbman);
+wbki_kbman_start(wbki_kbman_t *kbman);
 
 extern int
 wbki_kbman_stop(wbki_kbman_t *kbman);

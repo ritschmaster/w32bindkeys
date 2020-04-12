@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 /**
- * @author Richard BÃ¤ck
+ * @author Richard Bäck
  * @date 26 January 2020
  * @brief File contains the main function
  */
@@ -33,7 +33,6 @@
 #include <windows.h>
 #include <getopt.h>
 #include <unistd.h>
-#include <signal.h>
 
 #include "../config.h"
 #include "logger.h"
@@ -49,6 +48,8 @@
 
 #define WBK_GETOPT_OPTIONS "dhvV"
 
+#define WBK_WINDOW_CLASSNAME "wbkWindowClass"
+
 static struct option B3_GETOPT_LONG_OPTIONS[] = {
     /*   NAME          ARGUMENT           FLAG  SHORTNAME */
         {"help",       no_argument,       NULL, 'h'},
@@ -60,10 +61,7 @@ static struct option B3_GETOPT_LONG_OPTIONS[] = {
 
 static wbk_logger_t logger = { "main" };
 
-static const char g_szClassName[] = "myWindowClass";
-
-/** If non-0 then the application should exit */
-static char g_exit = 0;
+static HWND g_window_handler;
 
 static int
 print_version(void);
@@ -77,8 +75,11 @@ print_defaults(const wbk_datafinder_t *datafinder);
 static int
 parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder);
 
-static void
-graceful_exit(int signo);
+BOOL WINAPI
+ctrl_proc(_In_ DWORD ctrl_type);
+
+LRESULT CALLBACK
+main_window_proc(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -199,6 +200,8 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	FILE *rc_file;
 	wbki_parser_t *parser;
 	wbki_kbman_t *kbman = NULL;
+	WNDCLASSEX wc;
+	MSG msg;
 
 	error = 0;
 	rc_filename = NULL;
@@ -239,13 +242,38 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		if (signal(SIGINT, graceful_exit) == SIG_ERR) {
-			wbk_logger_log(&logger, SEVERE, "Unable to catch terminating signal\n");
+		wc.cbSize = sizeof(WNDCLASSEX);
+		wc.style = 0;
+		wc.lpfnWndProc = main_window_proc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInstance;
+		wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = WBK_WINDOW_CLASSNAME;
+		wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+
+		if(RegisterClassEx(&wc))
+		{
+			g_window_handler = CreateWindowEx(0, WBK_WINDOW_CLASSNAME, WBK_WINDOW_CLASSNAME,
+					       	                  0, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+		} else {
+			error = 1;
 		}
 
-		while (!g_exit) {
-			error = wbki_kbman_main(kbman);
-			sleep(3);
+		SetConsoleCtrlHandler(ctrl_proc, TRUE);
+	}
+
+	if (!error) {
+		error = wbki_kbman_start(kbman);
+	}
+
+	if (!error) {
+		while (GetMessage(&msg, NULL, 0, 0) > 0) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 		wbk_logger_log(&logger, INFO, "Terminating the application\n");
 		wbki_kbman_stop(kbman);
@@ -266,10 +294,40 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	return error;
 }
 
-void
-graceful_exit(int signo)
+LRESULT CALLBACK
+main_window_proc(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (signo == SIGINT) {
-		g_exit = 1;
+	LRESULT CALLBACK result;
+
+	result = 0;
+	switch(msg) {
+	case WM_QUERYENDSESSION:
+	case WM_ENDSESSION:
+	case WM_CLOSE:
+    	DestroyWindow(g_window_handler);
+    	PostQuitMessage(ERROR_SUCCESS);
+		break;
+
+	default:
+		result = DefWindowProc(window_handler, msg, wParam, lParam);
 	}
+
+	return result;
 }
+
+BOOL WINAPI
+ctrl_proc(_In_ DWORD ctrl_type)
+{
+	BOOL handled;
+
+	handled = FALSE;
+	switch (ctrl_type) {
+	default:
+		handled = TRUE;
+		SendMessage(g_window_handler, WM_CLOSE, (void *) NULL, (void *) NULL);
+		break;
+	}
+
+	return handled;
+}
+
