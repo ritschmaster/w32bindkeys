@@ -23,13 +23,13 @@
 *******************************************************************************/
 
 /**
- * @author Richard BÃ¤ck
- * @date 28 January 2020
- * @brief File contains the parser class definition
+ * @author Richard Bäck
+ * @date 30 January 2020
+ * @brief File contains the interpreter parser class definition
  */
 
-#ifndef WBK_PARSER_H
-#define WBK_PARSER_H
+#ifndef WBKI_PARSER_H
+#define WBKI_PARSER_H
 
 #include "kbman.h"
 
@@ -54,4 +54,4 @@ wbk_parser_parse(wbk_parser_t *parser);
 extern const char *
 wbk_parser_get_filename(wbk_parser_t *parser);
 
-#endif // WBK_PARSER_H
+#endif // WBKI_PARSER_H

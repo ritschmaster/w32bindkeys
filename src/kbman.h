@@ -24,42 +24,37 @@
 
 /**
  * @author Richard Bäck
- * @date 26 January 2020
- * @brief File contains the key binding manager class definition
+ * @date 29 January 2020
+ * @brief File contains interpreter keyboard manager class definition
  */
 
-#ifndef WBK_KBMAN_H
-#define WBK_KBMAN_H
+#ifndef WBKI_KBMAN_H
+#define WBKI_KBMAN_H
 
 #include <collectc/array.h>
+#include <windows.h>
 
-#include "kc.h"
+#include "kc_sys.h"
 
 typedef struct wbk_kbman_s
 {
 	/**
-	 * Array of wbk_kb_t
+	 * Array of wbk_kc_sys *
 	 */
-	Array *kb;
+	Array *kc_sys_arr;
 } wbk_kbman_t;
 
 /**
- * @brief Creates a new key binding manager 
- * @return A new key binding manager or NULL if allocation failed
  */
 extern wbk_kbman_t *
-wbk_kbman_new(void);
+wbk_kbman_new();
 
-/**
- * @brief Free a key binding manager 
- * @return Non-0 if the freeing failed
- */
-extern int
-wbk_kbman_free(wbk_kbman_t* kbman);
+extern wbk_kbman_t *
+wbk_kbman_free(wbk_kbman_t *kbman);
 
 /**
  * @brief Gets the key bindings of a key binding manager
- * @return The key bindings of a key binding manager
+ * @return Array of wbk_kc_sys *
  */
 extern Array *
 wbk_kbman_get_kb(wbk_kbman_t* kbman);
@@ -68,13 +63,36 @@ wbk_kbman_get_kb(wbk_kbman_t* kbman);
  * @param kb The key binding to add. The added key binding will be freed by the key binding manager
  */
 extern int
-wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_t *kb);
+wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
 
 /**
  * @brief Execute a key binding matching a combination
  * @return Non-0 if the combination was not found.
  */
 extern int
-wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *comb);
+wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b);
 
-#endif // WBK_KBMAN_H
+/**
+ * @brief Main loop, runs forever.
+ */
+extern int
+wbk_kbman_start(wbk_kbman_t *kbman);
+
+extern int
+wbk_kbman_stop(wbk_kbman_t *kbman);
+
+/**
+ * @param c The result of GetAsyncKeyState (a virtual key code).
+ * @return A virtual key code as modifier key
+ */
+extern wbk_mk_t
+wbk_kbman_win32_to_mk(unsigned char c);
+
+/**
+ * @param c The result of GetAsyncKeyState (a virtual key code).
+ * @return An actual character (e.g. 'a').
+ */
+extern char
+wbk_kbman_win32_to_char(unsigned char c);
+
+#endif // WBKI_KBMAN_H

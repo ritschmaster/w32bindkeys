@@ -38,9 +38,9 @@
 #include "logger.h"
 #include "util.h"
 #include "datafinder.h"
-#include "ikbman.h"
-#include "iparser.h"
+#include "kbman.h"
 #include "kc.h"
+#include "parser.h"
 
 #define WBK_RC ".w32bindkeysrc"
 
@@ -198,8 +198,8 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	char *rc_filename;
 	char *defaults_rc_filename;
 	FILE *rc_file;
-	wbki_parser_t *parser;
-	wbki_kbman_t *kbman = NULL;
+	wbk_parser_t *parser;
+	wbk_kbman_t *kbman = NULL;
 	WNDCLASSEX wc;
 	MSG msg;
 
@@ -228,14 +228,14 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		parser = wbki_parser_new(rc_filename);
+		parser = wbk_parser_new(rc_filename);
 		if (!parser) {
 			error = 1;
 		}
 	}
 
 	if (!error) {
-		kbman = wbki_parser_parse(parser);
+		kbman = wbk_parser_parse(parser);
 		if (!kbman) {
 			error = 1;
 		}
@@ -267,7 +267,7 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		error = wbki_kbman_start(kbman);
+		error = wbk_kbman_start(kbman);
 	}
 
 	if (!error) {
@@ -276,7 +276,7 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 			DispatchMessage(&msg);
 		}
 		wbk_logger_log(&logger, INFO, "Terminating the application\n");
-		wbki_kbman_stop(kbman);
+		wbk_kbman_stop(kbman);
 	}
 
 	if (rc_filename) {
@@ -284,11 +284,11 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (parser) {
-		wbki_parser_free(parser);
+		wbk_parser_free(parser);
 	}
 
 	if (kbman) {
-		wbki_kbman_free(kbman);
+		wbk_kbman_free(kbman);
 	}
 
 	return error;

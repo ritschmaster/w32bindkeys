@@ -32,11 +32,10 @@ endif
 
 bin_PROGRAMS = w32bindkeys
 
-noinst_LTLIBRARIES = libwbkinterpreter.la
 if INSTALLBASE
 lib_LTLIBRARIES = libwbkbase.la
 else
-noinst_LTLIBRARIES += libwbkbase.la
+noinst_LTLIBRARIES = libwbkbase.la
 endif
 
 if INSTALLBASE
@@ -47,7 +46,6 @@ nobase_include_HEADERS += wbkbase/b.h
 nobase_include_HEADERS += wbkbase/kc.h
 nobase_include_HEADERS += wbkbase/kc_sys.h
 nobase_include_HEADERS += wbkbase/kbman.h
-nobase_include_HEADERS += wbkbase/ikbman.h
 nobase_include_HEADERS += wbkbase/parser.h
 endif
 
@@ -59,22 +57,16 @@ libwbkbase_la_SOURCES += b.c b.h
 libwbkbase_la_SOURCES += kc.c kc.h
 libwbkbase_la_SOURCES += kc_sys.c kc_sys.h
 libwbkbase_la_SOURCES += kbman.c kbman.h
-libwbkbase_la_SOURCES += ikbman.c ikbman.h
 libwbkbase_la_SOURCES += parser.c parser.h
 
-libwbkbase_la_CFLAGS = @collectionc_CFLAGS@
+libwbkbase_la_CFLAGS = @collectionc_CFLAGS@ $(AM_CFLAGS)
 libwbkbase_la_LDFLAGS = --static -mwindows
 libwbkbase_la_LIBADD = @collectionc_LIBS@
 
-libwbkinterpreter_la_SOURCES = iparser.c iparser.h
-
-libwbkinterpreter_la_CFLAGS = @collectionc_CFLAGS@
-libwbkinterpreter_la_LDFLAGS = --static -mwindows
-libwbkinterpreter_la_LIBADD = libwbkbase.la @collectionc_LIBS@
-
 w32bindkeys_SOURCES = main.c
-w32bindkeys_LDFLAGS = --static
-w32bindkeys_LDADD = libwbkinterpreter.la
+w32bindkeys_CFLAGS = @collectionc_CFLAGS@ $(AM_CFLAGS)
+w32bindkeys_LDFLAGS = --static 
+w32bindkeys_LDADD = libwbkbase.la @collectionc_LIBS@
 
 if INSTALLBASE
 install-data-local:
