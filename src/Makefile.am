@@ -47,6 +47,7 @@ nobase_include_HEADERS += wbkbase/kc.h
 nobase_include_HEADERS += wbkbase/kc_sys.h
 nobase_include_HEADERS += wbkbase/kbman.h
 nobase_include_HEADERS += wbkbase/parser.h
+nobase_include_HEADERS += wbkbase/kbdaemon.h
 endif
 
 libwbkbase_la_SOURCES = logger.c logger.h
@@ -66,7 +67,7 @@ libwbkbase_la_LIBADD = @collectionc_LIBS@
 
 w32bindkeys_SOURCES = main.c
 w32bindkeys_CFLAGS = @collectionc_CFLAGS@ $(AM_CFLAGS)
-w32bindkeys_LDFLAGS = --static 
+w32bindkeys_LDFLAGS = --static
 w32bindkeys_LDADD = libwbkbase.la @collectionc_LIBS@
 
 if INSTALLBASE
