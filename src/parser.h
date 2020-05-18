@@ -28,8 +28,8 @@
  * @brief File contains the interpreter parser class definition
  */
 
-#ifndef WBKI_PARSER_H
-#define WBKI_PARSER_H
+#ifndef WBK_PARSER_H
+#define WBK_PARSER_H
 
 #include "kbman.h"
 
@@ -54,4 +54,4 @@ wbk_parser_parse(wbk_parser_t *parser);
 extern const char *
 wbk_parser_get_filename(wbk_parser_t *parser);
 
-#endif // WBKI_PARSER_H
+#endif // WBK_PARSER_H

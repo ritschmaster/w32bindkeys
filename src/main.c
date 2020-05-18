@@ -41,6 +41,7 @@
 #include "kbman.h"
 #include "kc.h"
 #include "parser.h"
+#include "kbdaemon.h"
 
 #define WBK_RC ".w32bindkeysrc"
 
@@ -62,6 +63,7 @@ static struct option B3_GETOPT_LONG_OPTIONS[] = {
 static wbk_logger_t logger = { "main" };
 
 static HWND g_window_handler;
+static wbk_kbman_t *g_kbman;
 
 static int
 print_version(void);
@@ -74,6 +76,9 @@ print_defaults(const wbk_datafinder_t *datafinder);
 
 static int
 parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder);
+
+static int
+kbdaemon_exec_fn(wbk_b_t *b);
 
 BOOL WINAPI
 ctrl_proc(_In_ DWORD ctrl_type);
@@ -199,7 +204,7 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	char *defaults_rc_filename;
 	FILE *rc_file;
 	wbk_parser_t *parser;
-	wbk_kbman_t *kbman = NULL;
+	wbk_kbdaemon_t *kbdaemon;
 	WNDCLASSEX wc;
 	MSG msg;
 
@@ -207,6 +212,8 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	rc_filename = NULL;
 	rc_file = NULL;
 	parser = NULL;
+	g_kbman = NULL;
+	kbdaemon = NULL;
 
 	if (!error) {
 		rc_filename = wbk_path_from_home(WBK_RC);
@@ -235,8 +242,15 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		kbman = wbk_parser_parse(parser);
-		if (!kbman) {
+		g_kbman = wbk_parser_parse(parser);
+		if (!g_kbman) {
+			error = 1;
+		}
+	}
+
+	if (!error) {
+		kbdaemon = wbk_kbdaemon_new(kbdaemon_exec_fn);
+		if (!kbdaemon) {
 			error = 1;
 		}
 	}
@@ -267,7 +281,7 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		error = wbk_kbman_start(kbman);
+		error = wbk_kbdaemon_start(kbdaemon);
 	}
 
 	if (!error) {
@@ -276,7 +290,7 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 			DispatchMessage(&msg);
 		}
 		wbk_logger_log(&logger, INFO, "Terminating the application\n");
-		wbk_kbman_stop(kbman);
+		wbk_kbdaemon_stop(kbdaemon);
 	}
 
 	if (rc_filename) {
@@ -287,11 +301,22 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 		wbk_parser_free(parser);
 	}
 
-	if (kbman) {
-		wbk_kbman_free(kbman);
+	if (g_kbman) {
+		wbk_kbman_free(g_kbman);
+		g_kbman = NULL;
+	}
+
+	if (kbdaemon) {
+		wbk_kbman_free(kbdaemon);
 	}
 
 	return error;
+}
+
+int
+kbdaemon_exec_fn(wbk_b_t *b)
+{
+	return wbk_kbman_exec(g_kbman, b);
 }
 
 LRESULT CALLBACK

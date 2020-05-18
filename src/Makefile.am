@@ -57,6 +57,7 @@ libwbkbase_la_SOURCES += b.c b.h
 libwbkbase_la_SOURCES += kc.c kc.h
 libwbkbase_la_SOURCES += kc_sys.c kc_sys.h
 libwbkbase_la_SOURCES += kbman.c kbman.h
+libwbkbase_la_SOURCES += kbdaemon.c kbdaemon.h
 libwbkbase_la_SOURCES += parser.c parser.h
 
 libwbkbase_la_CFLAGS = @collectionc_CFLAGS@ $(AM_CFLAGS)

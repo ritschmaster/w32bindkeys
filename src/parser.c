@@ -32,7 +32,7 @@
 #include "kc_sys.h"
 #include "parser.h"
 
-static wbk_logger_t logger =  { "iparser" };
+static wbk_logger_t logger =  { "parser" };
 
 typedef enum parser_state_s {
 	NONE,

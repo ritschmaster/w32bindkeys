@@ -23,53 +23,64 @@
 *******************************************************************************/
 
 /**
- * @author Richard BÃ¤ck
- * @date 29 January 2020
- * @brief File contains interpreter keyboard manager class definition
+ * @author Richard Bäck
+ * @date 2020-05-17
+ * @brief File contains interpreter keyboard daemon class definition
  */
 
-#ifndef WBK_KBMAN_H
-#define WBK_KBMAN_H
+#ifndef WBK_DAEMON_H
+#define WBK_DAEMON_H
 
 #include <collectc/array.h>
 #include <windows.h>
 
-#include "kc_sys.h"
+#include <b.h>
 
-typedef struct wbk_kbman_s
+typedef struct wbk_kbdaemon_s
 {
 	/**
-	 * Array of wbk_kc_sys *
+	 * Function is called, when the user holds a any key combination. Make sure
+	 * the function executes fast. Otherwise Windows automatically de-registers
+	 * the handler and thus breaks your application!
 	 */
-	Array *kc_sys_arr;
-} wbk_kbman_t;
+	int (*exec_fn)(wbk_b_t *b);
+} wbk_kbdaemon_t;
 
 /**
  */
-extern wbk_kbman_t *
-wbk_kbman_new();
+extern wbk_kbdaemon_t *
+wbk_kbdaemon_new(int (*exec_fn)(wbk_b_t *b));
 
-extern wbk_kbman_t *
-wbk_kbman_free(wbk_kbman_t *kbman);
-
-/**
- * @brief Gets the key bindings of a key binding manager
- * @return Array of wbk_kc_sys *
- */
-extern Array *
-wbk_kbman_get_kb(wbk_kbman_t* kbman);
-
-/**
- * @param kb The key binding to add. The added key binding will be freed by the key binding manager
- */
-extern int
-wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
-
+extern wbk_kbdaemon_t *
+wbk_kbdaemon_free(wbk_kbdaemon_t *kbdaemon);
 /**
  * @brief Execute a key binding matching a combination
  * @return Non-0 if the combination was not found.
  */
 extern int
-wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b);
+wbk_kbdaemon_exec(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b);
 
-#endif // WBK_KBMAN_H
+/**
+ * @brief Main loop, runs forever.
+ */
+extern int
+wbk_kbdaemon_start(wbk_kbdaemon_t *kbdaemon);
+
+extern int
+wbk_kbdaemon_stop(wbk_kbdaemon_t *kbdaemon);
+
+/**
+ * @param c The result of GetAsyncKeyState (a virtual key code).
+ * @return A virtual key code as modifier key
+ */
+extern wbk_mk_t
+wbk_kbdaemon_win32_to_mk(unsigned char c);
+
+/**
+ * @param c The result of GetAsyncKeyState (a virtual key code).
+ * @return An actual character (e.g. 'a').
+ */
+extern char
+wbk_kbdaemon_win32_to_char(unsigned char c);
+
+#endif // WBK_DAEMON_H
