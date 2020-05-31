@@ -29,7 +29,6 @@
  * private methods
  */
 
-#include <collectc/array.h>
 #include <windows.h>
 #include <pthread.h>
 
@@ -40,10 +39,8 @@ static wbk_logger_t logger =  { "kbdaemon" };
 
 typedef struct wbk_hookman_s
 {
-	/**
-	 * Array of wbk_kbdaemon_t *
-	 */
-	Array *kbdaemon_arr;
+	int kbdaemon_arr_len;
+	wbk_kbdaemon_t **kbdaemon_arr;
 
 	pthread_t thread;
 
@@ -94,7 +91,8 @@ wbk_hookman_create()
 
 	hookman = malloc(sizeof(hookman));
 
-	array_new(&(hookman->kbdaemon_arr));
+	hookman->kbdaemon_arr_len = 0;
+	hookman->kbdaemon_arr = NULL;
 
 	memset(&(hookman->thread), 0, sizeof(pthread_t));
 
@@ -108,9 +106,14 @@ wbk_hookman_create()
 int
 wbk_hookman_free(wbk_hookman_t *hookman)
 {
+	int i;
+
 	wbk_hookman_stop(hookman);
 
-	array_destroy(hookman->kbdaemon_arr);
+	for (i = 0; i < hookman->kbdaemon_arr_len; i++) {
+		hookman->kbdaemon_arr[i] = NULL;
+	}
+	free(hookman->kbdaemon_arr);
 	hookman->kbdaemon_arr = NULL;
 
 	wbk_b_free(hookman->cur_b);
@@ -134,13 +137,29 @@ wbk_hookman_get_instance()
 int
 wbk_hookman_add_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon)
 {
-	return array_add(hookman->kbdaemon_arr, kbdaemon);
+	hookman->kbdaemon_arr_len++;
+	hookman->kbdaemon_arr = realloc(hookman->kbdaemon_arr,
+									sizeof(wbk_kbdaemon_t **) * hookman->kbdaemon_arr_len);
+	hookman->kbdaemon_arr[hookman->kbdaemon_arr_len - 1] = kbdaemon;
+
+	return 0;
 }
 
 int
 wbk_hookman_remove_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon)
 {
-	return array_remove(hookman->kbdaemon_arr, kbdaemon, NULL);
+	int i;
+	int error;
+
+	error = 1;
+	for (int i = 0; i < hookman->kbdaemon_arr_len; i++) {
+		if (hookman->kbdaemon_arr[i] == kbdaemon) {
+			hookman->kbdaemon_arr[i] = NULL;
+			error = 0;
+		}
+	}
+
+	return error;
 }
 
 int
@@ -177,10 +196,9 @@ wbk_hookman_windows_hook(int nCode, WPARAM wParam, LPARAM lParam)
 	int ret;
 	wbk_hookman_t *hookman;
 	KBDLLHOOKSTRUCT *hookstruct;
-	ArrayIter iter;
-	wbk_kbdaemon_t *kbdaemon;
 	wbk_be_t be;
 	int changed_any;
+	int i;
 
 	ret = 0;
 	if (nCode >= 0) {
@@ -210,9 +228,9 @@ wbk_hookman_windows_hook(int nCode, WPARAM wParam, LPARAM lParam)
 		}
 
 		if (changed_any) {
-			array_iter_init(&iter, hookman->kbdaemon_arr);
-			while (array_iter_next(&iter, (void *) &kbdaemon) != CC_ITER_END) {
-				if (wbk_kbdaemon_exec(kbdaemon, hookman->cur_b) == 0) {
+			for (i = 0; i < hookman->kbdaemon_arr_len; i++) {
+				if (hookman->kbdaemon_arr[i]
+					&& wbk_kbdaemon_exec(hookman->kbdaemon_arr[i], hookman->cur_b) == 0) {
 					ret = 1;
 				}
 			}

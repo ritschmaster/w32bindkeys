@@ -31,7 +31,6 @@
 #ifndef WBK_DAEMON_H
 #define WBK_DAEMON_H
 
-#include <collectc/array.h>
 #include <windows.h>
 
 #include "b.h"
