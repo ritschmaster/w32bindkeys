@@ -44,6 +44,7 @@ typedef enum wbk_mk_e {
 	NUMLOCK,
 	CAPSLOCK,
 	SCROLL,
+	SPACE,
 	F1,
 	F2,
 	F3,

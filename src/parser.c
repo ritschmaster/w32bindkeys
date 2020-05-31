@@ -258,6 +258,8 @@ parse_token(const char *token)
 		modifier_key = SCROLL;
 	} else if (strcmp(copy, "return") == 0) {
 		modifier_key = ENTER;
+	} else if (strcmp(copy, "space") == 0) {
+		modifier_key = SPACE;
 	} else if (strcmp(copy,  "f1") == 0) {
 		modifier_key = F1;
 	} else if (strcmp(copy,  "f2") == 0) {

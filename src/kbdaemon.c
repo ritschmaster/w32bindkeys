@@ -293,7 +293,8 @@ wbk_kbdaemon_win32_to_mk(unsigned char c)
 		modifier = CTRL;
 	else if (c == 18 || c == 164 || c == 165)
 		modifier = ALT;
-	else if(c == 91 || c == 92)   modifier = WIN;
+	else if (c == VK_SPACE) modifier = SPACE;
+	else if (c == 91 || c == 92)  modifier = WIN;
 	else if (c == 112) modifier = F1;
 	else if (c == 113) modifier = F2;
 	else if (c == 114) modifier = F3;

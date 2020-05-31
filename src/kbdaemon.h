@@ -34,7 +34,7 @@
 #include <collectc/array.h>
 #include <windows.h>
 
-#include <b.h>
+#include "b.h"
 
 typedef struct wbk_kbdaemon_s
 {
@@ -42,6 +42,9 @@ typedef struct wbk_kbdaemon_s
 	 * Function is called, when the user holds a any key combination. Make sure
 	 * the function executes fast. Otherwise Windows automatically de-registers
 	 * the handler and thus breaks your application!
+	 *
+	 * If the function returns 0, then it overwrites any other application's
+	 * behavior for that key combination.
 	 */
 	int (*exec_fn)(wbk_b_t *b);
 } wbk_kbdaemon_t;

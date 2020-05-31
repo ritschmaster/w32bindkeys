@@ -307,7 +307,7 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (kbdaemon) {
-		wbk_kbman_free(kbdaemon);
+		wbk_kbdaemon_free(kbdaemon);
 	}
 
 	return error;
@@ -349,7 +349,7 @@ ctrl_proc(_In_ DWORD ctrl_type)
 	switch (ctrl_type) {
 	default:
 		handled = TRUE;
-		SendMessage(g_window_handler, WM_CLOSE, (void *) NULL, (void *) NULL);
+		SendMessage(g_window_handler, WM_CLOSE, (WPARAM) NULL, (LPARAM) NULL);
 		break;
 	}
 

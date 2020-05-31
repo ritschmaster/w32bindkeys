@@ -27,7 +27,7 @@ wbk_datafinder_new(const char *datadir)
 	strcpy(datafinder->datadir, datadir);
 
 #if defined(WIN32)
-	GetModuleFileNameA(NULL, w32_buffer, MAX_PATH);
+	GetModuleFileNameA(NULL, (LPSTR) w32_buffer, MAX_PATH);
 
 	size = sizeof(char) * (sizeof(wchar_t) * wcslen(w32_buffer) + 1);
 	datafinder->execdir = malloc(size);
