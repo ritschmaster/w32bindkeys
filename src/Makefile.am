@@ -61,14 +61,21 @@ libwbkbase_la_SOURCES += kbman.c kbman.h
 libwbkbase_la_SOURCES += kbdaemon.c kbdaemon.h
 libwbkbase_la_SOURCES += parser.c parser.h
 
-libwbkbase_la_CFLAGS = @collectionc_CFLAGS@ $(AM_CFLAGS)
-libwbkbase_la_LDFLAGS = --static -mwindows
+libwbkbase_la_CFLAGS = $(AM_CFLAGS)
+libwbkbase_la_CFLAGS += @collectionc_CFLAGS@ 
+libwbkbase_la_LDFLAGS = $(AM_LDFLAGS)
+libwbkbase_la_LDFLAGS += -mwindows 
+libwbkbase_la_LDFLAGS += -static 
 libwbkbase_la_LIBADD = @collectionc_LIBS@
 
 w32bindkeys_SOURCES = main.c
-w32bindkeys_CFLAGS = @collectionc_CFLAGS@ $(AM_CFLAGS)
-w32bindkeys_LDFLAGS = --static
-w32bindkeys_LDADD = libwbkbase.la @collectionc_LIBS@
+w32bindkeys_CFLAGS = $(AM_CFLAGS)
+w32bindkeys_CFLAGS += @collectionc_CFLAGS@ 
+w32bindkeys_LDFLAGS = $(AM_LDFLAGS)
+w32bindkeys_LDFLAGS += -mwindows
+w32bindkeys_LDFLAGS += -static 
+w32bindkeys_LDADD = libwbkbase.la 
+w32bindkeys_LDADD += @collectionc_LIBS@
 
 if INSTALLBASE
 install-data-local:

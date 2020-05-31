@@ -85,4 +85,11 @@ wbk_b_contains(wbk_b_t *b, const wbk_be_t *be);
 extern int
 wbk_b_compare(const wbk_b_t *b, const wbk_b_t *other);
 
+/**
+ * @return A new string containing the binding in a human readable form. Free it
+ * by yourself!
+ */
+extern char *
+wbk_b_to_str(const wbk_b_t *b);
+
 #endif // WBK_B_H

@@ -31,6 +31,28 @@
 #ifndef WBK_BE_H
 #define WBK_BE_H
 
+#define WIN_STR "Mod4"
+#define ALT_STR "Mod1"
+#define CTRL_STR "Ctrl"
+#define SHIFT_STR "Shift"
+#define ENTER_STR "Return"
+#define NUMLOCK_STR "Numlock"
+#define CAPSLOCK_STR "Capslock"
+#define SCROLL_STR "Scroll"
+#define SPACE_STR "Space"
+#define F1_STR "F1"
+#define F2_STR "F2"
+#define F3_STR "F3"
+#define F4_STR "F4"
+#define F5_STR "F5"
+#define F6_STR "F6"
+#define F7_STR "F7"
+#define F8_STR "F8"
+#define F9_STR "F9"
+#define F10_STR "F10"
+#define F11_STR "F11"
+#define F12_STR "F12"
+
 /**
  * @brief Modifier key
  */

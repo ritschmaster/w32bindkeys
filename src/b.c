@@ -32,6 +32,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "logger.h"
 
@@ -160,3 +161,145 @@ wbk_b_compare(const wbk_b_t *b, const wbk_b_t *other)
 	return differs;
 }
 
+char *
+wbk_b_to_str(const wbk_b_t *b)
+{
+	int i;
+	int str_cur_pos;
+	int length;
+	char *str;
+
+	str = malloc(sizeof(char) * 255);
+	str[0] = '\0';
+	str_cur_pos = 0;
+
+	for (i = 0; i < WBK_B_MODIFER_MAP_LEN; i++) {
+		if (b->modifier_map[i] == 1) {
+			if (str_cur_pos > 0) {
+				str[str_cur_pos++] = ' ';
+				str[str_cur_pos++] = '+';
+				str[str_cur_pos++] = ' ';
+			}
+
+			switch (i) {
+			case WIN:
+				strcpy(str+str_cur_pos, WIN_STR);
+				str_cur_pos += strlen(WIN_STR);
+				break;
+
+			case ALT:
+				strcpy(str+str_cur_pos, ALT_STR);
+				str_cur_pos += strlen(ENTER_STR);
+				break;
+
+			case CTRL:
+				strcpy(str+str_cur_pos, CTRL_STR);
+				str_cur_pos += strlen(ENTER_STR);
+				break;
+
+			case ENTER:
+				strcpy(str+str_cur_pos, ENTER_STR);
+				str_cur_pos += strlen(ENTER_STR);
+				break;
+
+			case NUMLOCK:
+				strcpy(str+str_cur_pos, NUMLOCK_STR);
+				str_cur_pos += strlen(NUMLOCK_STR);
+				break;
+
+			case CAPSLOCK:
+				strcpy(str+str_cur_pos, CAPSLOCK_STR);
+				str_cur_pos += strlen(CAPSLOCK_STR);
+				break;
+
+			case SCROLL:
+				strcpy(str+str_cur_pos, SCROLL_STR);
+				str_cur_pos += strlen(SCROLL_STR);
+				break;
+
+			case SPACE:
+				strcpy(str+str_cur_pos, SPACE_STR);
+				str_cur_pos += strlen(SPACE_STR);
+				break;
+
+			case F1:
+				strcpy(str+str_cur_pos, F1_STR);
+				str_cur_pos += strlen(F1_STR);
+				break;
+
+			case F2:
+				strcpy(str+str_cur_pos, F2_STR);
+				str_cur_pos += strlen(F2_STR);
+				break;
+
+			case F3:
+				strcpy(str+str_cur_pos, F3_STR);
+				str_cur_pos += strlen(F3_STR);
+				break;
+
+			case F4:
+				strcpy(str+str_cur_pos, F4_STR);
+				str_cur_pos += strlen(F4_STR);
+				break;
+
+			case F5:
+				strcpy(str+str_cur_pos, F5_STR);
+				str_cur_pos += strlen(F5_STR);
+				break;
+
+			case F6:
+				strcpy(str+str_cur_pos, F6_STR);
+				str_cur_pos += strlen(F6_STR);
+				break;
+
+			case F7:
+				strcpy(str+str_cur_pos, F7_STR);
+				str_cur_pos += strlen(F7_STR);
+				break;
+
+			case F8:
+				strcpy(str+str_cur_pos, F8_STR);
+				str_cur_pos += strlen(F8_STR);
+				break;
+
+			case F9:
+				strcpy(str+str_cur_pos, F9_STR);
+				str_cur_pos += strlen(F9_STR);
+				break;
+
+			case F10:
+				strcpy(str+str_cur_pos, F10_STR);
+				str_cur_pos += strlen(F10_STR);
+				break;
+
+			case F11:
+				strcpy(str+str_cur_pos, F11_STR);
+				str_cur_pos += strlen(F11_STR);
+				break;
+
+			case F12:
+				strcpy(str+str_cur_pos, F12_STR);
+				str_cur_pos += strlen(F12_STR);
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	for (i = 0; i < WBK_B_KEY_MAP_LEN; i++) {
+		if (b->key_map[i] == 1) {
+			if (str_cur_pos > 0) {
+				str[str_cur_pos++] = ' ';
+				str[str_cur_pos++] = '+';
+				str[str_cur_pos++] = ' ';
+			}
+
+			str[str_cur_pos++] = tolower(i);
+			str[str_cur_pos] = '\0';
+		}
+	}
+
+	return str;
+}

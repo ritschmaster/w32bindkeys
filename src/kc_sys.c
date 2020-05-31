@@ -33,10 +33,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#if defined(WIN32)
 #include <windows.h>
-#endif
 
 #include "logger.h"
 
@@ -82,7 +79,7 @@ wbk_kc_sys_free(wbk_kc_sys_t *kc_sys)
 const wbk_b_t *
 wbk_kc_sys_get_binding(const wbk_kc_sys_t *kc_sys)
 {
-	wbk_kc_get_binding(kc_sys->kc);
+	return wbk_kc_get_binding(kc_sys->kc);
 }
 
 const char *
@@ -104,7 +101,15 @@ wbk_kbthread_exec(LPVOID param)
 int
 wbk_kc_sys_exec(const wbk_kc_sys_t *kc_sys)
 {
-#if defined(WIN32)
+#ifdef DEBUG_ENABLED
+	char *binding;
+
+	binding = wbk_b_to_str(wbk_kc_sys_get_binding(kc_sys));
+	wbk_logger_log(&logger, DEBUG, "Exec binding: %s\n", binding);
+	free(binding);
+	binding = NULL;
+#endif
+
 	HANDLE thread_handler;
 
 	thread_handler = CreateThread(NULL,
@@ -118,20 +123,6 @@ wbk_kc_sys_exec(const wbk_kc_sys_t *kc_sys)
 	} else {
 		wbk_logger_log(&logger, SEVERE, "Exec failed: %s\n", kc_sys->cmd);
 	}
-#else
-	pid_t pid;
-
-	pid = fork();
-
-	if (pid == 0) {
-		if (system(kc_sys->cmd)) {
-			wbk_logger_log(&logger, SEVERE, "Exec failed: %s\n", kc_sys->cmd);
-		} else {
-			wbk_logger_log(&logger, INFO, "Exec: %s\n", kc_sys->cmd);
-		}
-		_exit(EXIT_SUCCESS);
-	}
-#endif
 
 	return 0;
 }
