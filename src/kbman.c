@@ -22,9 +22,7 @@
   SOFTWARE.
 *******************************************************************************/
 
-#include <collectc/array.h>
 #include <windows.h>
-#include <pthread.h>
 
 #include "logger.h"
 #include "kbman.h"
@@ -40,7 +38,8 @@ wbk_kbman_new()
 	kbman = NULL;
 	kbman = malloc(sizeof(wbk_kbman_t));
 
-	array_new(&(kbman->kc_sys_arr));
+	kbman->kc_sys_arr_len = 0;
+	kbman->kc_sys_arr = NULL;
 
 	return kbman;
 
@@ -49,54 +48,47 @@ wbk_kbman_new()
 wbk_kbman_t *
 wbk_kbman_free(wbk_kbman_t *kbman)
 {
-	ArrayIter kb_iter;
-	wbk_kc_sys_t *kc_sys;
+	int i;
 
-	array_iter_init(&kb_iter, wbk_kbman_get_kb(kbman));
-	while (array_iter_next(&kb_iter, (void *) &kc_sys) != CC_ITER_END) {
-		array_iter_remove(&kb_iter, NULL);
-		wbk_kc_sys_free(kc_sys);
+	for (i = 0; kbman->kc_sys_arr_len; i++) {
+		wbk_kc_sys_free(kbman->kc_sys_arr[i]);
+		kbman->kc_sys_arr[i] = NULL;
 	}
-	array_destroy_cb(kbman->kc_sys_arr, free);
+	free(kbman->kc_sys_arr);
 	kbman->kc_sys_arr = NULL;
 
 	free(kbman);
 }
 
-Array *
-wbk_kbman_get_kb(wbk_kbman_t* kbman)
-{
-	return kbman->kc_sys_arr;
-}
-
 int
 wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys)
 {
-	array_add(kbman->kc_sys_arr, kc_sys);
+	kbman->kc_sys_arr_len++;
+	kbman->kc_sys_arr = realloc(kbman->kc_sys_arr,
+							    sizeof(wbk_kc_sys_t **) * kbman->kc_sys_arr_len);
+	kbman->kc_sys_arr[kbman->kc_sys_arr_len - 1] = kc_sys;
+	return 0;
 }
 
 int
 wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b)
 {
-	int ret;
-	char found;
-	ArrayIter kb_iter;
-	wbk_kc_sys_t *kc_sys;
+	int error;
+	int i;
+	int found_at;
 
-	ret = -1;
+	error = 1;
 
-	found = 0;
-	array_iter_init(&kb_iter, wbk_kbman_get_kb(kbman));
-	while (!found && array_iter_next(&kb_iter, (void *) &kc_sys) != CC_ITER_END) {
-		if (wbk_b_compare(wbk_kc_sys_get_binding(kc_sys), b) == 0) {
-			found = 1;
+	found_at = -1;
+	for (i = 0; found_at < 0 && i < kbman->kc_sys_arr_len; i++) {
+		if (wbk_b_compare(wbk_kc_sys_get_binding(kbman->kc_sys_arr[i]), b) == 0) {
+			found_at = i;
 		}
 	}
 
-	if (found) {
-		wbk_kc_sys_exec(kc_sys);
-		ret = 0;
+	if (found_at >= 0) {
+		error = wbk_kc_sys_exec(kbman->kc_sys_arr[found_at]);
 	}
 
-	return ret;
+	return error;
 }

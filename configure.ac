@@ -26,7 +26,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([w32bindkeys], [0.3], [])
+AC_INIT([w32bindkeys], [0.4.0], [])
 AC_CONFIG_SRCDIR([src/])
 AC_CONFIG_HEADERS([config.h])
 

@@ -10,7 +10,7 @@ xbindkeys for Windows
 
 ## Compiling
 
-### On Windows using Msys2
+### On Windows (64 bit) using Msys2
 
 You will need a functioning MinGW environment. This sections describes the compilation using [Msys2](https://www.msys2.org/).
 
@@ -44,7 +44,7 @@ Afterwards you may install w32bindkeys by performing:
 
     make install
 
-### On Fedora Linux (64 bit)
+### On Fedora Linux (64 bit) for Windows (64 bit)
 
 First install MinGW:
 
@@ -82,7 +82,7 @@ If you want to re-use the core functionality you may supply a special option to 
 
 ### Using the <kbd>Win</kbd> key
 
-<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This migt be annoying for people coming from a Linux window manager background. Luckily almost every special binding can be disabled by doing the following:
+<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This can be annoying but luckily w32bindkeys can overwrite those bindings. Additionally almost every special binding can be disabled by doing the following:
 
 1. Run `regedit`
 2. Go to `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\`
@@ -90,4 +90,16 @@ If you want to re-use the core functionality you may supply a special option to 
 4. Restart the computer
 5. <kbd>Win</kbd> + <kbd>E</kbd> and friends are now disabled. The only exception is <kbd>Win</kbd> + <kbd>L</kbd>.
 
+It is not possible to overwrite <kbd>Win</kbd> + <kbd>L</kbd>. The key must be disabled, but by doing so locking the PC will be disabled too.
+
+## Version scheme
+
+The version scheme of w32bindkeys is as follows: 1.2.3
+
+1. Stages:
+ 0. Alpha
+ 1. Beta
+ 2. For Production use
+2. Releases breaking compatibility of its API or the configuration file.
+3. Collection of changes not breaking any compatibility. 
 

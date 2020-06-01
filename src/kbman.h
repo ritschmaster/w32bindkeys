@@ -31,17 +31,14 @@
 #ifndef WBK_KBMAN_H
 #define WBK_KBMAN_H
 
-#include <collectc/array.h>
 #include <windows.h>
 
 #include "kc_sys.h"
 
 typedef struct wbk_kbman_s
 {
-	/**
-	 * Array of wbk_kc_sys *
-	 */
-	Array *kc_sys_arr;
+	int kc_sys_arr_len;
+	wbk_kc_sys_t **kc_sys_arr;
 } wbk_kbman_t;
 
 /**
@@ -51,13 +48,6 @@ wbk_kbman_new();
 
 extern wbk_kbman_t *
 wbk_kbman_free(wbk_kbman_t *kbman);
-
-/**
- * @brief Gets the key bindings of a key binding manager
- * @return Array of wbk_kc_sys *
- */
-extern Array *
-wbk_kbman_get_kb(wbk_kbman_t* kbman);
 
 /**
  * @param kb The key binding to add. The added key binding will be freed by the key binding manager
