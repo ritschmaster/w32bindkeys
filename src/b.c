@@ -189,12 +189,17 @@ wbk_b_to_str(const wbk_b_t *b)
 
 			case ALT:
 				strcpy(str+str_cur_pos, ALT_STR);
-				str_cur_pos += strlen(ENTER_STR);
+				str_cur_pos += strlen(ALT_STR);
 				break;
 
 			case CTRL:
 				strcpy(str+str_cur_pos, CTRL_STR);
-				str_cur_pos += strlen(ENTER_STR);
+				str_cur_pos += strlen(CTRL_STR);
+				break;
+
+			case SHIFT:
+				strcpy(str+str_cur_pos, SHIFT_STR);
+				str_cur_pos += strlen(SHIFT_STR);
 				break;
 
 			case ENTER:
