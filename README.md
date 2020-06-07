@@ -3,12 +3,12 @@
 
 xbindkeys for Windows
 
-## Dependencies
+## Compiling
+
+### Dependencies
 
 * [MinGW](http://mingw.org/)
 * [Collections-C](https://github.com/srdja/Collections-C)
-
-## Compiling
 
 ### On Windows (64 bit) using Msys2
 
@@ -101,5 +101,12 @@ The version scheme of w32bindkeys is as follows: 1.2.3
  1. Beta
  2. For Production use
 2. Releases breaking compatibility of its API or the configuration file.
-3. Collection of changes not breaking any compatibility. 
+3. Collection of changes not breaking any compatibility.
 
+## Author
+
+Richard Bäck <richard.baeck@mailbox.org>
+
+## License
+
+MIT License
