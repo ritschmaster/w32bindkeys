@@ -1,7 +1,39 @@
 # w32bindkeys
+
+![GitHub](https://img.shields.io/github/license/ritschmaster/w32bindkeys)
 [![Join the chat at https://gitter.im/w32bindkeys/community](https://badges.gitter.im/w32bindkeys/community.svg)](https://gitter.im/w32bindkeys/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![GitHub All Releases](https://img.shields.io/github/downloads/ritschmaster/w32bindkeys/total)
 
 xbindkeys for Windows
+
+## Using w32bindkeys
+
+### Using binary releases
+
+1. Head over to the [Release](https://github.com/ritschmaster/w32bindkeys/releases) page and download the latest binary zip file.
+2. Decompress it somwhere
+3. Execute `w32bindkeys.exe`
+4. An example configuration file was copied to your home directory named `.w32bindkeysrc`. Modify it to your needs!
+
+### Using source code releases
+
+1. Head over to the [Release](https://github.com/ritschmaster/w32bindkeys/releases) page and download the latest source zip file.
+2. Decompress it somwhere
+3. See [Compiling](#Compiling)
+4. Execute `w32bindkeys.exe`
+5. An example configuration file was copied to your home directory named `.w32bindkeysrc`. Modify it to your needs!
+
+### Using the <kbd>Win</kbd> key
+
+<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This can be annoying but luckily w32bindkeys can overwrite those bindings. Additionally almost every special binding can be disabled by doing the following:
+
+1. Run `regedit`
+2. Go to `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\`
+3. Create the DWORD `NoWinKeys` with the value `1`
+4. Restart the computer
+5. <kbd>Win</kbd> + <kbd>E</kbd> and friends are now disabled. The only exception is <kbd>Win</kbd> + <kbd>L</kbd>.
+
+It is not possible to overwrite <kbd>Win</kbd> + <kbd>L</kbd>. The key must be disabled, but by doing so locking the PC will be disabled too.
 
 ## Compiling
 
@@ -70,27 +102,6 @@ Then compile w32bindkeys:
 If you want to re-use the core functionality you may supply a special option to the `configure` script that will produce a dynamic installable library:
 
     ./configure --enable-install-base
-
-## Using w32bindkeys
-
-### Using precompiled releases
-
-1. Head over to the [Release](https://github.com/ritschmaster/w32bindkeys/releases) page and download the latest zip file.
-2. Decompress it somwhere
-3. Execute `w32bindkeys.exe`
-4. An example configuration file was copied to your home directory named `.w32bindkeysrc`. Modify it to your needs!
-
-### Using the <kbd>Win</kbd> key
-
-<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This can be annoying but luckily w32bindkeys can overwrite those bindings. Additionally almost every special binding can be disabled by doing the following:
-
-1. Run `regedit`
-2. Go to `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\`
-3. Create the DWORD `NoWinKeys` with the value `1`
-4. Restart the computer
-5. <kbd>Win</kbd> + <kbd>E</kbd> and friends are now disabled. The only exception is <kbd>Win</kbd> + <kbd>L</kbd>.
-
-It is not possible to overwrite <kbd>Win</kbd> + <kbd>L</kbd>. The key must be disabled, but by doing so locking the PC will be disabled too.
 
 ## Version scheme
 
