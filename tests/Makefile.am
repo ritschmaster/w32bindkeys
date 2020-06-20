@@ -22,9 +22,14 @@
 # SOFTWARE.
 ################################################################################
 
+AM_CFLAGS = -I$(top_builddir)/src 
+
 if DEBUG
-AM_CFLAGS = -I$(top_builddir)/src -g -O0
+AM_CFLAGS += -g -O0
 AM_LDFLAGS = -g -O0
+else
+AM_CFLAGS += -O2
+AM_LDFLAGS = -O2
 endif
 
 TESTS = check_util_intarr_to_str

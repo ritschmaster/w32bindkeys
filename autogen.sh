@@ -23,9 +23,41 @@
 # SOFTWARE.
 ################################################################################
 
-function all
+function clean
 {
-    autoreconf -im && ./configure --enable-debug --enable-install-base && make
+    make distclean
+    rm -rf configure
+    rm -rf m4
+    rm -rf autom4te.cache
+    rm -rf aclocal.m4
+    rm -rf Makefile.in
+    rm -rf src/Makefile.in
+    rm -rf tests/Makefile.in
+    rm -rf data/Makefile.in
+}
+
+function debug
+{
+    clean
+    
+    autoreconf -im 
+    export CLFAGS="-g -O0 -D DEBUG_ENABLED=1" 
+    export LDFLAGS="-g -O0"
+    ./configure --enable-debug -enable-install-base 
+    #./configure -enable-install-base CLFAGS="-g -O0 -D DEBUG_ENABLED=1" LDFLAGS="-g -O0"
+    make
+}
+
+function release
+{
+    clean
+
+    autoreconf -im 
+    export CLFAGS="-O2" 
+    export LDFLAGS="-O2"
+    ./configure --enable-install-base 
+    #./configure --enable-install-base CLFAGS="-O2" LDFLAGS="-O2"
+    make
 }
 
 while getopts ":v" opt; do
@@ -39,7 +71,13 @@ done
 args=( $@ )
 
 case "${args[$OPTIND - 1]}" in
+    clean)
+        clean
+        ;;
+    debug)
+        debug
+        ;;
     * )
-        all
+        release
         ;;
 esac
