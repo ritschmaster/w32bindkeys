@@ -37,6 +37,8 @@
 
 typedef struct wbk_kbdaemon_s
 {
+	HANDLE global_mutex;
+
 	/**
 	 * Function is called, when the user holds a any key combination. Make sure
 	 * the function executes fast. Otherwise Windows automatically de-registers
@@ -53,7 +55,7 @@ typedef struct wbk_kbdaemon_s
 extern wbk_kbdaemon_t *
 wbk_kbdaemon_new(int (*exec_fn)(wbk_b_t *b));
 
-extern wbk_kbdaemon_t *
+extern int
 wbk_kbdaemon_free(wbk_kbdaemon_t *kbdaemon);
 /**
  * @brief Execute a key binding matching a combination

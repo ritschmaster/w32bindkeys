@@ -30,7 +30,6 @@
  */
 
 #include <windows.h>
-#include <pthread.h>
 
 #include "logger.h"
 #include "kbdaemon.h"
@@ -39,10 +38,10 @@ static wbk_logger_t logger =  { "kbdaemon" };
 
 typedef struct wbk_hookman_s
 {
+	HANDLE global_mutex;
+
 	int kbdaemon_arr_len;
 	wbk_kbdaemon_t **kbdaemon_arr;
-
-	pthread_t thread;
 
 	char stop;
 
@@ -54,7 +53,7 @@ typedef struct wbk_hookman_s
 static wbk_hookman_t *g_hookman = NULL;
 
 static wbk_hookman_t *
-wbk_hookman_create();
+wbk_hookman_new();
 
 static int
 wbk_hookman_free(wbk_hookman_t *hookman);
@@ -85,16 +84,16 @@ static LRESULT CALLBACK
 wbk_hookman_windows_hook(int nCode, WPARAM wParam, LPARAM lParam);
 
 wbk_hookman_t *
-wbk_hookman_create()
+wbk_hookman_new()
 {
 	wbk_hookman_t *hookman;
 
 	hookman = malloc(sizeof(hookman));
 
+	hookman->global_mutex = CreateMutex(NULL, FALSE, NULL);
+
 	hookman->kbdaemon_arr_len = 0;
 	hookman->kbdaemon_arr = NULL;
-
-	memset(&(hookman->thread), 0, sizeof(pthread_t));
 
 	hookman->stop = 1;
 
@@ -109,6 +108,9 @@ wbk_hookman_free(wbk_hookman_t *hookman)
 	int i;
 
 	wbk_hookman_stop(hookman);
+
+	ReleaseMutex(hookman->global_mutex);
+	CloseHandle(hookman->global_mutex);
 
 	for (i = 0; i < hookman->kbdaemon_arr_len; i++) {
 		hookman->kbdaemon_arr[i] = NULL;
@@ -128,7 +130,7 @@ wbk_hookman_t *
 wbk_hookman_get_instance()
 {
 	if (g_hookman == NULL) {
-		g_hookman = wbk_hookman_create();
+		g_hookman = wbk_hookman_new();
 	}
 
 	return g_hookman;
@@ -137,10 +139,14 @@ wbk_hookman_get_instance()
 int
 wbk_hookman_add_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon)
 {
+	WaitForSingleObject(hookman->global_mutex, INFINITE);
+
 	hookman->kbdaemon_arr_len++;
 	hookman->kbdaemon_arr = realloc(hookman->kbdaemon_arr,
 									sizeof(wbk_kbdaemon_t **) * hookman->kbdaemon_arr_len);
 	hookman->kbdaemon_arr[hookman->kbdaemon_arr_len - 1] = kbdaemon;
+
+	ReleaseMutex(hookman->global_mutex);
 
 	return 0;
 }
@@ -151,6 +157,8 @@ wbk_hookman_remove_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon)
 	int i;
 	int error;
 
+	WaitForSingleObject(hookman->global_mutex, INFINITE);
+
 	error = 1;
 	for (int i = 0; i < hookman->kbdaemon_arr_len; i++) {
 		if (hookman->kbdaemon_arr[i] == kbdaemon) {
@@ -158,6 +166,8 @@ wbk_hookman_remove_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon)
 			error = 0;
 		}
 	}
+
+	ReleaseMutex(hookman->global_mutex);
 
 	return error;
 }
@@ -168,6 +178,8 @@ wbk_hookman_start(wbk_hookman_t *hookman)
 	HINSTANCE h_instance;
 	int ret;
 
+	WaitForSingleObject(hookman->global_mutex, INFINITE);
+
 	if (hookman->stop) {
 		hookman->stop = 0;
 		h_instance = GetModuleHandle(NULL);
@@ -176,17 +188,24 @@ wbk_hookman_start(wbk_hookman_t *hookman)
 		ret = 1;
 	}
 
+	ReleaseMutex(hookman->global_mutex);
+
 	return ret;
 }
 
 int
 wbk_hookman_stop(wbk_hookman_t *hookman)
 {
+	WaitForSingleObject(hookman->global_mutex, INFINITE);
+
 	if (!hookman->stop) {
 		UnhookWindowsHookEx(hookman->hook_id);
 	}
 
 	hookman->stop = 1;
+
+	ReleaseMutex(hookman->global_mutex);
+
 	return 0;
 }
 
@@ -206,6 +225,8 @@ wbk_hookman_windows_hook(int nCode, WPARAM wParam, LPARAM lParam)
 
 		hookman = wbk_hookman_get_instance();
 		changed_any = 0;
+
+		WaitForSingleObject(hookman->global_mutex, INFINITE);
 
 		switch (wParam) {
 			case WM_KEYDOWN:
@@ -235,6 +256,8 @@ wbk_hookman_windows_hook(int nCode, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+
+		ReleaseMutex(hookman->global_mutex);
 	}
 
 	if (!ret) {
@@ -249,8 +272,12 @@ wbk_kbdaemon_new(int (*exec_fn)(wbk_b_t *b))
 {
 	wbk_kbdaemon_t *kbdaemon;
 
+	wbk_hookman_get_instance();
+
 	kbdaemon = NULL;
 	kbdaemon = malloc(sizeof(wbk_kbdaemon_t));
+
+	kbdaemon->global_mutex = CreateMutex(NULL, FALSE, NULL);
 
 	kbdaemon->exec_fn = exec_fn;
 
@@ -258,12 +285,19 @@ wbk_kbdaemon_new(int (*exec_fn)(wbk_b_t *b))
 
 }
 
-wbk_kbdaemon_t *
+int
 wbk_kbdaemon_free(wbk_kbdaemon_t *kbdaemon)
 {
+	wbk_kbdaemon_stop(kbdaemon);
+
+	ReleaseMutex(kbdaemon->global_mutex);
+	CloseHandle(kbdaemon->global_mutex);
+
 	kbdaemon->exec_fn = NULL;
 
 	free(kbdaemon);
+
+	return 0;
 }
 
 int
@@ -277,10 +311,14 @@ wbk_kbdaemon_start(wbk_kbdaemon_t *kbdaemon)
 {
 	wbk_hookman_t *hookman;
 
+	WaitForSingleObject(kbdaemon->global_mutex, INFINITE);
+
 	hookman = wbk_hookman_get_instance();
 	wbk_kbdaemon_stop(kbdaemon);
 	wbk_hookman_add_kbdaemon(hookman, kbdaemon);
 	wbk_hookman_start(hookman);
+
+	ReleaseMutex(kbdaemon->global_mutex);
 
 	return 0;
 }
@@ -290,8 +328,12 @@ wbk_kbdaemon_stop(wbk_kbdaemon_t *kbdaemon)
 {
 	wbk_hookman_t *hookman;
 
+	WaitForSingleObject(kbdaemon->global_mutex, INFINITE);
+
 	hookman = wbk_hookman_get_instance();
 	wbk_hookman_remove_kbdaemon(hookman, kbdaemon);
+
+	ReleaseMutex(kbdaemon->global_mutex);
 
 	return 0;
 }
