@@ -47,12 +47,14 @@
  *
  * - 1 character for a blank
  * - 4 characters for the log level
+ * - 1 character for a blank
+ *
  * - 1 character for a colon
  * - 1 character for a blank
  */
-#define FMT_ADDITIONAL_LEN 26
+#define FMT_ADDITIONAL_LEN 27
 
-#define FMT "%04d-%02d-%02d %02d:%02d:%02d %s: "
+#define FMT "%04d-%02d-%02d %02d:%02d:%02d %s %s: "
 
 #define LEVEL_DEBUG "DEBU"
 #define LEVEL_INFO "INFO"
@@ -71,6 +73,7 @@ int
 wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...)
 {
 	char *extended_fmt;
+	int name_length;
 	int length;
 	time_t rawtime;
 	struct tm *tm;
@@ -80,7 +83,8 @@ wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...)
 		time(&rawtime);
 		tm = gmtime(&rawtime);
 
-		length = strlen(fmt) + FMT_ADDITIONAL_LEN + 1;
+		name_length = strlen(logger->name);
+		length = strlen(fmt) + FMT_ADDITIONAL_LEN + name_length + 1;
 		extended_fmt = malloc(sizeof(char) * length);
 
 		switch (level) {
@@ -88,32 +92,36 @@ wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...)
 			sprintf(extended_fmt, FMT,
 					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
 					tm->tm_hour, tm->tm_min, tm->tm_sec,
-					LEVEL_DEBUG);
+					LEVEL_DEBUG,
+					logger->name);
 			break;
 
 		case INFO:
 			sprintf(extended_fmt, FMT,
 					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
 					tm->tm_hour, tm->tm_min, tm->tm_sec,
-					LEVEL_INFO);
+					LEVEL_INFO,
+					logger->name);
 			break;
 
 		case WARNING:
 			sprintf(extended_fmt, FMT,
 					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
 					tm->tm_hour, tm->tm_min, tm->tm_sec,
-					LEVEL_WARNING);
+					LEVEL_WARNING,
+					logger->name);
 			break;
 
 		case SEVERE:
 			sprintf(extended_fmt, FMT,
 					tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
 					tm->tm_hour, tm->tm_min, tm->tm_sec,
-					LEVEL_SEVERE);
+					LEVEL_SEVERE,
+					logger->name);
 			break;
 		}
 
-		strcpy(extended_fmt + FMT_ADDITIONAL_LEN, fmt);
+		strcpy(extended_fmt + FMT_ADDITIONAL_LEN + name_length, fmt);
 
 
 		va_start(argptr, fmt);
