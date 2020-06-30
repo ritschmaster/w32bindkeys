@@ -32,7 +32,7 @@
 
 #if defined(WIN32)
 #include <windows.h>
-#include <Shlobj.h>
+#include <shlobj.h>
 #else
 #include <pwd.h>
 #endif
