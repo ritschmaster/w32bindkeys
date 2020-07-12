@@ -96,12 +96,13 @@ Then compile and install Collections-C:
 
 Then compile w32bindkeys:
 
-    mingw64-configure
+    export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig/
+    ./configure --host=x86_64-w64-mingw32
     make
 
 If you want to re-use the core functionality you may supply a special option to the `configure` script that will produce a dynamic installable library:
 
-    ./configure --enable-install-base
+    ./configure --host=x86_64-w64-mingw32 --enable-install-base
 
 ## Version scheme
 
