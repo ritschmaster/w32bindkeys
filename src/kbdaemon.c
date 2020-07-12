@@ -36,184 +36,130 @@
 
 static wbk_logger_t logger =  { "kbdaemon" };
 
-typedef struct wbk_hookman_s
-{
-	HANDLE global_mutex;
+static int g_kbdaemon_arr_len = 0;
+static wbk_kbdaemon_t **g_kbdaemon_arr = NULL;
+static HHOOK g_hook_id = NULL;
+static wbk_b_t *g_cur_b = NULL;
 
-	int kbdaemon_arr_len;
-	wbk_kbdaemon_t **kbdaemon_arr;
-
-	char stop;
-
-	HHOOK hook_id;
-
-	wbk_b_t *cur_b;
-} wbk_hookman_t;
-
-static wbk_hookman_t *g_hookman = NULL;
-
-static wbk_hookman_t *
-wbk_hookman_new();
-
+/**
+ * Starts tracking keyboard activity by adding a low level keyboard hook to
+ * Windows.
+ *
+ * @return 0 if the tracking could be started.
+ */
 static int
-wbk_hookman_free(wbk_hookman_t *hookman);
+wbk_kbhook_start();
 
-static wbk_hookman_t *
-wbk_hookman_get_instance();
+/**
+ * Stops tracking keyboard activity by removing the low level keyboard hook from
+ * Windows.
+ *
+ * @return 0 if the tracking could be stopped.
+ */
+static int
+wbk_kbhook_stop();
+
+/**
+ * The low level keyboard hook started and stopped by wbk_kbhook_start()  and
+ * wbk_kbhook_stop().
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook(int nCode, WPARAM wParam, LPARAM lParam);
 
 /**
  * @param kbdaemon Will not be freed.
+ * @return 0 if the add was successful.
  */
 static int
-wbk_hookman_add_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon);
-
-static int
-wbk_hookman_remove_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon);
+wbk_kbhook_add_kbdaemon(wbk_kbdaemon_t *kbdaemon);
 
 /**
- * @brief Adds a handler to the Windows message loop
- * @return 0 if the thread was started.
+ * @param kbdaemon Will not be freed.
+ * @return 0 if the removal was successful.
  */
 static int
-wbk_hookman_start(wbk_hookman_t *hookman);
+wbk_kbhook_remove_kbdaemon(wbk_kbdaemon_t *kbdaemon);
 
-static int
-wbk_hookman_stop(wbk_hookman_t *hookman);
-
-static LRESULT CALLBACK
-wbk_hookman_windows_hook(int nCode, WPARAM wParam, LPARAM lParam);
-
-wbk_hookman_t *
-wbk_hookman_new()
-{
-	wbk_hookman_t *hookman;
-
-	hookman = malloc(sizeof(hookman));
-
-	hookman->global_mutex = CreateMutex(NULL, FALSE, NULL);
-
-	hookman->kbdaemon_arr_len = 0;
-	hookman->kbdaemon_arr = NULL;
-
-	hookman->stop = 1;
-
-	hookman->cur_b = wbk_b_new();
-
-	return hookman;
-}
 
 int
-wbk_hookman_free(wbk_hookman_t *hookman)
+wbk_kbhook_add_kbdaemon(wbk_kbdaemon_t *kbdaemon)
 {
-	int i;
+	int arr_len;
 
-	wbk_hookman_stop(hookman);
+	arr_len = g_kbdaemon_arr_len;
+	g_kbdaemon_arr_len = 0;
+	arr_len++;
 
-	ReleaseMutex(hookman->global_mutex);
-	CloseHandle(hookman->global_mutex);
+	g_kbdaemon_arr = realloc(g_kbdaemon_arr, sizeof(wbk_kbdaemon_t **) * arr_len);
+	g_kbdaemon_arr[arr_len - 1] = kbdaemon;
 
-	for (i = 0; i < hookman->kbdaemon_arr_len; i++) {
-		hookman->kbdaemon_arr[i] = NULL;
-	}
-	free(hookman->kbdaemon_arr);
-	hookman->kbdaemon_arr = NULL;
-
-	wbk_b_free(hookman->cur_b);
-	hookman->cur_b = NULL;
-
-	free(hookman);
-
-	return 0;
-}
-
-wbk_hookman_t *
-wbk_hookman_get_instance()
-{
-	if (g_hookman == NULL) {
-		g_hookman = wbk_hookman_new();
-	}
-
-	return g_hookman;
-}
-
-int
-wbk_hookman_add_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon)
-{
-	WaitForSingleObject(hookman->global_mutex, INFINITE);
-
-	hookman->kbdaemon_arr_len++;
-	hookman->kbdaemon_arr = realloc(hookman->kbdaemon_arr,
-									sizeof(wbk_kbdaemon_t **) * hookman->kbdaemon_arr_len);
-	hookman->kbdaemon_arr[hookman->kbdaemon_arr_len - 1] = kbdaemon;
-
-	ReleaseMutex(hookman->global_mutex);
+	g_kbdaemon_arr_len = arr_len;
 
 	return 0;
 }
 
 int
-wbk_hookman_remove_kbdaemon(wbk_hookman_t *hookman, wbk_kbdaemon_t *kbdaemon)
+wbk_kbhook_remove_kbdaemon(wbk_kbdaemon_t *kbdaemon)
 {
-	int i;
 	int error;
-
-	WaitForSingleObject(hookman->global_mutex, INFINITE);
+	int arr_len;
+	int i;
 
 	error = 1;
-	for (int i = 0; i < hookman->kbdaemon_arr_len; i++) {
-		if (hookman->kbdaemon_arr[i] == kbdaemon) {
-			hookman->kbdaemon_arr[i] = NULL;
+
+	arr_len = g_kbdaemon_arr_len;
+	g_kbdaemon_arr_len = 0;
+
+	error = 1;
+	for (int i = 0; i < arr_len; i++) {
+		if (g_kbdaemon_arr[i] == kbdaemon) {
+			g_kbdaemon_arr[i] = NULL;
 			error = 0;
 		}
 	}
 
-	ReleaseMutex(hookman->global_mutex);
+	g_kbdaemon_arr_len = arr_len;
 
 	return error;
 }
 
 int
-wbk_hookman_start(wbk_hookman_t *hookman)
+wbk_kbhook_start()
 {
+	int error;
 	HINSTANCE h_instance;
-	int ret;
 
-	WaitForSingleObject(hookman->global_mutex, INFINITE);
+	error = 0;
 
-	if (hookman->stop) {
-		hookman->stop = 0;
-		h_instance = GetModuleHandle(NULL);
-		hookman->hook_id = SetWindowsHookExA(WH_KEYBOARD_LL, wbk_hookman_windows_hook, h_instance, 0);
-	} else {
-		ret = 1;
+	if (g_cur_b == NULL) {
+		g_cur_b = wbk_b_new();
 	}
 
-	ReleaseMutex(hookman->global_mutex);
+	if (g_hook_id == NULL) {
+		h_instance = GetModuleHandle(NULL);
+		g_hook_id = SetWindowsHookExA(WH_KEYBOARD_LL, wbk_kbhook_windows_hook, h_instance, 0);
+	}
 
-	return ret;
+	return error;
 }
 
 int
-wbk_hookman_stop(wbk_hookman_t *hookman)
+wbk_kbhook_stop()
 {
-	WaitForSingleObject(hookman->global_mutex, INFINITE);
-
-	if (!hookman->stop) {
-		UnhookWindowsHookEx(hookman->hook_id);
+	if (g_hook_id) {
+		UnhookWindowsHookEx(g_hook_id);
 	}
 
-	hookman->stop = 1;
-
-	ReleaseMutex(hookman->global_mutex);
+	wbk_b_free(g_cur_b);
+	g_cur_b = NULL;
 
 	return 0;
 }
 
 LRESULT CALLBACK
-wbk_hookman_windows_hook(int nCode, WPARAM wParam, LPARAM lParam)
+wbk_kbhook_windows_hook(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	int ret;
-	wbk_hookman_t *hookman;
 	KBDLLHOOKSTRUCT *hookstruct;
 	wbk_be_t be;
 	int changed_any;
@@ -221,43 +167,45 @@ wbk_hookman_windows_hook(int nCode, WPARAM wParam, LPARAM lParam)
 
 	ret = 0;
 	if (nCode >= 0) {
-		hookstruct = (KBDLLHOOKSTRUCT *)lParam;
-
-		hookman = wbk_hookman_get_instance();
-		changed_any = 0;
-
-		WaitForSingleObject(hookman->global_mutex, INFINITE);
-
 		switch (wParam) {
-			case WM_KEYDOWN:
-			case WM_SYSKEYDOWN:
-				be.modifier = wbk_kbdaemon_win32_to_mk(hookstruct->vkCode);
-				be.key = wbk_kbdaemon_win32_to_char(hookstruct->vkCode);
-				if (wbk_b_add(hookman->cur_b, &be) == 0) {
-					changed_any = 1;
-				}
-				break;
+		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
+		case WM_KEYUP:
+		case WM_SYSKEYUP:
+			hookstruct = (KBDLLHOOKSTRUCT *)lParam;
 
-			case WM_KEYUP:
-			case WM_SYSKEYUP:
-				be.modifier = wbk_kbdaemon_win32_to_mk(hookstruct->vkCode);
-				be.key = wbk_kbdaemon_win32_to_char(hookstruct->vkCode);
-				if (wbk_b_remove(hookman->cur_b, &be) == 0) {
-					changed_any = 1;
-				}
-				break;
-		}
+			changed_any = 0;
 
-		if (changed_any) {
-			for (i = 0; i < hookman->kbdaemon_arr_len; i++) {
-				if (hookman->kbdaemon_arr[i]
-					&& wbk_kbdaemon_exec(hookman->kbdaemon_arr[i], hookman->cur_b) == 0) {
-					ret = 1;
+			be.modifier = wbk_kbdaemon_win32_to_mk(hookstruct->vkCode);
+			be.key = wbk_kbdaemon_win32_to_char(hookstruct->vkCode);
+
+			switch (wParam) {
+				case WM_KEYDOWN:
+				case WM_SYSKEYDOWN:
+					if (wbk_b_add(g_cur_b, &be) == 0) {
+						changed_any = 1;
+					}
+					break;
+
+				case WM_KEYUP:
+				case WM_SYSKEYUP:
+					be.modifier = wbk_kbdaemon_win32_to_mk(hookstruct->vkCode);
+					be.key = wbk_kbdaemon_win32_to_char(hookstruct->vkCode);
+					if (wbk_b_remove(g_cur_b, &be) == 0) {
+						changed_any = 1;
+					}
+					break;
+			}
+
+			if (changed_any) {
+				for (i = 0; i < g_kbdaemon_arr_len; i++) {
+					if (g_kbdaemon_arr[i]
+						&& wbk_kbdaemon_exec(g_kbdaemon_arr[i], g_cur_b) == 0) {
+						ret = 1;
+					}
 				}
 			}
 		}
-
-		ReleaseMutex(hookman->global_mutex);
 	}
 
 	if (!ret) {
@@ -272,8 +220,6 @@ wbk_kbdaemon_new(int (*exec_fn)(wbk_b_t *b))
 {
 	wbk_kbdaemon_t *kbdaemon;
 
-	wbk_hookman_get_instance();
-
 	kbdaemon = NULL;
 	kbdaemon = malloc(sizeof(wbk_kbdaemon_t));
 
@@ -282,7 +228,6 @@ wbk_kbdaemon_new(int (*exec_fn)(wbk_b_t *b))
 	kbdaemon->exec_fn = exec_fn;
 
 	return kbdaemon;
-
 }
 
 int
@@ -300,7 +245,7 @@ wbk_kbdaemon_free(wbk_kbdaemon_t *kbdaemon)
 	return 0;
 }
 
-int
+inline int
 wbk_kbdaemon_exec(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b)
 {
 	return kbdaemon->exec_fn(b);
@@ -309,14 +254,11 @@ wbk_kbdaemon_exec(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b)
 int
 wbk_kbdaemon_start(wbk_kbdaemon_t *kbdaemon)
 {
-	wbk_hookman_t *hookman;
-
 	WaitForSingleObject(kbdaemon->global_mutex, INFINITE);
 
-	hookman = wbk_hookman_get_instance();
 	wbk_kbdaemon_stop(kbdaemon);
-	wbk_hookman_add_kbdaemon(hookman, kbdaemon);
-	wbk_hookman_start(hookman);
+	wbk_kbhook_add_kbdaemon(kbdaemon);
+	wbk_kbhook_start();
 
 	ReleaseMutex(kbdaemon->global_mutex);
 
@@ -326,12 +268,9 @@ wbk_kbdaemon_start(wbk_kbdaemon_t *kbdaemon)
 int
 wbk_kbdaemon_stop(wbk_kbdaemon_t *kbdaemon)
 {
-	wbk_hookman_t *hookman;
-
 	WaitForSingleObject(kbdaemon->global_mutex, INFINITE);
 
-	hookman = wbk_hookman_get_instance();
-	wbk_hookman_remove_kbdaemon(hookman, kbdaemon);
+	wbk_kbhook_remove_kbdaemon(kbdaemon);
 
 	ReleaseMutex(kbdaemon->global_mutex);
 

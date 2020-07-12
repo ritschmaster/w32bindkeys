@@ -82,7 +82,7 @@ wbk_b_reset(wbk_b_t *b)
 	return 0;
 }
 
-int
+inline int
 wbk_b_add(wbk_b_t *b, const wbk_be_t *be)
 {
 	int ret;
@@ -103,7 +103,7 @@ wbk_b_add(wbk_b_t *b, const wbk_be_t *be)
 	return ret;
 }
 
-int
+inline int
 wbk_b_remove(wbk_b_t *b, const wbk_be_t *be)
 {
 	int ret;
@@ -124,7 +124,7 @@ wbk_b_remove(wbk_b_t *b, const wbk_be_t *be)
 	return ret;
 }
 
-int
+inline int
 wbk_b_contains(wbk_b_t *b, const wbk_be_t *be)
 {
 	int found;
@@ -138,27 +138,11 @@ wbk_b_contains(wbk_b_t *b, const wbk_be_t *be)
 	return found;
 }
 
-int
+inline int
 wbk_b_compare(const wbk_b_t *b, const wbk_b_t *other)
 {
-	int differs;
-	int i;
-
-	differs = 0;
-
-	for (i = 0; !differs && i < WBK_B_MODIFER_MAP_LEN; i++) {
-		if (b->modifier_map[i] != other->modifier_map[i]) {
-			differs = 1;
-		}
-	}
-
-	for (i = 0; !differs && i < WBK_B_KEY_MAP_LEN; i++) {
-		if (b->key_map[i] != other->key_map[i]) {
-			differs = 1;
-		}
-	}
-
-	return differs;
+	return memcmp(b->modifier_map, other->modifier_map, WBK_B_MODIFER_MAP_LEN * sizeof(wbk_mk_t))
+		   || memcmp(b->key_map, other->key_map, WBK_B_KEY_MAP_LEN * sizeof(char));
 }
 
 char *

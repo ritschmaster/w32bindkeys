@@ -31,6 +31,7 @@
 #include "be.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "logger.h"
 
@@ -39,7 +40,7 @@ static wbk_logger_t logger =  { "be" };
 static int
 wbk_be_compare_key(char a, char b);
 
-int
+inline int
 wbk_be_compare_key(char a, char b)
 {
 	if (a < b)
@@ -72,35 +73,22 @@ wbk_be_free(wbk_be_t *be)
 	return 0;
 }
 
-wbk_mk_t
+inline wbk_mk_t
 wbk_be_get_modifier(const wbk_be_t *be)
 {
 	return be->modifier;
 }
 
-char
+inline char
 wbk_be_get_key(const wbk_be_t *be)
 {
 	return be->key;
 }
 
-int
+inline int
 wbk_be_compare(const wbk_be_t *be, const wbk_be_t *other)
 {
-	int ret;
-
-	if (be->modifier && other->modifier) {
-		if (be->modifier < other->modifier)
-			ret = -1;
-		else if (be->modifier > other->modifier)
-			ret = 1;
-		else
-			ret = 0;
-	} else {
-		ret = wbk_be_compare_key(be->key, other->key);
-	}
-
-	return ret;
+	return memcmp(be, other, sizeof(wbk_be_t));
 }
 
 
