@@ -51,7 +51,7 @@
 
 #define WBK_WINDOW_CLASSNAME "wbkWindowClass"
 
-static struct option B3_GETOPT_LONG_OPTIONS[] = {
+static struct option WBK_GETOPT_LONG_OPTIONS[] = {
     /*   NAME          ARGUMENT           FLAG  SHORTNAME */
         {"help",       no_argument,       NULL, 'h'},
         {"verbose",    no_argument,       NULL, 'v'},
@@ -117,7 +117,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		option_index = 0;
 		while ((opt = getopt_long(argc, argv,
 								  WBK_GETOPT_OPTIONS,
-								  B3_GETOPT_LONG_OPTIONS,
+								  WBK_GETOPT_LONG_OPTIONS,
 								  &option_index))
 				!= -1) {
 			switch(opt) {
@@ -172,11 +172,11 @@ print_help(const char *cmd_name)
 	print_version();
 
 	fprintf(stdout, "Usage: %s [options]\n", cmd_name);
-	fprintf(stdout, "  where options are:\n", cmd_name);
-	fprintf(stdout, "  -V, --version          Print version and exit\n", cmd_name);
-	fprintf(stdout, "  -d, --defaults         Print a default rc file\n", cmd_name);
-	fprintf(stdout, "  -v, --verbose          More information on w32bindkeys when it run\n", cmd_name);
-	fprintf(stdout, "  -h, --help             This help!\n", cmd_name);
+	fprintf(stdout, "  where options are:\n");
+	fprintf(stdout, "  -V, --version          Print version and exit\n");
+	fprintf(stdout, "  -d, --defaults         Print a default rc file\n");
+	fprintf(stdout, "  -v, --verbose          More information on %s when it runs\n", PACKAGE);
+	fprintf(stdout, "  -h, --help             This help!\n");
 
 	return 0;
 }

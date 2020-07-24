@@ -48,7 +48,7 @@ You will need a functioning MinGW environment. This sections describes the compi
 
 First install the dependencies:
 
-    pacman -S gcc make cmake automake autoconf mingw-w64-x86_64-gcc
+    pacman -S make cmake automake autoconf mingw-w64-x86_64-gcc libtool
 
 Use the __MSYS2 MinGW 64-bit__ Terminal for the next actions and everytime you want to re-compile w32bindkeys.
 
@@ -80,7 +80,7 @@ Afterwards you may install w32bindkeys by performing:
 
 First install MinGW:
 
-    sudo dnf install -y mingw64-gcc mingw64-gcc-c++ mingw64-winpthreads-static cmake automake autoconf autoconf-archive libtool
+    sudo dnf install -y mingw64-gcc mingw64-gcc-c++ cmake automake autoconf autoconf-archive libtool
 
 Then compile and install Collections-C:
 
