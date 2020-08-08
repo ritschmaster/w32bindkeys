@@ -35,6 +35,10 @@
 
 #include "b.h"
 
+struct wbk_kbdaemon_s;
+
+typedef struct wbk_kbdaemon_s wbk_kbdaemon_t;
+
 typedef struct wbk_kbdaemon_s
 {
 	HANDLE global_mutex;
@@ -47,13 +51,13 @@ typedef struct wbk_kbdaemon_s
 	 * If the function returns 0, then it overwrites any other application's
 	 * behavior for that key combination.
 	 */
-	int (*exec_fn)(wbk_b_t *b);
+	int (*exec_fn)(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b);
 } wbk_kbdaemon_t;
 
 /**
  */
 extern wbk_kbdaemon_t *
-wbk_kbdaemon_new(int (*exec_fn)(wbk_b_t *b));
+wbk_kbdaemon_new(int (*exec_fn)(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b));
 
 extern int
 wbk_kbdaemon_free(wbk_kbdaemon_t *kbdaemon);

@@ -66,6 +66,21 @@ wbk_b_new()
 	return b;
 }
 
+wbk_b_t *
+wbk_b_clone(const wbk_b_t *other)
+{
+	wbk_b_t *b;
+
+	b = NULL;
+	if (other) {
+		b = wbk_b_new();
+		memcpy(b->modifier_map, other->modifier_map, sizeof(wbk_mk_t) * WBK_B_MODIFER_MAP_LEN);
+		memcpy(b->key_map, other->key_map, sizeof(char) * WBK_B_KEY_MAP_LEN);
+	}
+
+	return b;
+}
+
 int
 wbk_b_free(wbk_b_t *b)
 {

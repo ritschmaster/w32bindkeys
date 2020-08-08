@@ -43,8 +43,17 @@ typedef struct wbk_b_s
 	char key_map[WBK_B_KEY_MAP_LEN];
 } wbk_b_t;
 
+/**
+ * Creates a new binding
+ */
 extern wbk_b_t *
 wbk_b_new();
+
+/**
+ * Clones an existing binding.
+ */
+extern wbk_b_t *
+wbk_b_clone(const wbk_b_t *other);
 
 extern int
 wbk_b_free(wbk_b_t *b);

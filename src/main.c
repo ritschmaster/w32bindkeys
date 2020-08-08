@@ -51,6 +51,8 @@
 
 #define WBK_WINDOW_CLASSNAME "wbkWindowClass"
 
+#define WBK_KBDAEMON_ARR_LEN 3
+
 static struct option WBK_GETOPT_LONG_OPTIONS[] = {
     /*   NAME          ARGUMENT           FLAG  SHORTNAME */
         {"help",       no_argument,       NULL, 'h'},
@@ -63,7 +65,8 @@ static struct option WBK_GETOPT_LONG_OPTIONS[] = {
 static wbk_logger_t logger = { "main" };
 
 static HWND g_window_handler;
-static wbk_kbman_t *g_kbman;
+static wbk_kbdaemon_t **g_kbdaemon_arr = NULL;
+static wbk_kbman_t **g_kbman_arr = NULL;
 
 static int
 print_version(void);
@@ -78,7 +81,7 @@ static int
 parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder);
 
 static int
-kbdaemon_exec_fn(wbk_b_t *b);
+kbdaemon_exec_fn(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b);
 
 BOOL WINAPI
 ctrl_proc(_In_ DWORD ctrl_type);
@@ -204,7 +207,8 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	char *defaults_rc_filename;
 	FILE *rc_file;
 	wbk_parser_t *parser;
-	wbk_kbdaemon_t *kbdaemon;
+	wbk_kbman_t *kbman;
+	int i;
 	WNDCLASSEX wc;
 	MSG msg;
 
@@ -212,8 +216,34 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	rc_filename = NULL;
 	rc_file = NULL;
 	parser = NULL;
-	g_kbman = NULL;
-	kbdaemon = NULL;
+	kbman = NULL;
+
+	g_kbdaemon_arr = malloc(sizeof(wbk_kbdaemon_t **) * WBK_KBDAEMON_ARR_LEN);
+
+	if (!error) {
+		wc.cbSize = sizeof(WNDCLASSEX);
+		wc.style = 0;
+		wc.lpfnWndProc = main_window_proc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInstance;
+		wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = WBK_WINDOW_CLASSNAME;
+		wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+
+		if(RegisterClassEx(&wc))
+		{
+			g_window_handler = CreateWindowEx(0, WBK_WINDOW_CLASSNAME, WBK_WINDOW_CLASSNAME,
+					       	                  0, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+		} else {
+			error = 1;
+		}
+
+		SetConsoleCtrlHandler(ctrl_proc, TRUE);
+	}
 
 	if (!error) {
 		rc_filename = wbk_path_from_home(WBK_RC);
@@ -242,46 +272,26 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 	}
 
 	if (!error) {
-		g_kbman = wbk_parser_parse(parser);
-		if (!g_kbman) {
-			error = 1;
-		}
-	}
+		kbman = wbk_parser_parse(parser);
+		if (kbman) {
+			g_kbman_arr = wbk_kbman_split(kbman, WBK_KBDAEMON_ARR_LEN);
 
-	if (!error) {
-		kbdaemon = wbk_kbdaemon_new(kbdaemon_exec_fn);
-		if (!kbdaemon) {
-			error = 1;
-		}
-	}
-
-	if (!error) {
-		wc.cbSize = sizeof(WNDCLASSEX);
-		wc.style = 0;
-		wc.lpfnWndProc = main_window_proc;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = hInstance;
-		wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = WBK_WINDOW_CLASSNAME;
-		wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-
-		if(RegisterClassEx(&wc))
-		{
-			g_window_handler = CreateWindowEx(0, WBK_WINDOW_CLASSNAME, WBK_WINDOW_CLASSNAME,
-					       	                  0, 0, 0, 0, 0, NULL, NULL, hInstance, NULL);
+			wbk_kbman_free(kbman);
+			kbman = NULL;
 		} else {
 			error = 1;
 		}
-
-		SetConsoleCtrlHandler(ctrl_proc, TRUE);
 	}
 
 	if (!error) {
-		error = wbk_kbdaemon_start(kbdaemon);
+		for (i = 0; i < WBK_KBDAEMON_ARR_LEN; i++) {
+			g_kbdaemon_arr[i] = wbk_kbdaemon_new(kbdaemon_exec_fn);
+			if (g_kbdaemon_arr[i]) {
+				error = wbk_kbdaemon_start(g_kbdaemon_arr[i]);
+			} else {
+				error = 1;
+			}
+		}
 	}
 
 	if (!error) {
@@ -290,7 +300,6 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 			DispatchMessage(&msg);
 		}
 		wbk_logger_log(&logger, INFO, "Terminating the application\n");
-		wbk_kbdaemon_stop(kbdaemon);
 	}
 
 	if (rc_filename) {
@@ -301,22 +310,43 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 		wbk_parser_free(parser);
 	}
 
-	if (g_kbman) {
-		wbk_kbman_free(g_kbman);
-		g_kbman = NULL;
+	if (g_kbdaemon_arr) {
+		for (i = 0; i < WBK_KBDAEMON_ARR_LEN; i++) {
+			if (g_kbdaemon_arr[i]) {
+				wbk_kbdaemon_stop(g_kbdaemon_arr[i]);
+				wbk_kbdaemon_free(g_kbdaemon_arr[i]);
+				g_kbdaemon_arr[i] = NULL;
+			}
+		}
+		free(g_kbdaemon_arr);
+		g_kbdaemon_arr = NULL;
 	}
 
-	if (kbdaemon) {
-		wbk_kbdaemon_free(kbdaemon);
+	if (g_kbman_arr) {
+		for (i = 0; i < WBK_KBDAEMON_ARR_LEN; i++) {
+			if (g_kbman_arr[i]) {
+				wbk_kbman_free(g_kbman_arr[i]);
+				g_kbman_arr[i] = NULL;
+			}
+		}
+		free(g_kbman_arr);
+		g_kbman_arr = NULL;
 	}
 
 	return error;
 }
 
 int
-kbdaemon_exec_fn(wbk_b_t *b)
+kbdaemon_exec_fn(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b)
 {
-	return wbk_kbman_exec(g_kbman, b);
+	if (kbdaemon == g_kbdaemon_arr[0])
+		return wbk_kbman_exec(g_kbman_arr[0], b);
+	else if (kbdaemon == g_kbdaemon_arr[1])
+		return wbk_kbman_exec(g_kbman_arr[1], b);
+	else if (kbdaemon == g_kbdaemon_arr[2])
+		return wbk_kbman_exec(g_kbman_arr[2], b);
+	else
+		return 1;
 }
 
 LRESULT CALLBACK

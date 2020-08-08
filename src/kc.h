@@ -47,6 +47,12 @@ extern wbk_kc_t *
 wbk_kc_new(wbk_b_t *comb);
 
 /**
+ * Clones a key binding command.
+ */
+extern wbk_kc_t *
+wbk_kc_clone(const wbk_kc_t *other);
+
+/**
  * @brief Frees a key binding command
  * @return Non-0 if the freeing failed
  */

@@ -63,6 +63,28 @@ wbk_kc_sys_new(wbk_b_t *comb, char *cmd)
 	return kb_sys;
 }
 
+wbk_kc_sys_t *
+wbk_kc_sys_clone(const wbk_kc_sys_t *other)
+{
+	wbk_b_t *comb;
+	char *cmd;
+	int cmd_len;
+	wbk_kc_sys_t *kc_sys;
+
+	kc_sys = NULL;
+	if (other) {
+		comb = wbk_b_clone(wbk_kc_sys_get_binding(other));
+
+		cmd_len = strlen(wbk_kc_sys_get_cmd(other)) + 1;
+		cmd = malloc(sizeof(char) * cmd_len);
+		memcpy(cmd, wbk_kc_sys_get_cmd(other), sizeof(char) * cmd_len);
+
+		kc_sys = wbk_kc_sys_new(comb, cmd);
+	}
+
+	return kc_sys;
+}
+
 int
 wbk_kc_sys_free(wbk_kc_sys_t *kc_sys)
 {

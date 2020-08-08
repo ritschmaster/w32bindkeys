@@ -62,6 +62,21 @@ wbk_kc_new(wbk_b_t *comb)
 	return kc;
 }
 
+wbk_kc_t *
+wbk_kc_clone(const wbk_kc_t *other)
+{
+	wbk_b_t *b;
+	wbk_kc_t *kc;
+
+	kc = NULL;
+	if (other) {
+		b = wbk_b_clone(other->binding);
+		kc = wbk_kc_new(b);
+	}
+
+	return kc;
+}
+
 int
 wbk_kc_free(wbk_kc_t *kc)
 {

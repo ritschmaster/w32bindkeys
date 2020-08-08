@@ -50,6 +50,12 @@ extern wbk_kc_sys_t *
 wbk_kc_sys_new(wbk_b_t *comb, char *cmd);
 
 /**
+ * Clones a key binding system command
+ */
+extern wbk_kc_sys_t *
+wbk_kc_sys_clone(const wbk_kc_sys_t *other);
+
+/**
  * @brief Frees a key binding system command
  * @return Non-0 if the freeing failed
  */

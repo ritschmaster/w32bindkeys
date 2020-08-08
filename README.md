@@ -23,9 +23,24 @@ xbindkeys for Windows
 4. Execute `w32bindkeys.exe`
 5. An example configuration file was copied to your home directory named `.w32bindkeysrc`. Modify it to your needs!
 
-### Using the <kbd>Win</kbd> key
+## FAQ
 
-<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This can be annoying but luckily w32bindkeys can overwrite those bindings. Additionally almost every special binding can be disabled by doing the following:
+### There is already auto hotkey. Why should I even bother to give w32bindkeys a try?
+
+1. Auto hotkey is complicated and slow. Especially if you just want to open a terminal on <kbd>Win</kbd> + <kbd>Enter</kbd>.
+2. If you are a Linux user you might already use xbindkeys. w32bindkeys helps you to bridge that gap to a frequent use of Windows.
+
+### I want to remap the <kbd>Win</kbd> key
+
+w32bindkeys supplies you with that functionality! But be aware that it is imossible to remap <kbd>Win</kbd> + <kbd>L</kbd>. The key must be disabled, but by doing so locking the PC will be disabled too.
+
+### I need key bindings in my application too. Can I re-use parts of your project?
+
+Not only can you re-use it, but you can actually rely on it directly via the optional library that is produced during the build process!
+
+### Any cool hacks you know of?
+
+<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This can be annoying even if you do not use 32bindkeys. Almost every special binding can be disabled by doing the following:
 
 1. Run `regedit`
 2. Go to `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\`
@@ -33,7 +48,6 @@ xbindkeys for Windows
 4. Restart the computer
 5. <kbd>Win</kbd> + <kbd>E</kbd> and friends are now disabled. The only exception is <kbd>Win</kbd> + <kbd>L</kbd>.
 
-It is not possible to overwrite <kbd>Win</kbd> + <kbd>L</kbd>. The key must be disabled, but by doing so locking the PC will be disabled too.
 
 ## Compiling
 
@@ -103,6 +117,7 @@ Then compile w32bindkeys:
 If you want to re-use the core functionality you may supply a special option to the `configure` script that will produce a dynamic installable library:
 
     ./configure --host=x86_64-w64-mingw32 --enable-install-base
+
 
 ## Version scheme
 

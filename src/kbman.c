@@ -50,7 +50,7 @@ wbk_kbman_free(wbk_kbman_t *kbman)
 {
 	int i;
 
-	for (i = 0; kbman->kc_sys_arr_len; i++) {
+	for (i = 0; i < kbman->kc_sys_arr_len; i++) {
 		wbk_kc_sys_free(kbman->kc_sys_arr[i]);
 		kbman->kc_sys_arr[i] = NULL;
 	}
@@ -68,6 +68,27 @@ wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys)
 							    sizeof(wbk_kc_sys_t **) * kbman->kc_sys_arr_len);
 	kbman->kc_sys_arr[kbman->kc_sys_arr_len - 1] = kc_sys;
 	return 0;
+}
+
+wbk_kbman_t **
+wbk_kbman_split(wbk_kbman_t *kbman, int nominator)
+{
+	wbk_kbman_t **kbmans;
+	int i;
+	int j;
+
+	kbmans = malloc(sizeof(wbk_kbman_t **) * nominator);
+
+	for (i = 0; i < nominator; i++) {
+		kbmans[i] = wbk_kbman_new();
+		for (j = 0; j < kbman->kc_sys_arr_len; j++) {
+			if (j % nominator == i) {
+				wbk_kbman_add(kbmans[i], wbk_kc_sys_clone(kbman->kc_sys_arr[j]));
+			}
+		}
+	}
+
+	return kbmans;
 }
 
 int

@@ -90,6 +90,8 @@ wbk_kbhook_windows_hook2(int nCode, WPARAM wParam, LPARAM lParam);
  * Internal function to change an element of the global data.
  *
  * @param kbdaemon Will not be freed.
+ * @param g_kbdaemon_arr_len Will not be freed.
+ * @param g_kbdaemon_arr Will not be freed.
  * @return 0 if the add was successful.
  */
 static int
@@ -110,6 +112,8 @@ wbk_kbhook_add_kbdaemon(wbk_kbdaemon_t *kbdaemon);
  * Internal function to change an element of the global data.
  *
  * @param kbdaemon Will not be freed.
+ * @param g_kbdaemon_arr_len Will not be freed.
+ * @param g_kbdaemon_arr Will not be freed.
  * @return 0 if the removal was successful.
  */
 static int
@@ -142,12 +146,20 @@ wbk_kbhook_add_kbdaemon_internal(wbk_kbdaemon_t *kbdaemon,
 	int arr_len;
 
 	arr_len = *g_kbdaemon_arr_len;
+
+	/**
+	 * Act like the array is empty to not break any concurrently running thread
+	 */
 	*g_kbdaemon_arr_len = 0;
+
 	arr_len++;
 
 	*g_kbdaemon_arr = realloc(*g_kbdaemon_arr, sizeof(wbk_kbdaemon_t **) * arr_len);
-	*g_kbdaemon_arr[arr_len - 1] = kbdaemon;
+	(*g_kbdaemon_arr)[arr_len - 1] = kbdaemon;
 
+	/**
+	 * Increment the array length after everything is done to not break any concurrently running thread
+	 */
 	*g_kbdaemon_arr_len = arr_len;
 
 	return 0;
@@ -161,7 +173,7 @@ wbk_kbhook_add_kbdaemon(wbk_kbdaemon_t *kbdaemon)
 	error = wbk_kbhook_add_kbdaemon_internal(kbdaemon, &(g_kbhook_arr[g_kbhook_arr_i].arr_len), &(g_kbhook_arr[g_kbhook_arr_i].arr));
 	g_kbhook_arr_i++;
 	if (g_kbhook_arr_i >= g_kbhook_arr_len) {
-		g_kbhook_arr_len = 0;
+		g_kbhook_arr_i = 0;
 	}
 
 	return error;
@@ -179,16 +191,23 @@ wbk_kbhook_remove_kbdaemon_internal(wbk_kbdaemon_t *kbdaemon,
 	error = 1;
 
 	arr_len = *g_kbdaemon_arr_len;
+
+	/**
+	 * Act like the array is empty to not break any concurrently running thread
+	 */
 	*g_kbdaemon_arr_len = 0;
 
 	error = 1;
 	for (int i = 0; i < arr_len; i++) {
-		if (*g_kbdaemon_arr[i] == kbdaemon) {
-			*g_kbdaemon_arr[i] = NULL;
+		if ((*g_kbdaemon_arr)[i] == kbdaemon) {
+			(*g_kbdaemon_arr)[i] = NULL;
 			error = 0;
 		}
 	}
 
+	/**
+	 * Decrement the array length after everything is done to not break any concurrently running thread
+	 */
 	*g_kbdaemon_arr_len = arr_len;
 
 	return error;
@@ -296,8 +315,8 @@ wbk_kbhook_windows(int nCode, WPARAM wParam, LPARAM lParam,
 
 			if (changed_any) {
 				for (i = 0; i < *g_kbdaemon_arr_len; i++) {
-					if (*g_kbdaemon_arr[i]
-						&& wbk_kbdaemon_exec(*g_kbdaemon_arr[i], *g_cur_b) == 0) {
+					if ((*g_kbdaemon_arr)[i]
+						&& wbk_kbdaemon_exec((*g_kbdaemon_arr)[i], *g_cur_b) == 0) {
 						ret = 1;
 					}
 				}
@@ -340,7 +359,7 @@ wbk_kbhook_windows_hook2(int nCode, WPARAM wParam, LPARAM lParam)
 }
 
 wbk_kbdaemon_t *
-wbk_kbdaemon_new(int (*exec_fn)(wbk_b_t *b))
+wbk_kbdaemon_new(int (*exec_fn)(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b))
 {
 	wbk_kbdaemon_t *kbdaemon;
 
@@ -372,7 +391,7 @@ wbk_kbdaemon_free(wbk_kbdaemon_t *kbdaemon)
 inline int
 wbk_kbdaemon_exec(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b)
 {
-	return kbdaemon->exec_fn(b);
+	return kbdaemon->exec_fn(kbdaemon, b);
 }
 
 int

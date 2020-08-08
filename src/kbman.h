@@ -56,6 +56,15 @@ extern int
 wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
 
 /**
+ * Create an array of nominator new key board managers and divide the internal
+ * key commands by nominator over those new key board managers. The key commands
+ * are copied during this processes. The returned array and the returned key
+ * board managers need to be freed by yourself!
+ */
+extern wbk_kbman_t **
+wbk_kbman_split(wbk_kbman_t *kbman, int nominator);
+
+/**
  * @brief Execute a key binding matching a combination
  * @return Non-0 if the combination was not found.
  */
