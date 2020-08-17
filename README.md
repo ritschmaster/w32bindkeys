@@ -34,6 +34,8 @@ xbindkeys for Windows
 
 w32bindkeys supplies you with that functionality! But be aware that it is imossible to remap <kbd>Win</kbd> + <kbd>L</kbd>. The key must be disabled, but by doing so locking the PC will be disabled too.
 
+You might be interested in this [solution](https://stackoverflow.com/questions/301053/re-assign-override-hotkey-win-l-to-lock-windows#answer-27975295) to that problem. It works like a charm.
+
 ### I need key bindings in my application too. Can I re-use parts of your project?
 
 Not only can you re-use it, but you can actually rely on it directly via the optional library that is produced during the build process!
