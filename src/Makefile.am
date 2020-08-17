@@ -22,6 +22,7 @@
 # SOFTWARE.
 ################################################################################
 
+
 AM_CFLAGS = -D PKGDATADIR=\"$(pkgdatadir)\"
 
 if DEBUG
@@ -35,58 +36,53 @@ endif
 
 bin_PROGRAMS = w32bindkeys
 
-if INSTALLBASE
-lib_LTLIBRARIES = libwbkbase.la
+if INSTALLLIBRARY
+lib_LTLIBRARIES = libw32bindkeys.la
 else
-noinst_LTLIBRARIES = libwbkbase.la
+noinst_LTLIBRARIES = libw32bindkeys.la
 endif
 
-if INSTALLBASE
-nobase_include_HEADERS = wbkbase/logger.h
-nobase_include_HEADERS += wbkbase/util.h
-nobase_include_HEADERS += wbkbase/be.h
-nobase_include_HEADERS += wbkbase/b.h
-nobase_include_HEADERS += wbkbase/kc.h
-nobase_include_HEADERS += wbkbase/kc_sys.h
-nobase_include_HEADERS += wbkbase/kbman.h
-nobase_include_HEADERS += wbkbase/parser.h
-nobase_include_HEADERS += wbkbase/kbdaemon.h
-endif
 
-libwbkbase_la_SOURCES = logger.c logger.h
-libwbkbase_la_SOURCES += util.c util.h
-libwbkbase_la_SOURCES += datafinder.c datafinder.h
-libwbkbase_la_SOURCES += be.c be.h
-libwbkbase_la_SOURCES += b.c b.h
-libwbkbase_la_SOURCES += kc.c kc.h
-libwbkbase_la_SOURCES += kc_sys.c kc_sys.h
-libwbkbase_la_SOURCES += kbman.c kbman.h
-libwbkbase_la_SOURCES += kbdaemon.c kbdaemon.h
-libwbkbase_la_SOURCES += parser.c parser.h
+libw32bindkeys_la_SOURCES = logger.c logger.h
+libw32bindkeys_la_SOURCES += util.c util.h
+libw32bindkeys_la_SOURCES += datafinder.c datafinder.h
+libw32bindkeys_la_SOURCES += be.c be.h
+libw32bindkeys_la_SOURCES += b.c b.h
+libw32bindkeys_la_SOURCES += kc.c kc.h
+libw32bindkeys_la_SOURCES += kc_sys.c kc_sys.h
+libw32bindkeys_la_SOURCES += kbman.c kbman.h
+libw32bindkeys_la_SOURCES += kbdaemon.c kbdaemon.h
+libw32bindkeys_la_SOURCES += parser.c parser.h
 
-libwbkbase_la_CFLAGS = $(AM_CFLAGS)
-libwbkbase_la_CFLAGS += @collectionc_CFLAGS@ 
-libwbkbase_la_LDFLAGS = $(AM_LDFLAGS)
-libwbkbase_la_LDFLAGS += -mwindows 
-libwbkbase_la_LDFLAGS += -static 
-libwbkbase_la_LIBADD = @collectionc_LIBS@
+libw32bindkeys_la_CFLAGS = $(AM_CFLAGS)
+libw32bindkeys_la_CFLAGS += @collectionc_CFLAGS@
+libw32bindkeys_la_LDFLAGS = $(AM_LDFLAGS)
+libw32bindkeys_la_LDFLAGS += -mwindows
+libw32bindkeys_la_LDFLAGS += -static
+libw32bindkeys_la_LIBADD = @collectionc_LIBS@
 
 w32bindkeys_SOURCES = main.c
 w32bindkeys_CFLAGS = $(AM_CFLAGS)
-w32bindkeys_CFLAGS += @collectionc_CFLAGS@ 
+w32bindkeys_CFLAGS += @collectionc_CFLAGS@
 w32bindkeys_LDFLAGS = $(AM_LDFLAGS)
 w32bindkeys_LDFLAGS += -mwindows
-w32bindkeys_LDFLAGS += -static 
-w32bindkeys_LDADD = libwbkbase.la 
+w32bindkeys_LDFLAGS += -static
+w32bindkeys_LDADD = libw32bindkeys.la
 w32bindkeys_LDADD += @collectionc_LIBS@
 
-if INSTALLBASE
+if INSTALLLIBRARY
 install-data-local:
 	mkdir -p $(libdir)/pkgconfig
-	$(INSTALL_DATA) libwbkbase.pc $(libdir)/pkgconfig/
-	sed -i s,AUTOMAKE_PREFIX,$(prefix),g $(libdir)/pkgconfig/libwbkbase.pc
-	sed -i s,AUTOMAKE_VERSION,$(PACKAGE_VERSION),g $(libdir)/pkgconfig/libwbkbase.pc
+	$(INSTALL_DATA) libw32bindkeys.pc $(libdir)/pkgconfig/
+	sed -i s,AUTOMAKE_PREFIX,$(prefix),g $(libdir)/pkgconfig/libw32bindkeys.pc
+	sed -i s,AUTOMAKE_VERSION,$(PACKAGE_VERSION),g $(libdir)/pkgconfig/libw32bindkeys.pc
+
+install-exec-local:
+	echo Hello
 
 uninstall-local:
-	rm -f $(libdir)/pkgconfig/libwbkbase.pc
+	rm -f $(libdir)/pkgconfig/libw32bindkeys.pc
 endif
+
+SUBDIRS = headers_installation
+

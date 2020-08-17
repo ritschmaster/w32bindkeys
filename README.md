@@ -86,7 +86,7 @@ Then compile w32bindkeys:
 
 If you want to re-use the core functionality you may supply a special option to the `configure` script that will produce a dynamic installable library:
 
-    ./configure --enable-install-base
+    ./configure --enable-install-library
 
 Afterwards you may install w32bindkeys by performing:
 
@@ -118,7 +118,7 @@ Then compile w32bindkeys:
 
 If you want to re-use the core functionality you may supply a special option to the `configure` script that will produce a dynamic installable library:
 
-    ./configure --host=x86_64-w64-mingw32 --enable-install-base
+    ./configure --host=x86_64-w64-mingw32 --enable-install-library
 
 
 ## Version scheme

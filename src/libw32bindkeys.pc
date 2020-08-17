@@ -3,9 +3,9 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: libwbkbase
-Description: The base functions of w32bindkeys
+Name: libw32bindkeys
+Description: The functions of w32bindkeys
 Version: AUTOMAKE_VERSION
-Libs: -L${libdir} -lwbkbase
+Libs: -L${libdir} -lw32bindkeys
 Cflags: -I${includedir}
 

@@ -1,4 +1,3 @@
-#!/bin/bash
 ################################################################################
 # This file is part of w32bindkeys.
 #
@@ -23,59 +22,23 @@
 # SOFTWARE.
 ################################################################################
 
-function clean
-{
-    make distclean
-    rm -rf configure
-    rm -rf m4
-    rm -rf autom4te.cache
-    rm -rf aclocal.m4
-    rm -rf Makefile.in
-    rm -rf src/Makefile.in
-    rm -rf tests/Makefile.in
-    rm -rf data/Makefile.in
-}
+if DEBUG
+AM_CFLAGS = -g -O0
+AM_LDFLAGS = -g -O0
+else
+AM_CFLAGS = -O2
+AM_LDFLAGS = -O2
+endif
 
-function debug
-{
-    clean
+if INSTALLLIBRARY
+nobase_include_HEADERS = w32bindkeys/logger.h
+nobase_include_HEADERS += w32bindkeys/util.h
+nobase_include_HEADERS += w32bindkeys/be.h
+nobase_include_HEADERS += w32bindkeys/b.h
+nobase_include_HEADERS += w32bindkeys/kc.h
+nobase_include_HEADERS += w32bindkeys/kc_sys.h
+nobase_include_HEADERS += w32bindkeys/kbman.h
+nobase_include_HEADERS += w32bindkeys/parser.h
+nobase_include_HEADERS += w32bindkeys/kbdaemon.h
+endif
 
-    autoreconf -im
-    export CLFAGS="-g -O0 -D DEBUG_ENABLED=1"
-    export LDFLAGS="-g -O0"
-    ./configure --enable-debug -enable-install-library
-    make
-}
-
-function release
-{
-    clean
-
-    autoreconf -im
-    export CLFAGS="-O2"
-    export LDFLAGS="-O2"
-    ./configure --enable-install-library
-    make
-}
-
-while getopts ":v" opt; do
-    case "$opt" in
-        "v" )
-            verboseOn=1
-            ;;
-    esac
-done
-
-args=( $@ )
-
-case "${args[$OPTIND - 1]}" in
-    clean)
-        clean
-        ;;
-    debug)
-        debug
-        ;;
-    * )
-        release
-        ;;
-esac

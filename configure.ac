@@ -26,7 +26,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([w32bindkeys], [0.4.1], [])
+AC_INIT([w32bindkeys], [0.5], [])
 AC_CONFIG_SRCDIR([src/])
 AC_CONFIG_HEADERS([config.h])
 
@@ -62,20 +62,21 @@ AC_ARG_ENABLE(debug,
 			      [debug=false])
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
-AC_ARG_ENABLE(install-base,
-	      AS_HELP_STRING([--enable-install-base],
-			     [enable the installing of the libwbkbase library, default: no]),
+AC_ARG_ENABLE(install-library,
+	      AS_HELP_STRING([--enable-install-library],
+			     [enable the installing of the libw32bindkeys library, default: no]),
 			     [case "${enableval}" in
-			      yes) installbase=true ;;
-			      no)  installbase=false ;;
-			      *)   AC_MSG_ERROR([bad value ${enableval} for --enable-install-base]) ;;
+			      yes) installlibrary=true ;;
+			      no)  installlibrary=false ;;
+			      *)   AC_MSG_ERROR([bad value ${enableval} for --enable-install-library]) ;;
 		      	      esac],
-			      [installbase=false])
-AM_CONDITIONAL(INSTALLBASE, test x"$installbase" = x"true")
+			      [installlibrary=true])
+AM_CONDITIONAL(INSTALLLIBRARY, test x"$installlibrary" = x"true")
 
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 src/headers_installation/Makefile
                  tests/Makefile
                  data/Makefile])
 AC_CONFIG_MACRO_DIRS([m4])
