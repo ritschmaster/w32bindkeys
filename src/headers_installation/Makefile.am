@@ -40,5 +40,6 @@ nobase_include_HEADERS += w32bindkeys/kc_sys.h
 nobase_include_HEADERS += w32bindkeys/kbman.h
 nobase_include_HEADERS += w32bindkeys/parser.h
 nobase_include_HEADERS += w32bindkeys/kbdaemon.h
+nobase_include_HEADERS += w32bindkeys/datafinder.h
 endif
 
