@@ -42,7 +42,7 @@ Not only can you re-use it, but you can actually rely on it directly via the opt
 
 ### Any cool hacks you know of?
 
-<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This can be annoying even if you do not use 32bindkeys. Almost every special binding can be disabled by doing the following:
+<kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This can be annoying even if you do not use w32bindkeys. Almost every special binding can be disabled by doing the following:
 
 1. Run `regedit`
 2. Go to `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\`
@@ -123,14 +123,13 @@ If you want to re-use the core functionality you may supply a special option to 
 
 ## Version scheme
 
-The version scheme of w32bindkeys is as follows: 1.2.3
+The version scheme of w32bindkeys is as follows: x.y.z
 
-1. Stages:
- 0. Alpha
- 1. Beta
- 2. For Production use
-2. Releases breaking compatibility of its API or the configuration file.
-3. Collection of changes not breaking any compatibility.
+* x is the stage:
+  * < 0 is an unstable release
+  * > 0 is a stable release
+* y incidates changes to the API or the configuration file functionalities.
+* z indicates additions without breaking any compatibility.
 
 ## Author
 
