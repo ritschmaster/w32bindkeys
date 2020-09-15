@@ -40,6 +40,8 @@ You might be interested in this [solution](https://stackoverflow.com/questions/3
 
 Not only can you re-use it, but you can actually rely on it directly via the optional library that is produced during the build process!
 
+You might want to have a look at (copy parts of) `src/main.c` to enable w32bindkeys for your application as fast as possible.
+
 ### Any cool hacks you know of?
 
 <kbd>Win</kbd> is reserved in Windows for some special bindings. Like opening the Explorer by hitting <kbd>Win</kbd> + <kbd>E</kbd>. This can be annoying even if you do not use w32bindkeys. Almost every special binding can be disabled by doing the following:
@@ -48,7 +50,7 @@ Not only can you re-use it, but you can actually rely on it directly via the opt
 2. Go to `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\`
 3. Create the DWORD `NoWinKeys` with the value `1`
 4. Restart the computer
-5. <kbd>Win</kbd> + <kbd>E</kbd> and friends are now disabled. The only exception is <kbd>Win</kbd> + <kbd>L</kbd>.
+5. <kbd>Win</kbd> + <kbd>E</kbd> and friends are now disabled. The only exception is <kbd>Win</kbd> + <kbd>L</kbd> (see fix above).
 
 
 ## Compiling
@@ -127,7 +129,7 @@ The version scheme of w32bindkeys is as follows: x.y.z
 
 * x is the stage:
   * < 0 is an unstable release
-  * > 0 is a stable release
+  * \> 0 is a stable release
 * y incidates changes to the API or the configuration file functionalities.
 * z indicates additions without breaking any compatibility.
 
