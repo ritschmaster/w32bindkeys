@@ -59,6 +59,7 @@ libw32bindkeys_la_CFLAGS += @collectionc_CFLAGS@
 libw32bindkeys_la_LDFLAGS = $(AM_LDFLAGS)
 libw32bindkeys_la_LDFLAGS += -mwindows
 libw32bindkeys_la_LDFLAGS += -static
+libw32bindkeys_la_LDFLAGS += -lwtsapi32
 libw32bindkeys_la_LIBADD = @collectionc_LIBS@
 
 w32bindkeys_SOURCES = main.c
@@ -67,6 +68,7 @@ w32bindkeys_CFLAGS += @collectionc_CFLAGS@
 w32bindkeys_LDFLAGS = $(AM_LDFLAGS)
 w32bindkeys_LDFLAGS += -mwindows
 w32bindkeys_LDFLAGS += -static
+w32bindkeys_LDFLAGS += -lwtsapi32
 w32bindkeys_LDADD = libw32bindkeys.la
 w32bindkeys_LDADD += @collectionc_LIBS@
 

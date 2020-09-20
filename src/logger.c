@@ -129,9 +129,7 @@ wbk_logger_log(wbk_logger_t *logger, wbk_loglevel_t level, const char *fmt, ...)
 		va_end(argptr);
 	}
 
-	if (global_level == DEBUG) {
-		fflush(stdout);
-	}
+	fflush(stdout);
 
 	return 0;
 }

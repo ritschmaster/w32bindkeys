@@ -30,6 +30,7 @@
  */
 
 #include <windows.h>
+#include <wtsapi32.h>
 
 #include "logger.h"
 #include "kbdaemon.h"
@@ -46,6 +47,46 @@ struct kbhook_s
 };
 
 typedef struct kbhook_s *kbhook_t;
+
+#define WBK_KBHOOK_BUFFER_LENGTH 1024
+
+static int g_hook_entered = 0;
+static int g_hook_left = 0;
+
+/**
+ * Reset all currently tracked pressed keys.
+ */
+static int
+wbk_kbhook_reset_all_b(void);
+
+/**
+ * Track the current session and reset the tracked pressed keys if the session
+ * changes (e.g. the user locks the current session).
+ */
+static LRESULT CALLBACK
+wbk_kbhook_session_watcher_wnd_proc(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam);
+
+/**
+ * Start the tracking of the current session.
+ */
+static int
+wbk_kbhook_session_watcher_start(void);
+
+/**
+ * Watches if the hook was not left as often as it was entered. If it was not
+ * left as often as it was entered then all currently tracked pressed keys are
+ * reset. This is necessary * to avoid the breakage of w32bindkeys' low level
+ * keyboard hook by other low * level keyboard hooks or by a heavy load on the
+ * system.
+ */
+static DWORD WINAPI
+wbk_kbhook_hook_watcher(LPVOID param);
+
+/**
+ * the tracking of the low level keyboard hook.
+ */
+static int
+wbk_kbhook_hook_watcher_start(void);
 
 /**
  * Starts tracking keyboard activity by adding a low level keyboard hook to
@@ -137,6 +178,173 @@ static struct kbhook_s g_kbhook_arr[] = {
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook1, NULL },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook2, NULL }
 };
+
+static char g_session_watcher_created = 0;
+
+static HANDLE g_active_win_watcher_handler = NULL;
+
+int
+wbk_kbhook_reset_all_b(void)
+{
+	wbk_logger_log(&logger, DEBUG, "Reseting all tracked pressed keys\n");
+
+	wbk_b_reset(g_kbhook_arr[0].cur_b);
+	wbk_b_reset(g_kbhook_arr[1].cur_b);
+	wbk_b_reset(g_kbhook_arr[2].cur_b);
+
+	return 0;
+}
+
+LRESULT CALLBACK
+wbk_kbhook_session_watcher_wnd_proc(HWND window_handler, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	char reset;
+
+	reset = 0;
+	switch(msg) {
+	case WM_WTSSESSION_CHANGE:
+		reset = 1;
+	}
+
+	if (reset) {
+		wbk_kbhook_reset_all_b();
+	}
+
+	return DefWindowProc(window_handler, msg, wParam, lParam);
+}
+
+
+int
+wbk_kbhook_session_watcher_start(void)
+{
+	HINSTANCE hInstance;
+	WNDCLASSEX wc;
+	HWND window_handler;
+	int error;
+	char classname[] = "w32bindkeys session watcher";
+
+	error = 0;
+
+	if (!error) {
+		hInstance = GetModuleHandle(NULL);
+
+		wc.cbSize		= sizeof(WNDCLASSEX);
+		wc.style		 = 0;
+		wc.lpfnWndProc   = wbk_kbhook_session_watcher_wnd_proc;
+		wc.cbClsExtra	= 0;
+		wc.cbWndExtra	= 0;
+		wc.hInstance	 = hInstance;
+		wc.hIcon		 = LoadIcon(NULL, IDI_APPLICATION);
+		wc.hCursor	   = LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+		wc.lpszMenuName  = NULL;
+		wc.lpszClassName = classname;
+		wc.hIconSm	   = LoadIcon(NULL, IDI_APPLICATION);
+
+		if(!RegisterClassEx(&wc)) {
+			error = 1;
+		}
+	}
+
+	if (!error) {
+		window_handler = CreateWindowEx(WS_EX_NOACTIVATE,
+						classname,
+						classname,
+						WS_DISABLED,
+						0, 0,
+						0, 0,
+						NULL, NULL, hInstance, NULL);
+
+		ShowWindow(window_handler, SW_HIDE);
+
+		WTSRegisterSessionNotification(window_handler, NOTIFY_FOR_THIS_SESSION);
+	}
+
+	return error;
+}
+
+DWORD WINAPI
+wbk_kbhook_hook_watcher(LPVOID param)
+{
+	int i;
+	HWND window_handler;
+	char old_title[WBK_KBHOOK_BUFFER_LENGTH];
+	char old_classname[WBK_KBHOOK_BUFFER_LENGTH];
+	char new_title[WBK_KBHOOK_BUFFER_LENGTH];
+	char new_classname[WBK_KBHOOK_BUFFER_LENGTH];
+
+	char reset;
+
+	memset(old_title, 0, WBK_KBHOOK_BUFFER_LENGTH);
+	memset(old_classname, 0, WBK_KBHOOK_BUFFER_LENGTH);
+	memset(new_title, 0, WBK_KBHOOK_BUFFER_LENGTH);
+	memset(new_classname, 0, WBK_KBHOOK_BUFFER_LENGTH);
+
+	while (1) {
+		reset = 0;
+
+//		window_handler = GetForegroundWindow();
+//
+//		if (window_handler) {
+//			GetWindowText(window_handler, new_title, WBK_KBHOOK_BUFFER_LENGTH);
+//			GetClassName(window_handler, new_classname, WBK_KBHOOK_BUFFER_LENGTH);
+//		}
+//
+//		if (strcmp(old_title, new_title)
+//			&& strcmp(old_classname, new_classname)
+//			&& (strstr(old_title, "Oracle VM VirtualBox"))) {
+//			reset = 1;
+//		}
+//
+//		if (window_handler) {
+//			strcpy(old_title, new_title);
+//			strcpy(old_classname, new_classname);
+//		}
+
+		/**
+		 * Give the users n chances to press/release a key
+		 */
+		for (i = 0; i < 10; i++) {
+			reset = 0;
+			if (g_hook_entered != g_hook_left) {
+				reset = 1;
+			}
+			Sleep(10);
+		}
+
+		if (reset) {
+			wbk_kbhook_reset_all_b();
+			g_hook_entered = 0;
+			g_hook_left = 0;
+		}
+
+		Sleep(100);
+	}
+
+	return 0;
+}
+
+int
+wbk_kbhook_hook_watcher_start(void)
+{
+	int error;
+
+	error = 0;
+	g_active_win_watcher_handler = CreateThread(NULL,
+								   0,
+								   wbk_kbhook_hook_watcher,
+								   NULL,
+								   0,
+								   NULL);
+
+	if (!g_active_win_watcher_handler) {
+		error = 1;
+		wbk_logger_log(&logger, SEVERE, "Starting of the active window watcher thread failed.\n");
+	}
+
+	return error;
+}
+
 
 int
 wbk_kbhook_add_kbdaemon_internal(wbk_kbdaemon_t *kbdaemon,
@@ -281,6 +489,7 @@ wbk_kbhook_windows(int nCode, WPARAM wParam, LPARAM lParam,
 	int changed_any;
 	int i;
 
+	g_hook_entered++;
 	ret = 0;
 	if (nCode >= 0) {
 		switch (wParam) {
@@ -324,6 +533,7 @@ wbk_kbhook_windows(int nCode, WPARAM wParam, LPARAM lParam,
 		}
 	}
 
+	g_hook_left++;
 	if (!ret) {
 		ret = CallNextHookEx(NULL, nCode, wParam, lParam);
 	}
@@ -398,6 +608,16 @@ int
 wbk_kbdaemon_start(wbk_kbdaemon_t *kbdaemon)
 {
 	WaitForSingleObject(kbdaemon->global_mutex, INFINITE);
+
+	if (!g_session_watcher_created) {
+		wbk_kbhook_session_watcher_start();
+		g_session_watcher_created = 1;
+	}
+
+
+	if (!g_active_win_watcher_handler) {
+		wbk_kbhook_hook_watcher_start();
+	}
 
 	wbk_kbdaemon_stop(kbdaemon);
 	wbk_kbhook_add_kbdaemon(kbdaemon);
