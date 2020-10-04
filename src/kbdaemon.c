@@ -48,8 +48,6 @@ struct kbhook_s
 
 typedef struct kbhook_s *kbhook_t;
 
-#define WBK_KBHOOK_BUFFER_LENGTH 1024
-
 static int g_hook_entered = 0;
 static int g_hook_left = 0;
 
@@ -73,17 +71,16 @@ static int
 wbk_kbhook_session_watcher_start(void);
 
 /**
- * Watches if the hook was not left as often as it was entered. If it was not
- * left as often as it was entered then all currently tracked pressed keys are
- * reset. This is necessary * to avoid the breakage of w32bindkeys' low level
- * keyboard hook by other low * level keyboard hooks or by a heavy load on the
- * system.
+ * Watches if actually some keys are currently not pressed at all. If no key is
+ * pressed then the internal key binding objects are reset. This is necessary to
+ * avoid the breakage of w32bindkeys' low level keyboard hook by other low level
+ * keyboard hooks or by a heavy load on the system.
  */
 static DWORD WINAPI
 wbk_kbhook_hook_watcher(LPVOID param);
 
 /**
- * the tracking of the low level keyboard hook.
+ * Starts the watcher to the low level keyboard hook.
  */
 static int
 wbk_kbhook_hook_watcher_start(void);
@@ -266,50 +263,38 @@ wbk_kbhook_session_watcher_start(void)
 DWORD WINAPI
 wbk_kbhook_hook_watcher(LPVOID param)
 {
-	int i;
-	HWND window_handler;
-	char old_title[WBK_KBHOOK_BUFFER_LENGTH];
-	char old_classname[WBK_KBHOOK_BUFFER_LENGTH];
-	char new_title[WBK_KBHOOK_BUFFER_LENGTH];
-	char new_classname[WBK_KBHOOK_BUFFER_LENGTH];
-
 	char reset;
-
-	memset(old_title, 0, WBK_KBHOOK_BUFFER_LENGTH);
-	memset(old_classname, 0, WBK_KBHOOK_BUFFER_LENGTH);
-	memset(new_title, 0, WBK_KBHOOK_BUFFER_LENGTH);
-	memset(new_classname, 0, WBK_KBHOOK_BUFFER_LENGTH);
+	char c;
+	SHORT rv;
+	int i;
 
 	while (1) {
 		reset = 0;
 
-//		window_handler = GetForegroundWindow();
-//
-//		if (window_handler) {
-//			GetWindowText(window_handler, new_title, WBK_KBHOOK_BUFFER_LENGTH);
-//			GetClassName(window_handler, new_classname, WBK_KBHOOK_BUFFER_LENGTH);
-//		}
-//
-//		if (strcmp(old_title, new_title)
-//			&& strcmp(old_classname, new_classname)
-//			&& (strstr(old_title, "Oracle VM VirtualBox"))) {
-//			reset = 1;
-//		}
-//
-//		if (window_handler) {
-//			strcpy(old_title, new_title);
-//			strcpy(old_classname, new_classname);
-//		}
-
-		/**
-		 * Give the users n chances to press/release a key
-		 */
-		for (i = 0; i < 10; i++) {
-			reset = 0;
-			if (g_hook_entered != g_hook_left) {
-				reset = 1;
+		if (!reset) {
+			reset = 1;
+			for(c = 1; reset && c < 255; c++){
+				rv = GetAsyncKeyState(c);
+				if (rv & 0x8000) {
+					/**
+					 * A key is currently pressed
+					 */
+					reset = 0;
+				}
 			}
-			Sleep(10);
+		}
+
+		if (!reset) {
+			/**
+			 * Give the user i changes to stop typing
+			 */
+			for (i = 0; i < 5; i++) {
+				reset = 0;
+				if (g_hook_entered != g_hook_left) {
+					reset = 1;
+				}
+				Sleep(5);
+			}
 		}
 
 		if (reset) {
@@ -317,8 +302,6 @@ wbk_kbhook_hook_watcher(LPVOID param)
 			g_hook_entered = 0;
 			g_hook_left = 0;
 		}
-
-		Sleep(100);
 	}
 
 	return 0;
