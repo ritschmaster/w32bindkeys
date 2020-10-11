@@ -22,10 +22,13 @@
 # SOFTWARE.
 ################################################################################
 
-AM_CFLAGS = -I$(top_builddir)/src 
+AM_CFLAGS = -D PKGDATADIR=\"$(pkgdatadir)\"
+AM_CFLAGS += -D PKGSRCDIR=\"$(top_builddir)/src\"
+AM_CFLAGS += -I$(top_builddir)/src 
 
 if DEBUG
 AM_CFLAGS += -g -O0
+AM_CFLAGS += -D DEBUG_ENABLED=1
 AM_LDFLAGS = -g -O0
 else
 AM_CFLAGS += -O2
@@ -33,10 +36,15 @@ AM_LDFLAGS = -O2
 endif
 
 TESTS = check_util_intarr_to_str
+TESTS += check_datafinder
 
 check_PROGRAMS = check_util_intarr_to_str
+check_PROGRAMS += check_datafinder
 
 check_util_intarr_to_str_SOURCES = check_util_intarr_to_str.c
 check_util_intarr_to_str_LDFLAGS = --static
-check_util_intarr_to_str_LDADD = $(top_builddir)/src/libwbkinterpreter.la
+check_util_intarr_to_str_LDADD = $(top_builddir)/src/libw32bindkeys.la
 
+check_datafinder_SOURCES = check_datafinder.c
+check_datafinder_LDFLAGS = --static
+check_datafinder_LDADD = $(top_builddir)/src/libw32bindkeys.la

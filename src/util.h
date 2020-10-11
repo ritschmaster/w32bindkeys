@@ -41,6 +41,13 @@ extern char *
 wbk_intarr_to_str(Array *array);
 
 /**
+ * @brief Produces an absolute path to the home directory
+ * @return A new string. Free it by yourself.
+ */
+extern char *
+wbk_get_path_of_home(void);
+
+/**
  * @brief Produces an absolute path from the home directory
  * @return A new string. Free it by yourself.
  */

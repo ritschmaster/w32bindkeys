@@ -31,14 +31,14 @@
 #ifndef WBK_DATAFINDER_H
 #define WBK_DATAFINDER_H
 
+#include <collectc/array.h>
+
 typedef struct wbk_datafinder_s
 {
-	char *datadir;
-
 	/**
-	 * Length of datadir. It includes the terminating byte.
+	 * Array of char *
 	 */
-	int datadir_len;
+	Array *datadir_arr;
 
 	char *execdir;
 
@@ -53,6 +53,9 @@ wbk_datafinder_new(const char *datadir);
 
 extern int
 wbk_datafinder_free(wbk_datafinder_t *datafinder);
+
+extern int
+wbk_datafinder_add_datadir(wbk_datafinder_t *datafinder, const char *datadir);
 
 /**
  * @param data_file The base name of a file to search for.
