@@ -674,16 +674,25 @@ wbk_kbhook_start()
 
 	error = 0;
 
+  /**
+   * Init all kbhooks
+   */
 	for (i = 0; i < g_kbhook_arr_len; i++) {
 		if (g_kbhook_arr[i].cur_b == NULL) {
 			g_kbhook_arr[i].cur_b = wbk_b_new();
 		}
-
-		if (g_kbhook_arr[i].hook_id == NULL) {
-			h_instance = GetModuleHandle(NULL);
-			g_kbhook_arr[i].hook_id = SetWindowsHookExA(WH_KEYBOARD_LL, g_kbhook_arr[i].hook_fn, h_instance, 0);
-		}
 	}
+
+
+  /**
+   * Start all kbhooks
+   */
+	for (i = 0; i < g_kbhook_arr_len; i++) {
+    if (g_kbhook_arr[i].hook_id == NULL) {
+      h_instance = GetModuleHandle(NULL);
+      g_kbhook_arr[i].hook_id = SetWindowsHookExA(WH_KEYBOARD_LL, g_kbhook_arr[i].hook_fn, h_instance, 0);
+     }
+  }
 
 	return error;
 }
