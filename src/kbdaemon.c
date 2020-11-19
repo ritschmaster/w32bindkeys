@@ -31,6 +31,7 @@
 
 #include <windows.h>
 #include <wtsapi32.h>
+#include <time.h>
 
 #include "logger.h"
 #include "kbdaemon.h"
@@ -409,6 +410,14 @@ wbk_kbhook_reset_all_b(void)
 
 	Sleep(5);
 
+  for (i = 0; i < g_kbhook_arr_len; i++) {
+		g_kbhook_arr[i].hook_entered = -10000;
+		g_kbhook_arr[i].hook_left = 0;
+		wbk_b_reset(g_kbhook_arr[i].cur_b);
+	}
+
+	Sleep(10);
+
 	for (i = 0; i < g_kbhook_arr_len; i++) {
 		g_kbhook_arr[i].hook_entered = 0;
 		g_kbhook_arr[i].hook_left = 0;
@@ -426,14 +435,15 @@ int
 wbk_kbhook_any_hook_broken(void)
 {
 	int broken;
+  int i;
 
 	broken = 0;
 
-	if ((g_kbhook_arr[0].hook_entered != g_kbhook_arr[0].hook_left)
-		|| (g_kbhook_arr[1].hook_entered != g_kbhook_arr[1].hook_left)
-		|| (g_kbhook_arr[2].hook_entered != g_kbhook_arr[2].hook_left)) {
-		broken = 1;
-	}
+  for (i = 0; !broken && i < g_kbhook_arr_len; i++) {
+    if (g_kbhook_arr[i].hook_entered != g_kbhook_arr[i].hook_left) {
+      broken = 1;
+    }
+  }
 
 	return broken;
 }
@@ -513,42 +523,55 @@ wbk_kbhook_hook_watcher(LPVOID param)
 	char c;
 	SHORT rv;
 	int i;
+  time_t timestamp;
 
 	while (1) {
 		reset = 0;
 
-		if (!reset) {
-			reset = 1;
-			for(c = 1; reset && c < 255; c++){
-				rv = GetAsyncKeyState(c);
-				if (rv & 0x8000) {
-					/**
-					 * A key is currently pressed
-					 */
-					reset = 0;
-				}
-			}
-		}
+    if (!reset
+        && time(NULL) - timestamp > 10) {
+      /**
+       * Periodically reset all the tracked keys
+       */
+      reset = 1;
+    }
 
-		if (!reset) {
-			/**
-			 * Give the user i changes to stop typing
-			 */
-			for (i = 0; i < 5; i++) {
-				reset = 0;
-				if (wbk_kbhook_any_hook_broken()) {
-					reset = 1;
-				}
-				Sleep(5);
-			}
-		}
+    if (!reset) {
+      /**
+       * Check if any key is pressed
+       */
+      for(c = 1; reset && c < 255; c++){
+        rv = GetAsyncKeyState(c);
+        if (rv & 0x8000) {
+          /**
+           * A key is currently pressed
+           */
+          reset = 0;
+        }
+      }
+    }
 
-		if (reset) {
-			wbk_kbhook_reset_all_b();
-		}
+    if (!reset) {
+    /**
+     * Give the user i changes to stop typing
+     */
+    for (i = 0; i < 5; i++) {
+      reset = 0;
+      if (wbk_kbhook_any_hook_broken()) {
+        reset = 1;
+      }
+      Sleep(300);
+      }
+    }
 
-		Sleep(5);
-	}
+    if (reset) {
+      wbk_kbhook_reset_all_b();
+
+      timestamp = time(NULL);
+    }
+
+    Sleep(1000);
+  }
 
 	return 0;
 }
