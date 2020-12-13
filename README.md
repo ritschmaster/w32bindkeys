@@ -30,6 +30,18 @@ xbindkeys for Windows
 1. Auto hotkey is complicated and slow. Especially if you just want to open a terminal on <kbd>Win</kbd> + <kbd>Enter</kbd>.
 2. If you are a Linux user you might already use xbindkeys. w32bindkeys helps you to bridge that gap to a frequent use of Windows.
 
+### Are there known limitations?
+
+Yes, there is: w32bindkeys uses the [WIN32 API Low Level Keyboard Hook](https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms644985(v=vs.85)). The nature of this hook is that the registered function (i.e. processing w32bindkeys key bindings) will be terminated if its execution speed is too slow. This happens without any notification and therefore the developer cannot check if his hook will be removed. Normally this won't happen, but if many key bindings are registered then this might occur. To avoid this issue w32bindkeys applies the following strategies:
+
+1. The key bindings are segmented on currently 30 different hooks. As every hook will receive its own time slot this helps to avoid the removal of the hook.
+2. Each hook tracks by itself if it has been successfully left after entrance. This allows w32bindkeys to notice if a hook has been removed and will reset the tracked keys.
+3. After a certain amount of time the tracked keys will be reset. This is especially important if the CPU is under heavy load.
+
+Points 2. and 3. will result in losing the track of already pressed keys. Example: Imagine you have bound <kbd>Win</kbd> + <kbd>return</kbd> to opening a command prompt. Then you press <kbd>Win</kbd> for 15 seconds and then finally press <kbd>return</kbd>. The command prompt won't show up as the tracked keys have already been reset in the mean time. But pressing both keys at once of course will open the command prompt.
+
+**If you have any better solution to this issue, please contact me or open a pull request.**
+
 ### I want to remap the <kbd>Win</kbd> key
 
 w32bindkeys supplies you with that functionality! But be aware that it is imossible to remap <kbd>Win</kbd> + <kbd>L</kbd>. The key must be disabled, but by doing so locking the PC will be disabled too.
