@@ -33,10 +33,17 @@
 #ifndef WBK_KB_H
 #define WBK_KB_H
 
-typedef struct wbk_kc_s
+typedef struct wbk_kc_s wbk_kc_t;
+
+struct wbk_kc_s
 {
+  int (*kc_free)(wbk_kc_t *kc);
+  const wbk_b_t *(*kc_get_binding)(const wbk_kc_t *kc);
+  int (*kc_exec)(const wbk_kc_t *kc);
+
 	wbk_b_t *binding;
-} wbk_kc_t;
+};
+
 
 /**
  * @brief Creates a new key binding command

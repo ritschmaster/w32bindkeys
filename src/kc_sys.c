@@ -39,28 +39,63 @@
 
 static wbk_logger_t logger =  { "kc_sys" };
 
+/**
+ * Implementaiton of wbk_kc_free().
+ *
+ * @brief Frees a key binding system command
+ * @return Non-0 if the freeing failed
+ */
+static int
+wbk_kc_sys_free_impl(wbk_kc_t *kc);
+
+/**
+ * Implementation of wbk_kc_sys_get_cmd().
+ *
+ */
+static const char *
+wbk_kc_sys_get_cmd_impl(const wbk_kc_sys_t *kc_sys);
+
+/**
+ * Implementation of wbk_kc_exec().
+ *
+ * @brief Execute the system command of a key binding system command
+ * @return Non-0 if the execution failed
+ */
+static int
+wbk_kc_sys_exec_impl(const wbk_kc_t *kc);
+
 static DWORD WINAPI
 wbk_kbthread_exec(LPVOID param);
 
 wbk_kc_sys_t *
 wbk_kc_sys_new(wbk_b_t *comb, char *cmd)
 {
-	wbk_kc_sys_t *kb_sys;
+  wbk_kc_t *kc;
+	wbk_kc_sys_t *kc_sys;
 	int length;
 
-	kb_sys = NULL;
-	kb_sys = malloc(sizeof(wbk_kc_sys_t));
-	memset(kb_sys, 0, sizeof(wbk_kc_sys_t));
+	kc_sys = NULL;
+	kc_sys = malloc(sizeof(wbk_kc_sys_t));
+	memset(kc_sys, 0, sizeof(wbk_kc_sys_t));
 
-	if (kb_sys != NULL) {
-		kb_sys->kc = wbk_kc_new(comb);
+  if (kc_sys) {
+    kc = wbk_kc_new(comb);
+    memcpy(kc_sys, kc, sizeof(wbk_kc_t));
+    free(kc); /* Just free the top level element */
+
+    kc_sys->super_kc_free = kc_sys->kc.kc_free;
+    kc_sys->super_kc_exec = kc_sys->kc.kc_exec;
+
+    kc_sys->kc.kc_free = wbk_kc_sys_free_impl;
+    kc_sys->kc.kc_exec = wbk_kc_sys_exec_impl;
+    kc_sys->kc_sys_get_cmd = wbk_kc_sys_get_cmd_impl;
+  }
+
+	if (kc_sys) {
+		kc_sys->cmd = cmd;
 	}
 
-	if (kb_sys != NULL) {
-		kb_sys->cmd = cmd;
-	}
-
-	return kb_sys;
+	return kc_sys;
 }
 
 wbk_kc_sys_t *
@@ -73,7 +108,7 @@ wbk_kc_sys_clone(const wbk_kc_sys_t *other)
 
 	kc_sys = NULL;
 	if (other) {
-		comb = wbk_b_clone(wbk_kc_sys_get_binding(other));
+		comb = wbk_b_clone(wbk_kc_get_binding((wbk_kc_t *) other));
 
 		cmd_len = strlen(wbk_kc_sys_get_cmd(other)) + 1;
 		cmd = malloc(sizeof(char) * cmd_len);
@@ -85,27 +120,30 @@ wbk_kc_sys_clone(const wbk_kc_sys_t *other)
 	return kc_sys;
 }
 
-int
-wbk_kc_sys_free(wbk_kc_sys_t *kc_sys)
+const char *
+wbk_kc_sys_get_cmd(const wbk_kc_sys_t *kc_sys)
 {
-	wbk_kc_free(kc_sys->kc);
-	kc_sys->kc = NULL;
+	return kc_sys->kc_sys_get_cmd(kc_sys);
+}
 
-	free(kc_sys->cmd);
+
+int
+wbk_kc_sys_free_impl(wbk_kc_t *kc)
+{
+  wbk_kc_sys_t *kc_sys;
+
+  kc_sys = (wbk_kc_sys_t *) kc;
+
+  free(kc_sys->cmd);
 	kc_sys->cmd = NULL;
 
-	free(kc_sys);
+  kc_sys->super_kc_free(kc);
+
 	return 0;
 }
 
-const wbk_b_t *
-wbk_kc_sys_get_binding(const wbk_kc_sys_t *kc_sys)
-{
-	return wbk_kc_get_binding(kc_sys->kc);
-}
-
 const char *
-wbk_kc_sys_get_cmd(const wbk_kc_sys_t *kc_sys)
+wbk_kc_sys_get_cmd_impl(const wbk_kc_sys_t *kc_sys)
 {
 	return kc_sys->cmd;
 }
@@ -121,12 +159,15 @@ wbk_kbthread_exec(LPVOID param)
 }
 
 int
-wbk_kc_sys_exec(const wbk_kc_sys_t *kc_sys)
+wbk_kc_sys_exec_impl(const wbk_kc_t *kc)
 {
+  const wbk_kc_sys_t *kc_sys;
+
+  kc_sys = (const wbk_kc_sys_t *) kc;
 #ifdef DEBUG_ENABLED
 	char *binding;
 
-	binding = wbk_b_to_str(wbk_kc_sys_get_binding(kc_sys));
+	binding = wbk_b_to_str(wbk_kc_get_binding(kc));
 	wbk_logger_log(&logger, DEBUG, "Exec binding: %s\n", binding);
 	free(binding);
 	binding = NULL;

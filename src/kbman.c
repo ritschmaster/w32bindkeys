@@ -51,7 +51,7 @@ wbk_kbman_free(wbk_kbman_t *kbman)
 	int i;
 
 	for (i = 0; i < kbman->kc_sys_arr_len; i++) {
-		wbk_kc_sys_free(kbman->kc_sys_arr[i]);
+		wbk_kc_free((wbk_kc_t *) kbman->kc_sys_arr[i]);
 		kbman->kc_sys_arr[i] = NULL;
 	}
 	free(kbman->kc_sys_arr);
@@ -102,13 +102,13 @@ wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b)
 
 	found_at = -1;
 	for (i = 0; found_at < 0 && i < kbman->kc_sys_arr_len; i++) {
-		if (wbk_b_compare(wbk_kc_sys_get_binding(kbman->kc_sys_arr[i]), b) == 0) {
+		if (wbk_b_compare(wbk_kc_get_binding((wbk_kc_t *) kbman->kc_sys_arr[i]), b) == 0) {
 			found_at = i;
 		}
 	}
 
 	if (found_at >= 0) {
-		error = wbk_kc_sys_exec(kbman->kc_sys_arr[found_at]);
+		error = wbk_kc_exec((wbk_kc_t *) kbman->kc_sys_arr[found_at]);
 	}
 
 	return error;

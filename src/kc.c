@@ -33,14 +33,30 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#if defined(WIN32)
 #include <windows.h>
-#endif
 
 #include "logger.h"
 
 static wbk_logger_t logger =  { "kc" };
+
+/**
+ * Implementation of wbk_kc_free().
+ */
+static int
+wbk_kc_free_impl(wbk_kc_t *kc);
+
+/**
+ * Implementation of wbk_kc_get_binding().
+ */
+static const wbk_b_t *
+wbk_kc_get_binding_impl(const wbk_kc_t *kc);
+
+/**
+ * Implementation of wbk_kc_exec().
+ */
+static int
+wbk_kc_exec_impl(const wbk_kc_t *kc);
+
 
 static DWORD WINAPI
 wbk_kbthread_exec(LPVOID param);
@@ -54,6 +70,10 @@ wbk_kc_new(wbk_b_t *comb)
 	kc = NULL;
 	kc = malloc(sizeof(wbk_kc_t));
 	memset(kc, 0, sizeof(wbk_kc_t));
+
+  kc->kc_free = wbk_kc_free_impl;
+  kc->kc_get_binding = wbk_kc_get_binding_impl;
+  kc->kc_exec = wbk_kc_exec_impl;
 
 	if (kc != NULL) {
 		kc->binding = comb;
@@ -80,6 +100,24 @@ wbk_kc_clone(const wbk_kc_t *other)
 int
 wbk_kc_free(wbk_kc_t *kc)
 {
+  return kc->kc_free(kc);
+}
+
+const wbk_b_t *
+wbk_kc_get_binding(const wbk_kc_t *kc)
+{
+  return kc->kc_get_binding(kc);
+}
+
+int
+wbk_kc_exec(const wbk_kc_t *kc)
+{
+  return kc->kc_exec(kc);
+}
+
+int
+wbk_kc_free_impl(wbk_kc_t *kc)
+{
 	if (kc->binding) {
 		wbk_b_free(kc->binding);
 		kc->binding = NULL;
@@ -90,13 +128,13 @@ wbk_kc_free(wbk_kc_t *kc)
 }
 
 const wbk_b_t *
-wbk_kc_get_binding(const wbk_kc_t *kc)
+wbk_kc_get_binding_impl(const wbk_kc_t *kc)
 {
 	return kc->binding;
 }
 
 int
-wbk_kc_exec(const wbk_kc_t *kc)
+wbk_kc_exec_impl(const wbk_kc_t *kc)
 {
 	return 1;
 }

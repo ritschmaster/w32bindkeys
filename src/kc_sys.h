@@ -26,6 +26,8 @@
  * @author Richard Bäck
  * @date 2020-02-26
  * @brief File contains the key binding system command class definition
+ *
+ * wbk_kc_sys_t inherits all methods of wkb_kc_t (see kc.h).
  */
 
 #include "kc.h"
@@ -33,12 +35,18 @@
 #ifndef WBK_KC_SYS_H
 #define WBK_KC_SYS_H
 
-typedef struct wbk_kc_sys_s
+typedef struct wbk_kc_sys_s wbk_kc_sys_t;
+
+struct wbk_kc_sys_s
 {
-	wbk_kc_t *kc;
+	wbk_kc_t kc;
+  int (*super_kc_free)(wbk_kc_t *kc);
+  int (*super_kc_exec)(const wbk_kc_t *kc);
+
+  const char *(*kc_sys_get_cmd)(const wbk_kc_sys_t *kc_sys);
 
 	char *cmd;
-} wbk_kc_sys_t;
+};
 
 /**
  * @brief Creates a new key binding system command
@@ -54,20 +62,6 @@ wbk_kc_sys_new(wbk_b_t *comb, char *cmd);
  */
 extern wbk_kc_sys_t *
 wbk_kc_sys_clone(const wbk_kc_sys_t *other);
-
-/**
- * @brief Frees a key binding system command
- * @return Non-0 if the freeing failed
- */
-extern int
-wbk_kc_sys_free(wbk_kc_sys_t *kc);
-
-/**
- * @brief Gets the combinations of a key binding system command.
- * @return The combinations of a key binding system command. It is an array of wbk_b_t.
- */
-extern const wbk_b_t *
-wbk_kc_sys_get_binding(const wbk_kc_sys_t *kc);
 
 /**
  * @brief Gets the command of a key binding system command.
