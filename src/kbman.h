@@ -34,12 +34,18 @@
 #include <windows.h>
 
 #include "kc_sys.h"
+typedef struct wbk_kbman_s wbk_kbman_t;
 
-typedef struct wbk_kbman_s
+struct wbk_kbman_s
 {
+  wbk_kbman_t *(*kbman_free)(wbk_kbman_t *kbman);
+  int (*kbman_add)(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
+  wbk_kbman_t **(*kbman_split)(wbk_kbman_t *kbman, int nominator);
+  int (*kbman_exec)(wbk_kbman_t *kbman, wbk_b_t *b);
+
 	int kc_sys_arr_len;
 	wbk_kc_sys_t **kc_sys_arr;
-} wbk_kbman_t;
+};
 
 /**
  */

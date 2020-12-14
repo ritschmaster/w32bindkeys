@@ -70,11 +70,4 @@ wbk_kc_sys_clone(const wbk_kc_sys_t *other);
 extern const char *
 wbk_kc_sys_get_cmd(const wbk_kc_sys_t *kc_sys);
 
-/**
- * @brief Execute the system command of a key binding system command
- * @return Non-0 if the execution failed
- */
-extern int
-wbk_kc_sys_exec(const wbk_kc_sys_t *kc_sys);
-
 #endif // WBK_KC_SYS_H

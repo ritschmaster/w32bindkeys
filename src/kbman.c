@@ -30,6 +30,18 @@
 
 static wbk_logger_t logger =  { "kbman" };
 
+static wbk_kbman_t *
+wbk_kbman_free_impl(wbk_kbman_t *kbman);
+
+static int
+wbk_kbman_add_impl(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
+
+static wbk_kbman_t **
+wbk_kbman_split_impl(wbk_kbman_t *kbman, int nominator);
+
+static int
+wbk_kbman_exec_impl(wbk_kbman_t *kbman, wbk_b_t *b);
+
 wbk_kbman_t *
 wbk_kbman_new()
 {
@@ -38,15 +50,45 @@ wbk_kbman_new()
 	kbman = NULL;
 	kbman = malloc(sizeof(wbk_kbman_t));
 
-	kbman->kc_sys_arr_len = 0;
-	kbman->kc_sys_arr = NULL;
+  if (kbman) {
+    kbman->kbman_free = wbk_kbman_free_impl;
+    kbman->kbman_add = wbk_kbman_add_impl;
+    kbman->kbman_split = wbk_kbman_split_impl;
+    kbman->kbman_exec = wbk_kbman_exec_impl;
 
-	return kbman;
+    kbman->kc_sys_arr_len = 0;
+    kbman->kc_sys_arr = NULL;
+  }
 
+  return kbman;
 }
 
 wbk_kbman_t *
 wbk_kbman_free(wbk_kbman_t *kbman)
+{
+  return kbman->kbman_free(kbman);
+}
+
+int
+wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys)
+{
+  return kbman->kbman_add(kbman, kc_sys);
+}
+
+wbk_kbman_t **
+wbk_kbman_split(wbk_kbman_t *kbman, int nominator)
+{
+  return kbman->kbman_split(kbman, nominator);
+}
+
+int
+wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b)
+{
+  return kbman->kbman_exec(kbman, b);
+}
+
+wbk_kbman_t *
+wbk_kbman_free_impl(wbk_kbman_t *kbman)
 {
 	int i;
 
@@ -61,7 +103,7 @@ wbk_kbman_free(wbk_kbman_t *kbman)
 }
 
 int
-wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys)
+wbk_kbman_add_impl(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys)
 {
 	kbman->kc_sys_arr_len++;
 	kbman->kc_sys_arr = realloc(kbman->kc_sys_arr,
@@ -71,7 +113,7 @@ wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys)
 }
 
 wbk_kbman_t **
-wbk_kbman_split(wbk_kbman_t *kbman, int nominator)
+wbk_kbman_split_impl(wbk_kbman_t *kbman, int nominator)
 {
 	wbk_kbman_t **kbmans;
 	int i;
@@ -92,7 +134,7 @@ wbk_kbman_split(wbk_kbman_t *kbman, int nominator)
 }
 
 int
-wbk_kbman_exec(wbk_kbman_t *kbman, wbk_b_t *b)
+wbk_kbman_exec_impl(wbk_kbman_t *kbman, wbk_b_t *b)
 {
 	int error;
 	int i;
