@@ -37,6 +37,7 @@ typedef struct wbk_kc_s wbk_kc_t;
 
 struct wbk_kc_s
 {
+  wbk_kc_t *(*kc_clone)(const wbk_kc_t *other);
   int (*kc_free)(wbk_kc_t *kc);
   const wbk_b_t *(*kc_get_binding)(const wbk_kc_t *kc);
   int (*kc_exec)(const wbk_kc_t *kc);

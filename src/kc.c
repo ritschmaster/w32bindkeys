@@ -39,6 +39,9 @@
 
 static wbk_logger_t logger =  { "kc" };
 
+static wbk_kc_t *
+wbk_kc_clone_impl(const wbk_kc_t *other);
+
 /**
  * Implementation of wbk_kc_free().
  */
@@ -71,6 +74,7 @@ wbk_kc_new(wbk_b_t *comb)
 	kc = malloc(sizeof(wbk_kc_t));
 	memset(kc, 0, sizeof(wbk_kc_t));
 
+  kc->kc_clone = wbk_kc_clone_impl;
   kc->kc_free = wbk_kc_free_impl;
   kc->kc_get_binding = wbk_kc_get_binding_impl;
   kc->kc_exec = wbk_kc_exec_impl;
@@ -85,16 +89,7 @@ wbk_kc_new(wbk_b_t *comb)
 wbk_kc_t *
 wbk_kc_clone(const wbk_kc_t *other)
 {
-	wbk_b_t *b;
-	wbk_kc_t *kc;
-
-	kc = NULL;
-	if (other) {
-		b = wbk_b_clone(other->binding);
-		kc = wbk_kc_new(b);
-	}
-
-	return kc;
+  return other->kc_clone(other);
 }
 
 int
@@ -113,6 +108,21 @@ int
 wbk_kc_exec(const wbk_kc_t *kc)
 {
   return kc->kc_exec(kc);
+}
+
+wbk_kc_t *
+wbk_kc_clone_impl(const wbk_kc_t *other)
+{
+	wbk_b_t *b;
+	wbk_kc_t *kc;
+
+	kc = NULL;
+	if (other) {
+		b = wbk_b_clone(other->binding);
+		kc = wbk_kc_new(b);
+	}
+
+	return kc;
 }
 
 int

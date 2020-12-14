@@ -40,6 +40,14 @@
 static wbk_logger_t logger =  { "kc_sys" };
 
 /**
+ * Implementation of wbk_kc_clone().
+ *
+ * Clones a key binding system command
+ */
+static wbk_kc_t *
+wbk_kc_sys_clone_impl(const wbk_kc_t *super_other);
+
+/**
  * Implementaiton of wbk_kc_free().
  *
  * @brief Frees a key binding system command
@@ -83,9 +91,11 @@ wbk_kc_sys_new(wbk_b_t *comb, char *cmd)
     memcpy(kc_sys, kc, sizeof(wbk_kc_t));
     free(kc); /* Just free the top level element */
 
+    kc_sys->super_kc_clone = kc_sys->kc.kc_clone;
     kc_sys->super_kc_free = kc_sys->kc.kc_free;
     kc_sys->super_kc_exec = kc_sys->kc.kc_exec;
 
+    kc_sys->kc.kc_clone = wbk_kc_sys_clone_impl;
     kc_sys->kc.kc_free = wbk_kc_sys_free_impl;
     kc_sys->kc.kc_exec = wbk_kc_sys_exec_impl;
     kc_sys->kc_sys_get_cmd = wbk_kc_sys_get_cmd_impl;
@@ -98,13 +108,16 @@ wbk_kc_sys_new(wbk_b_t *comb, char *cmd)
 	return kc_sys;
 }
 
-wbk_kc_sys_t *
-wbk_kc_sys_clone(const wbk_kc_sys_t *other)
+wbk_kc_t *
+wbk_kc_sys_clone_impl(const wbk_kc_t *super_other)
 {
-	wbk_b_t *comb;
+	const wbk_kc_sys_t *other;
+  wbk_b_t *comb;
 	char *cmd;
 	int cmd_len;
 	wbk_kc_sys_t *kc_sys;
+
+  other = (const wbk_kc_sys_t *) super_other;
 
 	kc_sys = NULL;
 	if (other) {
@@ -117,7 +130,7 @@ wbk_kc_sys_clone(const wbk_kc_sys_t *other)
 		kc_sys = wbk_kc_sys_new(comb, cmd);
 	}
 
-	return kc_sys;
+	return (wbk_kc_t *) kc_sys;
 }
 
 const char *

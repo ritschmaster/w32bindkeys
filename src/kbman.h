@@ -33,18 +33,18 @@
 
 #include <windows.h>
 
-#include "kc_sys.h"
+#include "kc.h"
 typedef struct wbk_kbman_s wbk_kbman_t;
 
 struct wbk_kbman_s
 {
   wbk_kbman_t *(*kbman_free)(wbk_kbman_t *kbman);
-  int (*kbman_add)(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
+  int (*kbman_add)(wbk_kbman_t *kbman, wbk_kc_t *kc);
   wbk_kbman_t **(*kbman_split)(wbk_kbman_t *kbman, int nominator);
   int (*kbman_exec)(wbk_kbman_t *kbman, wbk_b_t *b);
 
-	int kc_sys_arr_len;
-	wbk_kc_sys_t **kc_sys_arr;
+	int kc_arr_len;
+	wbk_kc_t **kc_arr;
 };
 
 /**
@@ -59,7 +59,7 @@ wbk_kbman_free(wbk_kbman_t *kbman);
  * @param kb The key binding to add. The added key binding will be freed by the key binding manager
  */
 extern int
-wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_sys_t *kc_sys);
+wbk_kbman_add(wbk_kbman_t *kbman, wbk_kc_t *kc);
 
 /**
  * Create an array of nominator new key board managers and divide the internal

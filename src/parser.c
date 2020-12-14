@@ -128,7 +128,7 @@ wbk_parser_parse(wbk_parser_t *parser)
 
 			if (cmd != NULL && binding != NULL) {
 				kc = wbk_kc_sys_new(binding, cmd);
-				wbk_kbman_add(kbman, kc);
+				wbk_kbman_add(kbman, (wbk_kc_t *)kc);
 				kc = NULL;
 				cmd = NULL;
 				binding = NULL;

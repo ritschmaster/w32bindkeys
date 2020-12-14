@@ -40,6 +40,7 @@ typedef struct wbk_kc_sys_s wbk_kc_sys_t;
 struct wbk_kc_sys_s
 {
 	wbk_kc_t kc;
+  wbk_kc_t *(*super_kc_clone)(const wbk_kc_t *other);
   int (*super_kc_free)(wbk_kc_t *kc);
   int (*super_kc_exec)(const wbk_kc_t *kc);
 
@@ -56,12 +57,6 @@ struct wbk_kc_sys_s
  */
 extern wbk_kc_sys_t *
 wbk_kc_sys_new(wbk_b_t *comb, char *cmd);
-
-/**
- * Clones a key binding system command
- */
-extern wbk_kc_sys_t *
-wbk_kc_sys_clone(const wbk_kc_sys_t *other);
 
 /**
  * @brief Gets the command of a key binding system command.
