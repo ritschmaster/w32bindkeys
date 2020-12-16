@@ -51,7 +51,7 @@
 
 #define WBK_WINDOW_CLASSNAME "wbkWindowClass"
 
-#define WBK_KBDAEMON_ARR_LEN 3
+#define WBK_KBDAEMON_ARR_LEN 30
 
 static struct option WBK_GETOPT_LONG_OPTIONS[] = {
     /*   NAME          ARGUMENT           FLAG  SHORTNAME */
@@ -339,14 +339,13 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 int
 kbdaemon_exec_fn(wbk_kbdaemon_t *kbdaemon, wbk_b_t *b)
 {
-	if (kbdaemon == g_kbdaemon_arr[0])
-		return wbk_kbman_exec(g_kbman_arr[0], b);
-	else if (kbdaemon == g_kbdaemon_arr[1])
-		return wbk_kbman_exec(g_kbman_arr[1], b);
-	else if (kbdaemon == g_kbdaemon_arr[2])
-		return wbk_kbman_exec(g_kbman_arr[2], b);
-	else
-		return 1;
+  int i;
+
+  for (i = 0; i < WBK_KBDAEMON_ARR_LEN; i++) {
+    if (kbdaemon == g_kbdaemon_arr[i])
+      return wbk_kbman_exec(g_kbman_arr[i], b);
+  }
+  return 1;
 }
 
 LRESULT CALLBACK
