@@ -260,6 +260,7 @@ parameterized_main(HINSTANCE hInstance, const wbk_datafinder_t *datafinder)
 				rc_file = NULL;
 			} else {
 				error = 1;
+        wbk_logger_log(&logger, SEVERE, "Could not find/open the default config.\n");
 			}
 		}
 	}

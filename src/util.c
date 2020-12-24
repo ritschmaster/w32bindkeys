@@ -60,36 +60,6 @@ wbk_intarr_to_str(Array *array)
 		str[pos] = temp;
 		pos = pos + 1;
 
-//		temp = temp << 24;
-//		if (temp) {
-//			temp = temp << 16;
-//			if (temp) {
-//				temp = temp << 8;
-//				if (temp) {
-//					str = realloc(str, pos + 4);
-//					str[pos] = *character;
-//					str[pos + 1] = *character << 8;
-//					str[pos + 2] = *character << 16;
-//					str[pos + 3] = *character << 24;
-//					pos = pos + 4;
-//				} else {
-//					str = realloc(str, pos + 3);
-//					str[pos] = *character << 8;
-//					str[pos + 1] = *character << 16;
-//					str[pos + 2] = *character << 24;
-//					pos = pos + 3;
-//				}
-//			} else {
-//				str = realloc(str, pos + 2);
-//				str[pos] = *character << 16;
-//				str[pos + 1] = *character << 24;
-//				pos = pos + 2;
-//			}
-//		} else {
-//			str = realloc(str, pos + 1);
-//			str[pos] = *character << 24;
-//			pos = pos + 1;
-//		}
 	}
 
 	str = realloc(str, pos + 1);
