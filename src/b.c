@@ -103,19 +103,14 @@ wbk_b_add(wbk_b_t *b, const wbk_be_t *be)
 	int ret;
 
 	ret = 1;
-	if (wbk_be_get_modifier(be) != 0) {
-		if (b->modifier_map[wbk_be_get_modifier(be)] == 0) {
-			b->modifier_map[wbk_be_get_modifier(be)] = 1;
-			ret = 0;
-		}
-	} else if (wbk_be_get_key(be) != 0) {
-		if (b->key_map[wbk_be_get_key(be)] == 0) {
-			b->key_map[wbk_be_get_key(be)] = 1;
-			ret = 0;
-		}
-	}
+	if (b->modifier_map[wbk_be_get_modifier(be)] == 0
+		|| b->key_map[wbk_be_get_key(be)] == 0) {
+	  b->modifier_map[wbk_be_get_modifier(be)] = 1;
+	  b->key_map[wbk_be_get_key(be)] = 1;
+      ret = 0;
+    }
 
-	return ret;
+    return ret;
 }
 
 inline int
@@ -124,19 +119,14 @@ wbk_b_remove(wbk_b_t *b, const wbk_be_t *be)
 	int ret;
 
 	ret = 1;
-	if (wbk_be_get_modifier(be) != 0) {
-		if (b->modifier_map[wbk_be_get_modifier(be)] != 0) {
-			b->modifier_map[wbk_be_get_modifier(be)] = 0;
-			ret = 0;
-		}
-	} else if (wbk_be_get_key(be) != 0) {
-		if (b->key_map[wbk_be_get_key(be)] != 0) {
-			b->key_map[wbk_be_get_key(be)] = 0;
-			ret = 0;
-		}
-	}
+	if (b->modifier_map[wbk_be_get_modifier(be)] != 0
+		|| b->key_map[wbk_be_get_key(be)] != 0) {
+	  b->modifier_map[wbk_be_get_modifier(be)] = 0;
+	  b->key_map[wbk_be_get_key(be)] = 0;
+	  ret = 0;
+    }
 
-	return ret;
+    return ret;
 }
 
 inline int

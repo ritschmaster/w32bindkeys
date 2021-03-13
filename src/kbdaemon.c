@@ -315,6 +315,146 @@ static LRESULT CALLBACK
 wbk_kbhook_windows_hook29(int nCode, WPARAM wParam, LPARAM lParam);
 
 /**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 30th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook30(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 31st global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook31(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 32nd global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook32(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 33rd global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook33(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 34th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook34(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 35th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook35(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 36th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook36(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 37th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook37(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 38th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook38(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 39th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook39(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 40th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook40(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 41st global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook41(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 42nd global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook42(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 43rd global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook43(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 44th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook44(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 45th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook45(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 46th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook46(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 47th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook47(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 48th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook48(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
+ * A low level keyboard hook started and stopped by wbk_kbhook_start() and
+ * wbk_kbhook_stop(). It is used for the 49th global element.
+ */
+static LRESULT CALLBACK
+wbk_kbhook_windows_hook49(int nCode, WPARAM wParam, LPARAM lParam);
+
+/**
  * Internal function to change an element of the global data.
  *
  * @param kbdaemon Will not be freed.
@@ -358,20 +498,22 @@ wbk_kbhook_remove_kbdaemon_internal(wbk_kbdaemon_t *kbdaemon,
 static int
 wbk_kbhook_remove_kbdaemon(wbk_kbdaemon_t *kbdaemon);
 
-static int g_kbhook_arr_len = 30;
+#define W32_KBHOOK_ARR_LEN 30
+
+static int g_kbhook_arr_len = W32_KBHOOK_ARR_LEN;
 static int g_kbhook_arr_i = 0;
 static struct kbhook_s g_kbhook_arr[] = {
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook0, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook1, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook2, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook3, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook4, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook5, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook6, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook7, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook8, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook9, NULL, 0, 0 },
-    { 0, NULL, NULL, wbk_kbhook_windows_hook10, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook0,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook1,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook2,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook3,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook4,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook5,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook6,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook7,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook8,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook9,  NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook10, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook11, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook12, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook13, NULL, 0, 0 },
@@ -381,7 +523,7 @@ static struct kbhook_s g_kbhook_arr[] = {
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook17, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook18, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook19, NULL, 0, 0 },
-    { 0, NULL, NULL, wbk_kbhook_windows_hook20, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook20, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook21, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook22, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook23, NULL, 0, 0 },
@@ -390,7 +532,27 @@ static struct kbhook_s g_kbhook_arr[] = {
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook26, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook27, NULL, 0, 0 },
 		{ 0, NULL, NULL, wbk_kbhook_windows_hook28, NULL, 0, 0 },
-		{ 0, NULL, NULL, wbk_kbhook_windows_hook29, NULL, 0, 0 }
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook29, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook30, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook31, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook32, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook33, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook34, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook35, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook36, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook37, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook38, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook39, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook40, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook41, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook42, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook43, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook44, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook45, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook46, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook47, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook48, NULL, 0, 0 },
+		{ 0, NULL, NULL, wbk_kbhook_windows_hook49, NULL, 0, 0 }
 };
 
 static char g_session_watcher_created = 0;
@@ -411,17 +573,14 @@ wbk_kbhook_reset_all_b(void)
 	Sleep(5);
 
   for (i = 0; i < g_kbhook_arr_len; i++) {
-		g_kbhook_arr[i].hook_entered = -10000;
-		g_kbhook_arr[i].hook_left = 0;
 		wbk_b_reset(g_kbhook_arr[i].cur_b);
 	}
 
 	Sleep(10);
 
 	for (i = 0; i < g_kbhook_arr_len; i++) {
-		g_kbhook_arr[i].hook_entered = 0;
-		g_kbhook_arr[i].hook_left = 0;
 		wbk_b_reset(g_kbhook_arr[i].cur_b);
+		g_kbhook_arr[i].hook_entered = 0;
 	}
 
 	Sleep(5);
@@ -516,87 +675,92 @@ wbk_kbhook_session_watcher_start(void)
 	return error;
 }
 
+#define W32_KBHOOK_LAST_WAS_SAME_CHECKS 20
+#define W32_KBHOOK_LAST_WAS_SAME_STREAK 10
+
+/**
+ * Defines when the next check is performed. The unit is milliseconds
+ */
+#define W32_KBHOOK_LAST_WAS_SAME_NEXT_CHECK_IN 100
+
 DWORD WINAPI
-wbk_kbhook_hook_watcher(LPVOID param)
-{
-	char reset;
-	char c;
-	SHORT rv;
-	int i;
-  time_t timestamp;
+wbk_kbhook_hook_watcher(LPVOID param) {
+  int i;
+  int times_checked;
 
-	while (1) {
-		reset = 0;
+  /*
+   * The last HOOK_ENTERED for each hook
+   */
+  int last[W32_KBHOOK_ARR_LEN];
 
-    if (!reset
-        && time(NULL) - timestamp > 10) {
-      /**
-       * Periodically reset all the tracked keys
-       */
-      reset = 1;
-    }
+  /**
+   * How often the last HOOK_ENTERED was the same in one streak for each hook
+   */
+  int last_was_same[W32_KBHOOK_ARR_LEN];
 
-    if (!reset) {
-      /**
-       * Check if any key is pressed
-       */
-      for(c = 1; reset && c < 255; c++){
-        rv = GetAsyncKeyState(c);
-        if (rv & 0x8000) {
-          /**
-           * A key is currently pressed
-           */
-          reset = 0;
-        }
+  memset(last, 0, W32_KBHOOK_ARR_LEN * sizeof(int));
+  memset(last_was_same, 0, W32_KBHOOK_ARR_LEN * sizeof(int));
+  times_checked = 0;
+
+  /**
+   * Reset the key when: the HOOK_ENTERED tracker was
+   * W32_KBHOOK_LAST_WAS_SAME_STREAK of W32_KBHOOK_LAST_WAS_SAME_CHECKS times
+   * the same in a streak. The check is performed every
+   * W32_KBHOOK_LAST_WAS_SAME_NEXT_CHECK_IN second.
+   *
+   * This is very unlikekly except if a key hangs.
+   */
+  while (1) {
+	for (i = 0; i < g_kbhook_arr_len; i++) {
+
+	  if (g_kbhook_arr[i].hook_entered > 0 &&
+		  g_kbhook_arr[i].hook_entered == last[i]) {
+		last_was_same[i]++;
+	  } else {
+		last_was_same[i] = 0;
+	  }
+
+	  if (i == 0) {
+		wbk_logger_log(&logger, DEBUG, "Checking %d == %d, streak = %d\n", g_kbhook_arr[i].hook_entered, last[i], last_was_same[i]);
+	  }
+
+	  last[i] = g_kbhook_arr[i].hook_entered;
+
+	  if (last_was_same[i] >= W32_KBHOOK_LAST_WAS_SAME_STREAK) {
+		wbk_b_reset(g_kbhook_arr[i].cur_b);
+		g_kbhook_arr[i].hook_entered = 0;
+		wbk_logger_log(&logger, DEBUG, "Resetting a KBHOOK\n");
+        last_was_same[i] = 0;
       }
     }
 
-    if (!reset) {
-    /**
-     * Give the user i changes to stop typing
-     */
-    for (i = 0; i < 5; i++) {
-      reset = 0;
-      if (wbk_kbhook_any_hook_broken()) {
-        reset = 1;
-      }
-      Sleep(300);
-      }
+    if (times_checked > W32_KBHOOK_LAST_WAS_SAME_CHECKS) {
+      times_checked = 0;
     }
+    times_checked++;
 
-    if (reset) {
-      wbk_kbhook_reset_all_b();
-
-      timestamp = time(NULL);
-    }
-
-    Sleep(1000);
+    Sleep(W32_KBHOOK_LAST_WAS_SAME_NEXT_CHECK_IN);
   }
 
-	return 0;
+  return 0;
 }
 
 int
-wbk_kbhook_hook_watcher_start(void)
-{
-	int error;
+wbk_kbhook_hook_watcher_start(void) {
+  int error;
 
-	error = 0;
-	g_active_win_watcher_handler = CreateThread(NULL,
-								   0,
-								   wbk_kbhook_hook_watcher,
-								   NULL,
-								   0,
-								   NULL);
+  error = 0;
+  g_active_win_watcher_handler =
+      CreateThread(NULL, 0, wbk_kbhook_hook_watcher, NULL, 0, NULL);
 
-	if (!g_active_win_watcher_handler) {
-		error = 1;
-		wbk_logger_log(&logger, SEVERE, "Starting of the active window watcher thread failed.\n");
-	}
+  if (!g_active_win_watcher_handler) {
+    error = 1;
+    wbk_logger_log(&logger, SEVERE,
+                   "Starting of the active window watcher thread failed.\n");
+  }
 
-	return error;
+  return error;
 }
-
 
 int
 wbk_kbhook_add_kbdaemon_internal(wbk_kbdaemon_t *kbdaemon,
@@ -752,15 +916,12 @@ wbk_kbhook_windows(int nCode, WPARAM wParam, LPARAM lParam,
 	int changed_any;
 	int i;
 
-	*hook_entered++;
+	(*hook_entered)++;
 	ret = 0;
 
-	if (*hook_entered != *hook_left) {
-		nCode = 0;
-		ret = 0;
-	}
-
-	if (nCode >= 0) {
+	if (nCode >= 0
+		/* && *hook_left == 0 */
+	) {
 		switch (wParam) {
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
@@ -802,7 +963,8 @@ wbk_kbhook_windows(int nCode, WPARAM wParam, LPARAM lParam,
 		}
 	}
 
-	*hook_left++;
+  /* *hook_entered--; */
+
 	if (!ret) {
 		ret = CallNextHookEx(NULL, nCode, wParam, lParam);
 	}
@@ -1138,6 +1300,226 @@ wbk_kbhook_windows_hook29(int nCode, WPARAM wParam, LPARAM lParam)
                             &(g_kbhook_arr[29].cur_b),
                             &(g_kbhook_arr[29].hook_entered),
                             &(g_kbhook_arr[29].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook30(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+						   &(g_kbhook_arr[30].arr_len),
+						   &(g_kbhook_arr[30].arr),
+						   &(g_kbhook_arr[30].cur_b),
+						   &(g_kbhook_arr[30].hook_entered),
+						   &(g_kbhook_arr[30].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook31(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+						   &(g_kbhook_arr[31].arr_len),
+						   &(g_kbhook_arr[31].arr),
+						   &(g_kbhook_arr[31].cur_b),
+						   &(g_kbhook_arr[31].hook_entered),
+						   &(g_kbhook_arr[31].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook32(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+						   &(g_kbhook_arr[32].arr_len),
+						   &(g_kbhook_arr[32].arr),
+						   &(g_kbhook_arr[32].cur_b),
+						   &(g_kbhook_arr[32].hook_entered),
+						   &(g_kbhook_arr[32].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook33(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[33].arr_len),
+                            &(g_kbhook_arr[33].arr),
+                            &(g_kbhook_arr[33].cur_b),
+                            &(g_kbhook_arr[33].hook_entered),
+                            &(g_kbhook_arr[33].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook34(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[34].arr_len),
+                            &(g_kbhook_arr[34].arr),
+                            &(g_kbhook_arr[34].cur_b),
+                            &(g_kbhook_arr[34].hook_entered),
+                            &(g_kbhook_arr[34].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook35(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[35].arr_len),
+                            &(g_kbhook_arr[35].arr),
+                            &(g_kbhook_arr[35].cur_b),
+                            &(g_kbhook_arr[35].hook_entered),
+                            &(g_kbhook_arr[35].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook36(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[36].arr_len),
+                            &(g_kbhook_arr[36].arr),
+                            &(g_kbhook_arr[36].cur_b),
+                            &(g_kbhook_arr[36].hook_entered),
+                            &(g_kbhook_arr[36].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook37(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[37].arr_len),
+                            &(g_kbhook_arr[37].arr),
+                            &(g_kbhook_arr[37].cur_b),
+                            &(g_kbhook_arr[37].hook_entered),
+                            &(g_kbhook_arr[37].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook38(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[38].arr_len),
+                            &(g_kbhook_arr[38].arr),
+                            &(g_kbhook_arr[38].cur_b),
+                            &(g_kbhook_arr[38].hook_entered),
+                            &(g_kbhook_arr[38].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook39(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[39].arr_len),
+                            &(g_kbhook_arr[39].arr),
+                            &(g_kbhook_arr[39].cur_b),
+                            &(g_kbhook_arr[39].hook_entered),
+                            &(g_kbhook_arr[39].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook40(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+						   &(g_kbhook_arr[40].arr_len),
+						   &(g_kbhook_arr[40].arr),
+						   &(g_kbhook_arr[40].cur_b),
+						   &(g_kbhook_arr[40].hook_entered),
+						   &(g_kbhook_arr[40].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook41(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+						   &(g_kbhook_arr[41].arr_len),
+						   &(g_kbhook_arr[41].arr),
+						   &(g_kbhook_arr[41].cur_b),
+						   &(g_kbhook_arr[41].hook_entered),
+						   &(g_kbhook_arr[41].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook42(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+						   &(g_kbhook_arr[42].arr_len),
+						   &(g_kbhook_arr[42].arr),
+						   &(g_kbhook_arr[42].cur_b),
+						   &(g_kbhook_arr[42].hook_entered),
+						   &(g_kbhook_arr[42].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook43(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[43].arr_len),
+                            &(g_kbhook_arr[43].arr),
+                            &(g_kbhook_arr[43].cur_b),
+                            &(g_kbhook_arr[43].hook_entered),
+                            &(g_kbhook_arr[43].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook44(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[44].arr_len),
+                            &(g_kbhook_arr[44].arr),
+                            &(g_kbhook_arr[44].cur_b),
+                            &(g_kbhook_arr[44].hook_entered),
+                            &(g_kbhook_arr[44].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook45(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[45].arr_len),
+                            &(g_kbhook_arr[45].arr),
+                            &(g_kbhook_arr[45].cur_b),
+                            &(g_kbhook_arr[45].hook_entered),
+                            &(g_kbhook_arr[45].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook46(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[46].arr_len),
+                            &(g_kbhook_arr[46].arr),
+                            &(g_kbhook_arr[46].cur_b),
+                            &(g_kbhook_arr[46].hook_entered),
+                            &(g_kbhook_arr[46].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook47(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[47].arr_len),
+                            &(g_kbhook_arr[47].arr),
+                            &(g_kbhook_arr[47].cur_b),
+                            &(g_kbhook_arr[47].hook_entered),
+                            &(g_kbhook_arr[47].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook48(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[48].arr_len),
+                            &(g_kbhook_arr[48].arr),
+                            &(g_kbhook_arr[48].cur_b),
+                            &(g_kbhook_arr[48].hook_entered),
+                            &(g_kbhook_arr[48].hook_left));
+}
+
+LRESULT CALLBACK
+wbk_kbhook_windows_hook49(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return wbk_kbhook_windows(nCode, wParam, lParam,
+                            &(g_kbhook_arr[49].arr_len),
+                            &(g_kbhook_arr[49].arr),
+                            &(g_kbhook_arr[49].cur_b),
+                            &(g_kbhook_arr[49].hook_entered),
+                            &(g_kbhook_arr[49].hook_left));
 }
 
 wbk_kbdaemon_t *
