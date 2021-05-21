@@ -1,7 +1,7 @@
 # w32bindkeys
 
 ![GitHub](https://img.shields.io/github/license/ritschmaster/w32bindkeys)
-[![Join the chat at https://gitter.im/w32bindkeys/community](https://badges.gitter.im/w32bindkeys/community.svg)](https://gitter.im/w32bindkeys/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Telegram chat](https://img.shields.io/badge/chat-%40w32bindkeys-%2335ADE1?logo=telegram)](https://t.me/w32bindkeys)
 ![GitHub All Releases](https://img.shields.io/github/downloads/ritschmaster/w32bindkeys/total)
 
 xbindkeys for Windows
