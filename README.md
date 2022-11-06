@@ -94,6 +94,8 @@ Then compile and install Collections-C:
 
 Then compile w32bindkeys:
 
+    git clone https://github.com/ritschmaster/w32bindkeys.git
+    cd w32bindkeys
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/mingw64/lib/pkgconfig
     ./autogen.sh
     make
@@ -126,6 +128,8 @@ Then compile and install Collections-C:
 
 Then compile w32bindkeys:
 
+    git clone https://github.com/ritschmaster/w32bindkeys.git
+    cd w32bindkeys
     export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig/
     ./configure --host=x86_64-w64-mingw32
     make
