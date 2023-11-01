@@ -6,6 +6,10 @@
 
 xbindkeys for Windows
 
+## Current state
+
+I have moved on to use macOS exclusively. As a result I completely dropped using xbindkeys/w32bindkeys and also stopped developing w32bindkeys. Therefore I am open to transfer the ownership to anyone who is willing to actively maintain this piece of software. Just write me an e-mail.
+
 ## Using w32bindkeys
 
 ### Using binary releases
